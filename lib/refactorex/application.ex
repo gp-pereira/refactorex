@@ -8,7 +8,7 @@ defmodule Refactorex.Application do
         GenLSP.Buffer,
         [communication: {GenLSP.Communication.TCP, [port: 9000]}]
       },
-      {Refactorex, [buffer: GenLSP.Buffer]},
+      {Refactorex, []}
     ]
 
     opts = [strategy: :one_for_one, name: Refactorex.Supervisor]
