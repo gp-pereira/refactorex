@@ -1,73 +1,66 @@
 defmodule Refactorex do
   use GenLSP
 
+  alias GenLSP.Requests.{
+    Initialize,
+    TextDocumentCodeAction
+  }
 
-  # alias GenLSP.ErrorResponse
+  alias GenLSP.Notifications.{
+    TextDocumentDidOpen,
+    TextDocumentDidChange
+  }
 
-  # alias GenLSP.Enumerations.{
-  #   CodeActionKind,
-  #   DiagnosticSeverity,
-  #   ErrorCodes,
-  #   TextDocumentSyncKind
-  # }
+  alias __MODULE__.Response
 
-  # alias GenLSP.Notifications.{
-  #   Exit,
-  #   Initialized,
-  #   TextDocumentDidChange,
-  #   TextDocumentDidOpen,
-  #   TextDocumentDidSave
-  # }
-
-  # alias GenLSP.Requests.{Initialize, Shutdown, TextDocumentCodeAction}
-
-  # alias GenLSP.Structures.{
-  #   CodeActionContext,
-  #   CodeActionOptions,
-  #   CodeActionParams,
-  #   CodeDescription,
-  #   Diagnostic,
-  #   DidOpenTextDocumentParams,
-  #   InitializeParams,
-  #   InitializeResult,
-  #   Position,
-  #   Range,
-  #   SaveOptions,
-  #   ServerCapabilities,
-  #   TextDocumentIdentifier,
-  #   TextDocumentItem,
-  #   TextDocumentSyncOptions,
-  #   WorkDoneProgressBegin,
-  #   WorkDoneProgressEnd
-  # }
+  require Logger
 
   def start_link(args) do
-    {args, opts} = Keyword.split(args, []) |>IO.inspect()
+    {args, opts} = Keyword.split(args, [])
     GenLSP.start_link(__MODULE__, args, opts)
   end
 
   @impl true
-  def init(lsp, args) do
-    # some_arg = Keyword.fetch!(args, :some_arg)
-    IO.inspect("init called")
-
-    {:ok, lsp}
+  def init(lsp, _args) do
+    Logger.info("Starting Refactorex server")
+    {:ok, assign(lsp, documents: %{})}
   end
 
-  # @impl true
-  # def handle_request(%Initialize{params: %InitializeParams{root_uri: root_uri}}, lsp) do
-  #   IO.inspect("heheh")
+  @impl true
+  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
+    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  end
 
-  #   {:reply,
-  #    %InitializeResult{
-  #      capabilities: %ServerCapabilities{
-  #        text_document_sync: %TextDocumentSyncOptions{
-  #          open_close: true,
-  #          save: %SaveOptions{include_text: true},
-  #          change: TextDocumentSyncKind.full()
-  #        }
-  #      },
-  #      server_info: %{name: "MyLSP"}
-  #    }, assign(lsp, root_uri: root_uri)}
-  # end
+  @impl true
+  def handle_request(%TextDocumentCodeAction{} = r, lsp) do
+    IO.inspect(r.method, label: "request")
+
+    {:reply, Response.code_actions(), lsp}
+  end
+
+  @impl true
+  def handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
+    %{uri: uri, text: text} = params.text_document
+
+    {:noreply, replace_document(lsp, uri, text)}
+  end
+
+  @impl true
+  def handle_notification(%TextDocumentDidChange{params: params}, lsp) do
+    %{uri: uri} = params.text_document
+    [%{text: text}] = params.content_changes
+
+    {:noreply, replace_document(lsp, uri, text)}
+  end
+
+  @impl true
+  def handle_notification(r, lsp) do
+    IO.inspect(r.method, label: "notification")
+    Logger.info("git here")
+
+    {:noreply, lsp}
+  end
+
+  defp replace_document(lsp, uri, text),
+    do: put_in(lsp.assigns.documents[uri], text)
 end
