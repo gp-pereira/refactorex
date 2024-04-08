@@ -1,0 +1,27 @@
+{
+  // Task docs: https://go.microsoft.com/fwlink/?LinkId=733558
+  // I recommned you set some keybindings to run them quickly.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mix test stale",
+      "type": "shell",
+      "command": "mix test --stale",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "mix test",
+      "type": "shell",
+      "command": "mix test",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

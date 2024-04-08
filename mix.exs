@@ -20,7 +20,10 @@ defmodule Refactorex.MixProject do
 
   defp deps do
     [
-      {:gen_lsp, "~> 0.3.0"}
+      {:gen_lsp, "~> 0.3.0"},
+      {:sourceror, "~> 1.0"},
+      # {:diffie, "~> 0.2.0"},
+      {:credo, "~> 1.7.0", only: [:test, :dev], runtime: false}
     ]
   end
 end
