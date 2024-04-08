@@ -1,33 +1,29 @@
-defmodule Refactorex.Refactor.Function.OneLine do
-  use Refactorex.Refactor
+defmodule Refactorex.Refactor.Function.KeywordSyntax do
+  use Refactorex.Refactor,
+    title: "Rewrite function with keyword syntax",
+    kind: "refactor.rewrite"
 
-  def do_refactor(%{node: {:def, _, _}} = zipper, false, position) do
-    if can_refactor?(position, zipper),
-      do: {:halt, one_line_function(zipper), true},
-      else: {:skip, zipper, false}
-  end
-
-  def do_refactor(zipper, bool, _), do: {:cont, zipper, bool}
-
-  defp can_refactor?(%{line: line}, %{node: {:def, meta, _}} = zipper) do
+  def can_refactor?(%{node: {:def, meta, _}} = zipper, %{start: %{line: line}}) do
     cond do
-      # one line functions don't have an :end
+      # keyword functions don't have an :end
       is_nil(meta[:end][:line]) ->
-        false
+        :skip
 
-      # selection start is outside function declaration
+      # range start is outside function declaration
       line < meta[:do][:line] or line > meta[:end][:line] ->
-        false
+        :skip
 
       function_block_has_inner_blocks?(zipper) ->
-        false
+        :skip
 
       true ->
         true
     end
   end
 
-  defp one_line_function(zipper) do
+  def can_refactor?(_, _), do: false
+
+  def refactor(zipper) do
     zipper
     |> Z.update(fn {:def, meta, macro} ->
       {:def, Keyword.drop(meta, [:do, :end]), macro}
