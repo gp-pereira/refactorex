@@ -69,6 +69,26 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
     )
   end
 
+  test "refactors private function" do
+    assert_refactored(
+      KeywordSyntax,
+      """
+      defmodule Foo do
+        #      v
+        defp baz(arg) do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        #      v
+        defp baz(arg), do: arg
+      end
+      """
+    )
+  end
+
   test "ignores multiple block functions " do
     assert_not_refactored(
       KeywordSyntax,

@@ -1,9 +1,13 @@
 defmodule Refactorex.Refactor.Function.KeywordSyntax do
   use Refactorex.Refactor,
-    title: "Rewrite function with keyword syntax",
+    title: "Rewrite function using keyword syntax",
     kind: "refactor.rewrite"
 
-  def can_refactor?(%{node: {:def, meta, _}} = zipper, %{start: %{line: line}}) do
+  defguardp function?(tag) when tag in ~w(def defp)a
+
+  def can_refactor?(%{node: {tag, meta, _}} = zipper, range) when function?(tag) do
+    %{start: %{line: line}} = range
+
     cond do
       # keyword functions don't have an :end
       is_nil(meta[:end][:line]) ->
@@ -25,8 +29,8 @@ defmodule Refactorex.Refactor.Function.KeywordSyntax do
 
   def refactor(zipper) do
     zipper
-    |> Z.update(fn {:def, meta, macro} ->
-      {:def, Keyword.drop(meta, [:do, :end]), macro}
+    |> Z.update(fn {function, meta, macro} ->
+      {function, Keyword.drop(meta, [:do, :end]), macro}
     end)
     |> go_to_function_block()
     |> Z.update(fn {{:__block__, meta, [:do]}, macro} ->
@@ -40,7 +44,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntax do
     |> then(&match?(%{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}}, &1))
   end
 
-  defp go_to_function_block(zipper) do
+  def go_to_function_block(zipper) do
     zipper
     |> Z.down()
     |> Z.right()

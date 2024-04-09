@@ -43,6 +43,26 @@ defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
     )
   end
 
+  test "refactors private function" do
+    assert_refactored(
+      RegularSyntax,
+      """
+      defmodule Foo do
+        #      v
+        defp baz, do: nil
+      end
+      """,
+      """
+      defmodule Foo do
+        #      v
+        defp baz do
+          nil
+        end
+      end
+      """
+    )
+  end
+
   test "ignores regular functions" do
     assert_not_refactored(
       RegularSyntax,

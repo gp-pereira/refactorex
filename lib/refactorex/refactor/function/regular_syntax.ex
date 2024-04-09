@@ -1,10 +1,13 @@
 defmodule Refactorex.Refactor.Function.RegularSyntax do
   use Refactorex.Refactor,
-    title: "Rewrite keyword function with regular syntax",
+    title: "Rewrite keyword function using regular syntax",
     kind: "refactor.rewrite"
 
-  def can_refactor?(%{node: {:def, meta, _}} = zipper, %{start: %{line: line}}) do
+  defguardp function?(tag) when tag in ~w(def defp)a
+
+  def can_refactor?(%{node: {tag, meta, _}} = zipper, range) when function?(tag) do
     %{node: {{:__block__, block_meta, _}, _}} = go_to_function_block(zipper)
+    %{start: %{line: line}} = range
 
     cond do
       # only keyword functions have format tag
@@ -24,8 +27,8 @@ defmodule Refactorex.Refactor.Function.RegularSyntax do
 
   def refactor(zipper) do
     zipper
-    |> Z.update(fn {:def, meta, macro} ->
-      {:def, Keyword.merge(meta, do: [], end: []), macro}
+    |> Z.update(fn {function, meta, macro} ->
+      {function, Keyword.merge(meta, do: [], end: []), macro}
     end)
     |> go_to_function_block()
     |> Z.update(fn {{:__block__, meta, [:do]}, macro} ->
@@ -33,7 +36,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntax do
     end)
   end
 
-  defp go_to_function_block(zipper) do
+  def go_to_function_block(zipper) do
     zipper
     |> Z.down()
     |> Z.right()
