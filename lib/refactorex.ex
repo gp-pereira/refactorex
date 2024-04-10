@@ -3,7 +3,8 @@ defmodule Refactorex do
 
   alias GenLSP.Requests.{
     Initialize,
-    TextDocumentCodeAction
+    TextDocumentCodeAction,
+    CodeActionResolve
   }
 
   alias GenLSP.Notifications.{
@@ -11,7 +12,10 @@ defmodule Refactorex do
     TextDocumentDidChange
   }
 
-  alias __MODULE__.Response
+  alias __MODULE__.{
+    Refactor,
+    Response
+  }
 
   require Logger
 
@@ -27,15 +31,44 @@ defmodule Refactorex do
   end
 
   @impl true
-  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
-    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp),
+    do: {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+
+  @impl true
+  def handle_request(%TextDocumentCodeAction{params: params}, lsp) do
+    case params do
+      %{
+        context: %{trigger_kind: 1},
+        text_document: %{uri: uri},
+        range: range
+      } ->
+        range = update_in(range.start.line, &(&1 + 1))
+        range = update_in(range.end.line, &(&1 + 1))
+
+        {
+          :reply,
+          lsp.assigns.documents[uri]
+          |> Refactor.available_refactorings(range)
+          |> Response.suggest_refactorings(uri, range),
+          lsp
+        }
+
+      _ ->
+        {:reply, [], lsp}
+    end
   end
 
   @impl true
-  def handle_request(%TextDocumentCodeAction{} = r, lsp) do
-    IO.inspect(r.method, label: "request")
+  def handle_request(%CodeActionResolve{params: params}, lsp) do
+    %{module: module, uri: uri, range: range} = atom_map(params.data)
 
-    {:reply, Response.code_actions(), lsp}
+    {
+      :reply,
+      lsp.assigns.documents[uri]
+      |> Refactor.refactor(range, module)
+      |> Response.perform_refactoring(uri),
+      lsp
+    }
   end
 
   @impl true
@@ -54,13 +87,16 @@ defmodule Refactorex do
   end
 
   @impl true
-  def handle_notification(r, lsp) do
-    IO.inspect(r.method, label: "notification")
-    Logger.info("git here")
-
-    {:noreply, lsp}
-  end
+  def handle_notification(_, lsp), do: {:noreply, lsp}
 
   defp replace_document(lsp, uri, text),
     do: put_in(lsp.assigns.documents[uri], text)
+
+  defp atom_map(%{} = map) do
+    map
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), atom_map(v)} end)
+    |> Map.new()
+  end
+
+  defp atom_map(not_map), do: not_map
 end

@@ -13,19 +13,52 @@ defmodule Refactorex.Response do
           save: %Structures.SaveOptions{include_text: true},
           change: Enumerations.TextDocumentSyncKind.full()
         },
-        code_action_provider: true
+        code_action_provider: %Structures.CodeActionOptions{
+          resolve_provider: true
+        }
       }
     }
   end
 
-  def code_actions do
-    [
+  def suggest_refactorings(refactorings, uri, range) do
+    Enum.map(refactorings, fn refactoring ->
       %Structures.CodeAction{
-        title: "my_first_action"
-      },
-      %Structures.CodeAction{
-        title: "my_second_action"
+        title: refactoring.title,
+        kind: refactoring.kind,
+        data: %{
+          module: refactoring.module,
+          range: range,
+          uri: uri
+        }
       }
-    ]
+    end)
+  end
+
+  def perform_refactoring(refactoring, uri) do
+    %Structures.CodeAction{
+      title: refactoring.title,
+      kind: refactoring.kind,
+      edit: %Structures.WorkspaceEdit{
+        changes: %{
+          uri =>
+            Enum.map(
+              refactoring.diffs,
+              &%Structures.TextEdit{
+                new_text: &1.text,
+                range: %Structures.Range{
+                  start: %Structures.Position{
+                    line: &1.range.start.line,
+                    character: &1.range.start.character
+                  },
+                  end: %Structures.Position{
+                    line: &1.range.end.line,
+                    character: &1.range.end.character
+                  }
+                }
+              }
+            )
+        }
+      }
+    }
   end
 end
