@@ -18,10 +18,10 @@ defmodule Refactorex.Diff do
       rest,
       [
         %{
-          text: "#{Enum.join(ins, "\n")}",
+          text: Enum.join(ins, "\n"),
           range: %{
             start: %{
-              line: line,
+              line: line - 1,
               character: 0
             },
             end: %{
@@ -44,11 +44,11 @@ defmodule Refactorex.Diff do
           text: (ins ++ [""]) |> Enum.join("\n"),
           range: %{
             start: %{
-              line: line,
+              line: line - 1,
               character: 0
             },
             end: %{
-              line: line,
+              line: line - 1,
               character: 0
             }
           }
@@ -67,7 +67,7 @@ defmodule Refactorex.Diff do
           text: "",
           range: %{
             start: %{
-              line: line,
+              line: line - 1,
               character: 0
             },
             end: %{

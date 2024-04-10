@@ -21,7 +21,7 @@ defmodule Refactorex.DiffTest do
              %{
                text: " def bar(arg), do: arg",
                range: %{
-                 start: %{line: 2, character: 0},
+                 start: %{line: 1, character: 0},
                  end: %{line: 3, character: 4}
                }
              }
@@ -50,8 +50,8 @@ defmodule Refactorex.DiffTest do
              %{
                text: "\n def baz(arg) do\n   arg + 10\n end\n",
                range: %{
-                 start: %{line: 4, character: 0},
-                 end: %{line: 4, character: 0}
+                 start: %{line: 3, character: 0},
+                 end: %{line: 3, character: 0}
                }
              }
            ]
@@ -79,7 +79,7 @@ defmodule Refactorex.DiffTest do
              %{
                text: "",
                range: %{
-                 start: %{line: 4, character: 0},
+                 start: %{line: 3, character: 0},
                  end: %{line: 7, character: 4}
                }
              }
