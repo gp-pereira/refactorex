@@ -1,8 +1,10 @@
 defmodule Refactorex.Refactoring do
   defstruct [
+    # This will be the Refactor responsible for the refactoring
+    :module,
     # This will be the code action name that appears to the user
     :title,
-    # This will be used to same category refactors on menus
+    # This will be used to group same category refactors on menus
     # - quickfix
     # - refactor
     # - refactor.extract

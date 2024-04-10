@@ -144,7 +144,7 @@
           {Credo.Check.Refactor.AppendSingleItem, []},
           {Credo.Check.Refactor.DoubleBooleanNegation, []},
           {Credo.Check.Refactor.FilterReject, []},
-          {Credo.Check.Refactor.IoPuts, false},
+          {Credo.Check.Refactor.IoPuts, []},
           {Credo.Check.Refactor.RejectFilter, []},
           {Credo.Check.Refactor.NegatedIsNil, []},
           # {Credo.Check.Refactor.MapMap, []},

@@ -10,40 +10,39 @@ defmodule Refactorex.Refactor do
 
       @behaviour Refactorex.Refactor
 
-      def refactor(text, t, opts \\ []) do
-        case Sourceror.parse_string(text) do
-          {:ok, macro} ->
-            macro
-            |> Z.zip()
-            |> Z.traverse_while(false, &maybe_refactor(&1, &2, t))
-            |> then(fn {zipper, refactored?} ->
-              if opts[:raw],
-                do: {zipper.node, refactored?},
-                else: {Sourceror.to_string(zipper.node), refactored?}
-            end)
-        end
+      def available?(zipper, range) do
+        zipper
+        |> Z.traverse_while(false, &visit(&1, &2, range, false))
+        |> then(fn {_, available?} -> available? end)
+      end
+
+      def refactor(zipper, range) do
+        zipper
+        |> Z.traverse_while(false, &visit(&1, &2, range, true))
+        |> then(fn {%{node: node}, true} -> Sourceror.to_string(node) end)
       end
 
       @docs """
-      Disabled because some Refactors don't return all three types
+      Disabled because some Refactors don't return all three atoms
       """
-      @dialyzer {:no_match, maybe_refactor: 3}
+      @dialyzer {:no_match, visit: 4}
 
-      defp maybe_refactor(zipper, false, t) do
-        case can_refactor?(zipper, t) do
+      defp visit(zipper, false, range, refactor?) do
+        case can_refactor?(zipper, range) do
           :skip ->
             {:skip, zipper, false}
 
-          true ->
-            {:halt, refactor(zipper), true}
-
           false ->
             {:cont, zipper, false}
+
+          true ->
+            {:halt, if(refactor?, do: refactor(zipper), else: zipper), true}
         end
       end
 
-      def identify_refactor(diffs) do
+      def refactoring(diffs \\ []) do
         %Refactorex.Refactoring{
+          module: __MODULE__,
           title: unquote(Keyword.fetch!(attrs, :title)),
           kind: unquote(Keyword.fetch!(attrs, :kind)),
           diffs: diffs
@@ -52,21 +51,36 @@ defmodule Refactorex.Refactor do
     end
   end
 
-  def available_refactorings(original, range, modules \\ refactors()) do
-    modules
-    |> Stream.map(&{&1, &1.refactor(original, range)})
-    |> Stream.filter(&match?({_, {_, true}}, &1))
-    |> Enum.map(fn {m, {refactored, _}} ->
-      original
-      |> Refactorex.Diff.find_diffs(refactored)
-      |> m.identify_refactor()
-    end)
+  @refactors [
+    __MODULE__.Function.KeywordSyntax,
+    __MODULE__.Function.RegularSyntax
+  ]
+
+  def available_refactorings(original, range, modules \\ @refactors) do
+    case Sourceror.parse_string(original)  do
+      {:ok, macro} ->
+        zipper = Sourceror.Zipper.zip(macro)
+
+        modules
+        |> Stream.map(&{&1, &1.available?(zipper, range)})
+        |> Stream.filter(&match?({_, true}, &1))
+        |> Enum.map(fn {module, _} -> module.refactoring() end)
+
+      # this error means the file could not be parsed,
+      # so there are no refactorings available for it
+      {:error, _} ->
+        []
+    end
   end
 
-  defp refactors do
-    [
-      __MODULE__.Function.KeywordSyntax,
-      __MODULE__.Function.RegularSyntax
-    ]
+  def refactor(original, range, module) do
+    module = String.to_atom(module)
+
+    original
+    |> Sourceror.parse_string!()
+    |> Sourceror.Zipper.zip()
+    |> module.refactor(range)
+    |> then(&Refactorex.Diff.find_diffs(original, &1))
+    |> module.refactoring()
   end
 end

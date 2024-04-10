@@ -6,19 +6,27 @@ defmodule Refactorex.RefactorCase do
       use ExUnit.Case, unquote(opts)
 
       import Refactorex.RefactorCase
+
+      require Logger
     end
   end
 
   defmacro assert_refactored(module, original, expected, opts \\ []) do
     quote do
       module = unquote(module)
-      original = String.trim(unquote(original))
-      expected = String.trim(unquote(expected))
       opts = unquote(opts)
 
-      if opts[:range], do: IO.puts("Range: #{inspect(range(original))}")
+      original = String.trim(unquote(original))
+      expected = String.trim(unquote(expected))
 
-      assert {refactored, true} = module.refactor(original, range(original))
+      zipper = original |> Sourceror.parse_string!() |> Sourceror.Zipper.zip()
+      range = original |> range()
+
+      if opts[:range], do: Logger.info("Range: #{inspect(range)}")
+
+      assert true == module.available?(zipper, range)
+
+      refactored = module.refactor(zipper, range(original))
 
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
@@ -33,7 +41,9 @@ defmodule Refactorex.RefactorCase do
       module = unquote(module)
       original = String.trim(unquote(original))
 
-      assert module.refactor(original, range(original)) == {original, false}
+      zipper = original |> Sourceror.parse_string!() |> Sourceror.Zipper.zip()
+
+      assert false == module.available?(zipper, range(original))
     end
   end
 
