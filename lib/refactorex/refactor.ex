@@ -42,13 +42,31 @@ defmodule Refactorex.Refactor do
         end
       end
 
-      def identify_refactor(text) do
-        %{
-          text: text,
+      def identify_refactor(diffs) do
+        %Refactorex.Refactoring{
           title: unquote(Keyword.fetch!(attrs, :title)),
-          kind: unquote(Keyword.fetch!(attrs, :kind))
+          kind: unquote(Keyword.fetch!(attrs, :kind)),
+          diffs: diffs
         }
       end
     end
+  end
+
+  def available_refactorings(original, range, modules \\ refactors()) do
+    modules
+    |> Stream.map(&{&1, &1.refactor(original, range)})
+    |> Stream.filter(&match?({_, {_, true}}, &1))
+    |> Enum.map(fn {m, {refactored, _}} ->
+      original
+      |> Refactorex.Diff.find_diffs(refactored)
+      |> m.identify_refactor()
+    end)
+  end
+
+  defp refactors do
+    [
+      __MODULE__.Function.KeywordSyntax,
+      __MODULE__.Function.RegularSyntax
+    ]
   end
 end
