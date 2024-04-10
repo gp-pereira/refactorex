@@ -1,11 +1,11 @@
-defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
+defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Function.RegularSyntax
+  alias Refactorex.Refactor.Function.UseRegularSyntax
 
   test "refactors keyword function with regular syntax" do
     assert_refactored(
-      RegularSyntax,
+      UseRegularSyntax,
       """
       defmodule Foo do
         #      v
@@ -25,7 +25,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
 
   test "refactors function with zero arguments and no return " do
     assert_refactored(
-      RegularSyntax,
+      UseRegularSyntax,
       """
       defmodule Foo do
         #      v
@@ -45,7 +45,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
 
   test "refactors private function" do
     assert_refactored(
-      RegularSyntax,
+      UseRegularSyntax,
       """
       defmodule Foo do
         #      v
@@ -65,7 +65,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
 
   test "ignores regular functions" do
     assert_not_refactored(
-      RegularSyntax,
+      UseRegularSyntax,
       """
       defmodule Foo do
         #     v
@@ -79,7 +79,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntaxTest do
 
   test "ignores functions outside range" do
     assert_not_refactored(
-      RegularSyntax,
+      UseRegularSyntax,
       """
       defmodule Foo do
         def bar(arg), do: arg

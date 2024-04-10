@@ -88,7 +88,7 @@ defmodule RefactorexServerTest do
           "title" => "Rewrite function using keyword syntax",
           "kind" => "refactor.rewrite",
           "data" => %{
-            "module" => "Elixir.Refactorex.Refactor.Function.KeywordSyntax",
+            "module" => "Elixir.Refactorex.Refactor.Function.UseKeywordSyntax",
             "uri" => ^file_uri,
             "range" => %{
               "start" => %{"line" => 2, "character" => 4},

@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Function.RegularSyntax do
+defmodule Refactorex.Refactor.Function.UseRegularSyntax do
   use Refactorex.Refactor,
     title: "Rewrite keyword function using regular syntax",
     kind: "refactor.rewrite"
@@ -15,7 +15,7 @@ defmodule Refactorex.Refactor.Function.RegularSyntax do
         :skip
 
       # range start is outside function declaration
-      line < meta[:line] or line > block_meta[:line] ->
+      line < meta[:line] or line > meta[:line] ->
         :skip
 
       true ->

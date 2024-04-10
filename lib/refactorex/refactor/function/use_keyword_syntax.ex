@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Function.KeywordSyntax do
+defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
   use Refactorex.Refactor,
     title: "Rewrite function using keyword syntax",
     kind: "refactor.rewrite"
@@ -14,7 +14,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntax do
         :skip
 
       # range start is outside function declaration
-      line < meta[:do][:line] or line > meta[:end][:line] ->
+      line < meta[:do][:line] or line > meta[:do][:line] ->
         :skip
 
       function_block_has_inner_blocks?(zipper) ->

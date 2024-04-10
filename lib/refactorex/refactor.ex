@@ -52,12 +52,12 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
-    __MODULE__.Function.KeywordSyntax,
-    __MODULE__.Function.RegularSyntax
+    __MODULE__.Function.UseKeywordSyntax,
+    __MODULE__.Function.UseRegularSyntax
   ]
 
   def available_refactorings(original, range, modules \\ @refactors) do
-    case Sourceror.parse_string(original)  do
+    case Sourceror.parse_string(original) do
       {:ok, macro} ->
         zipper = Sourceror.Zipper.zip(macro)
 

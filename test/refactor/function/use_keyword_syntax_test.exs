@@ -1,11 +1,11 @@
-defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
+defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Function.KeywordSyntax
+  alias Refactorex.Refactor.Function.UseKeywordSyntax
 
   test "refactors function with keyword syntax" do
     assert_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       defmodule Foo do
         def bar(arg) do
@@ -33,7 +33,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "refactors function with zero arguments and no return " do
     assert_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       #    v
       def baz do
@@ -48,7 +48,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "refactors function with a single multiline map" do
     assert_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       #    v
       def baz do
@@ -71,7 +71,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "refactors private function" do
     assert_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       defmodule Foo do
         #      v
@@ -91,7 +91,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "ignores multiple block functions " do
     assert_not_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       defmodule Foo do
         #    v
@@ -106,7 +106,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "ignores keyword functions" do
     assert_not_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       defmodule Foo do
         #     v
@@ -118,7 +118,7 @@ defmodule Refactorex.Refactor.Function.KeywordSyntaxTest do
 
   test "ignores functions outside range" do
     assert_not_refactored(
-      KeywordSyntax,
+      UseKeywordSyntax,
       """
       #      v
       defmodule Foo do
