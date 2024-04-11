@@ -87,4 +87,14 @@ defmodule Refactorex.RefactorCase do
         }
     end)
   end
+
+  def print_tree(text) do
+    IO.puts("")
+
+    text
+    |> Sourceror.parse_string!()
+    |> Refactorex.TreePrinter.print()
+
+    text
+  end
 end
