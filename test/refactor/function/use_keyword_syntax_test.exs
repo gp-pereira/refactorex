@@ -24,7 +24,6 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
           arg
         end
 
-        #      v
         def baz(arg1, arg2 \\\\ nil), do: bar(arg1) + arg2
       end
       """
@@ -40,7 +39,6 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
       end
       """,
       """
-      #    v
       def baz, do: nil
       """
     )
@@ -59,13 +57,13 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
        end
       """,
       """
-      #    v
       def baz,
         do: %{
           username: "gp-pereira",
           language: "pt-BR"
         }
-      """
+      """,
+      range: true
     )
   end
 
@@ -82,7 +80,6 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
       """,
       """
       defmodule Foo do
-        #      v
         defp baz(arg), do: arg
       end
       """

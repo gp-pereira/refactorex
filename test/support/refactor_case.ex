@@ -19,14 +19,19 @@ defmodule Refactorex.RefactorCase do
       original = String.trim(unquote(original))
       expected = String.trim(unquote(expected))
 
-      zipper = original |> Sourceror.parse_string!() |> Sourceror.Zipper.zip()
-      range = original |> range()
+      range = range(original)
+
+      zipper =
+        original
+        |> String.replace(~r/\t*#(?:\s*[v^])\n/, "")
+        |> Sourceror.parse_string!()
+        |> Sourceror.Zipper.zip()
 
       if opts[:range], do: Logger.info("Range: #{inspect(range)}")
 
       assert true == module.available?(zipper, range)
 
-      refactored = module.refactor(zipper, range(original))
+      refactored = module.refactor(zipper, range)
 
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
@@ -41,7 +46,11 @@ defmodule Refactorex.RefactorCase do
       module = unquote(module)
       original = String.trim(unquote(original))
 
-      zipper = original |> Sourceror.parse_string!() |> Sourceror.Zipper.zip()
+      zipper =
+        original
+        |> String.replace(~r/\t*#(?:\s*[v^])\n/, "")
+        |> Sourceror.parse_string!()
+        |> Sourceror.Zipper.zip()
 
       assert false == module.available?(zipper, range(original))
     end
@@ -49,7 +58,6 @@ defmodule Refactorex.RefactorCase do
 
   def range(text) do
     text
-    |> String.trim()
     |> String.split("\n")
     |> Enum.with_index()
     |> Enum.filter(fn {text, _} -> Regex.match?(~r/\s*#(?:\s*[v^])/, text) end)
@@ -57,11 +65,11 @@ defmodule Refactorex.RefactorCase do
       [{text, line}] ->
         %{
           start: %{
-            line: line + 2,
+            line: line + 1,
             character: String.length(text)
           },
           end: %{
-            line: line + 2,
+            line: line + 1,
             character: String.length(text)
           }
         }
@@ -69,7 +77,7 @@ defmodule Refactorex.RefactorCase do
       [{start_text, start_line}, {end_text, end_line}] ->
         %{
           start: %{
-            line: start_line + 2,
+            line: start_line + 1,
             character: String.length(start_text)
           },
           end: %{

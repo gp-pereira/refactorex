@@ -14,7 +14,6 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
       """,
       """
       defmodule Foo do
-        #      v
         def baz(arg1, arg2 \\\\ nil) do
           bar(arg1) + arg2
         end
@@ -34,7 +33,6 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
       """,
       """
       defmodule Foo do
-        #      v
         def baz do
           nil
         end
@@ -54,7 +52,6 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
       """,
       """
       defmodule Foo do
-        #      v
         defp baz do
           nil
         end
