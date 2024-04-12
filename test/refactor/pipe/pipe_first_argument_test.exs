@@ -1,7 +1,7 @@
-defmodule Refactorex.Refactor.Function.PipeFirstArgumentTest do
+defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Function.PipeFirstArgument
+  alias Refactorex.Refactor.Pipe.PipeFirstArgument
 
   test "pipes the first argument into the function" do
     assert_refactored(
