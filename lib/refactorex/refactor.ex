@@ -52,6 +52,7 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
+    __MODULE__.Function.PipeFirstArgument,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax
   ]
