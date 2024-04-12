@@ -44,6 +44,25 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
     )
   end
 
+  test "refactors function with single statement that spans several blocks" do
+    assert_refactored(
+      UseKeywordSyntax,
+      """
+      defmodule Foo do
+        #    v
+        def parse(%{"arg" => arg}) do
+          {:ok, %{arg: arg}}
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def parse(%{"arg" => arg}), do: {:ok, %{arg: arg}}
+      end
+      """
+    )
+  end
+
   test "refactors function with a single multiline map" do
     assert_refactored(
       UseKeywordSyntax,
@@ -62,8 +81,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
           username: "gp-pereira",
           language: "pt-BR"
         }
-      """,
-      range: true
+      """
     )
   end
 
@@ -86,15 +104,16 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
     )
   end
 
-  test "ignores multiple block functions " do
+  test "ignores multiple statements functions " do
     assert_not_refactored(
       UseKeywordSyntax,
       """
       defmodule Foo do
         #    v
         def baz(arg) do
-          arg
-          arg + 1
+          foo1(arg)
+          foo2(arg)
+          foo(arg)
         end
       end
       """

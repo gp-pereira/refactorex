@@ -41,7 +41,16 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
   defp function_block_has_inner_blocks?(zipper) do
     zipper
     |> go_to_function_block()
-    |> then(&match?(%{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}}, &1))
+    |> then(fn
+      %{node: {{:__block__, _, _}, {:__block__, _, [{{:__block__, _, _}, _} | _]}}} ->
+        false
+
+      %{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}} ->
+        true
+
+      _ ->
+        false
+    end)
   end
 
   def go_to_function_block(zipper) do
