@@ -3,9 +3,9 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
     title: "Rewrite keyword function using regular syntax",
     kind: "refactor.rewrite"
 
-  defguardp function?(tag) when tag in ~w(def defp)a
+  import Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {tag, meta, _}} = zipper, range) when function?(tag) do
+  def can_refactor?(%{node: {id, meta, _}} = zipper, range) when function_id?(id) do
     %{node: {{:__block__, block_meta, _}, _}} = go_to_function_block(zipper)
     %{start: %{line: line}} = range
 
@@ -34,12 +34,5 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
     |> Z.update(fn {{:__block__, meta, [:do]}, macro} ->
       {{:__block__, Keyword.drop(meta, [:format]), [:do]}, macro}
     end)
-  end
-
-  def go_to_function_block(zipper) do
-    zipper
-    |> Z.down()
-    |> Z.right()
-    |> Z.down()
   end
 end

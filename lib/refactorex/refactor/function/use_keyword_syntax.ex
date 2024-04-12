@@ -3,21 +3,21 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
     title: "Rewrite function using keyword syntax",
     kind: "refactor.rewrite"
 
-  defguardp function?(tag) when tag in ~w(def defp)a
+  import Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {tag, meta, _}} = zipper, range) when function?(tag) do
+  def can_refactor?(%{node: {id, meta, _}} = zipper, range) when function_id?(id) do
     %{start: %{line: line}} = range
 
     cond do
       # keyword functions don't have an :end
-      is_nil(meta[:end][:line]) ->
+      is_nil(meta[:end]) ->
         :skip
 
       # range start is outside function declaration
-      line < meta[:do][:line] or line > meta[:do][:line] ->
+      line < meta[:line] or line > meta[:line] ->
         :skip
 
-      function_block_has_inner_blocks?(zipper) ->
+      function_has_multiple_statements?(zipper) ->
         :skip
 
       true ->
@@ -29,8 +29,8 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
 
   def refactor(zipper) do
     zipper
-    |> Z.update(fn {function, meta, macro} ->
-      {function, Keyword.drop(meta, [:do, :end]), macro}
+    |> Z.update(fn {id, meta, macro} ->
+      {id, Keyword.drop(meta, [:do, :end]), macro}
     end)
     |> go_to_function_block()
     |> Z.update(fn {{:__block__, meta, [:do]}, macro} ->
@@ -38,7 +38,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
     end)
   end
 
-  defp function_block_has_inner_blocks?(zipper) do
+  defp function_has_multiple_statements?(zipper) do
     zipper
     |> go_to_function_block()
     |> then(fn
@@ -51,12 +51,5 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
       _ ->
         false
     end)
-  end
-
-  def go_to_function_block(zipper) do
-    zipper
-    |> Z.down()
-    |> Z.right()
-    |> Z.down()
   end
 end

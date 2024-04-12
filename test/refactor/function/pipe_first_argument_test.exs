@@ -144,6 +144,26 @@ defmodule Refactorex.Refactor.Function.PipeFirstArgumentTest do
     )
   end
 
+  test "pipes function into case block" do
+    assert_refactored(
+      PipeFirstArgument,
+      """
+      #   v
+      case list do
+        [] -> :empty
+        _ -> :not_empty
+      end
+      """,
+      """
+      list
+      |> case do
+        [] -> :empty
+        _ -> :not_empty
+      end
+      """
+    )
+  end
+
   test "ignores already piped functions" do
     assert_not_refactored(
       PipeFirstArgument,
@@ -221,7 +241,6 @@ defmodule Refactorex.Refactor.Function.PipeFirstArgumentTest do
     )
   end
 
-  @tag :debug
   test "ignores function declara22tions" do
     assert_not_refactored(
       PipeFirstArgument,

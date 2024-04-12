@@ -3,6 +3,8 @@ defmodule Refactorex.Refactor.Function.PipeFirstArgument do
     title: "Pipe first argument into function",
     kind: "refactor.rewrite"
 
+  import Refactorex.Refactor.Function
+
   def can_refactor?(%{node: {_, _, []}}, _), do: false
 
   def can_refactor?(%{node: {id, _, _}}, _)
@@ -13,13 +15,10 @@ defmodule Refactorex.Refactor.Function.PipeFirstArgument do
     %{start: %{line: line}} = range
 
     cond do
-      is_nil(meta[:closing]) ->
-        false
-
       line < meta[:line] or line > meta[:line] ->
         false
 
-      outside_function_call?(zipper, range) ->
+      not can_pipe_into?(zipper.node, range) ->
         false
 
       invalid_parent?(zipper) ->
@@ -56,26 +55,6 @@ defmodule Refactorex.Refactor.Function.PipeFirstArgument do
     end)
   end
 
-  defp outside_function_call?(%{node: {:., _, [Access | _]}}, _), do: true
-
-  defp outside_function_call?(%{node: {id, meta, _}}, range) when is_atom(id),
-    do: outside_function_call?([id], meta, range)
-
-  defp outside_function_call?(%{node: {{:., _, [{id, _, nil}, _]}, meta, _}}, range),
-    do: outside_function_call?([id], meta, range)
-
-  defp outside_function_call?(%{node: {{:., _, [{_, _, aliases}, _]}, meta, _}}, range),
-    do: outside_function_call?(aliases, meta, range)
-
-  defp outside_function_call?(_, _), do: true
-
-  defp outside_function_call?(ids, meta, %{start: %{character: c}}) do
-    id_length =
-      ids
-      |> Enum.map(&Atom.to_string/1)
-      |> Enum.join(".")
-      |> String.length()
-
-    c < meta[:column] - id_length or c > meta[:closing][:column]
-  end
+  defp can_pipe_into?({:case, _, _}, _), do: true
+  defp can_pipe_into?(node, range), do: function_call?(node, range)
 end
