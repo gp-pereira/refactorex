@@ -1,6 +1,8 @@
 defmodule Refactorex.Refactor.Function do
   alias Sourceror.Zipper, as: Z
 
+  import Refactorex.Refactor.Range
+
   defguard function_id?(id) when id in ~w(def defp)a
 
   def go_to_function_block(%{node: {id, _, _}} = zipper) when function_id?(id) do
@@ -25,19 +27,24 @@ defmodule Refactorex.Refactor.Function do
 
   def function_call?(_, _), do: false
 
-  defp function_call?(ids, meta, range) do
+  defp function_call?(aliases, meta, range) do
+    # this is the most important tag to
+    # determine if the node is a function
     if is_nil(meta[:closing]) do
       false
     else
-      %{start: %{character: s}} = range
-
-      id_length =
-        ids
+      # Knowing that the node is indeed a function,
+      # move its start column to before its aliases
+      # and check if the range is inside of it
+      aliases_length =
+        aliases
         |> Enum.map(&Atom.to_string/1)
         |> Enum.join(".")
         |> String.length()
 
-      s >= meta[:column] - id_length and s <= meta[:closing][:column]
+      meta = Keyword.update!(meta, :column, &(&1 - aliases_length))
+
+      range_inside_of?(range, meta, meta[:closing])
     end
   end
 end

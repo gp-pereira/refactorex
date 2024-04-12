@@ -7,15 +7,13 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
 
   def can_refactor?(%{node: {id, meta, _}} = zipper, range) when function_id?(id) do
     %{node: {{:__block__, block_meta, _}, _}} = go_to_function_block(zipper)
-    %{start: %{line: line}} = range
 
     cond do
       # only keyword functions have format tag
       block_meta[:format] != :keyword ->
         :skip
 
-      # range start is outside function declaration
-      line < meta[:line] or line > meta[:line] ->
+      not same_start_line?(range, meta) ->
         :skip
 
       true ->

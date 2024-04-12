@@ -8,6 +8,8 @@ defmodule Refactorex.Refactor do
     quote do
       alias Sourceror.Zipper, as: Z
 
+      import Refactorex.Refactor.Range
+
       @behaviour Refactorex.Refactor
 
       def available?(zipper, range) do
