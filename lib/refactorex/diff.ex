@@ -72,7 +72,7 @@ defmodule Refactorex.Diff do
             },
             end: %{
               line: line + length(del) - 1,
-              character: del |> List.last() |> String.length()
+              character: 0
             }
           }
         }

@@ -80,7 +80,7 @@ defmodule Refactorex.DiffTest do
                text: "",
                range: %{
                  start: %{line: 3, character: 0},
-                 end: %{line: 7, character: 4}
+                 end: %{line: 7, character: 0}
                }
              }
            ]
