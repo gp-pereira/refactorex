@@ -11,14 +11,12 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgument do
       when id in [:%{}, :__block__, :fn],
       do: false
 
-  def can_refactor?(%{node: {_, meta, _}} = zipper, range) do
-    %{start: %{line: line}} = range
-
+  def can_refactor?(%{node: {_, meta, _} = node} = zipper, range) do
     cond do
-      line < meta[:line] or line > meta[:line] ->
+      not same_start_line?(range, meta) ->
         false
 
-      not can_pipe_into?(zipper.node, range) ->
+      not can_pipe_into?(node, range) ->
         false
 
       invalid_parent?(zipper) ->

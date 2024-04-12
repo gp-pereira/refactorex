@@ -144,7 +144,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
     )
   end
 
-  test "pipes function into case block" do
+  test "pipes argument into case block" do
     assert_refactored(
       PipeFirstArgument,
       """
@@ -160,6 +160,29 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
         [] -> :empty
         _ -> :not_empty
       end
+      """
+    )
+  end
+
+  test "pipes argument into multiline function" do
+    assert_refactored(
+      PipeFirstArgument,
+      """
+      #  v
+      post(
+        payment
+        |> client(),
+        "/payments",
+        Sale.format(payment)
+      )
+      """,
+      """
+      payment
+      |> client()
+      |> post(
+        "/payments",
+        Sale.format(payment)
+      )
       """
     )
   end
@@ -241,7 +264,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
     )
   end
 
-  test "ignores function declara22tions" do
+  test "ignores function declaration with when clause" do
     assert_not_refactored(
       PipeFirstArgument,
       """
