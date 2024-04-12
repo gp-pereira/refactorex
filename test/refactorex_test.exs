@@ -1,4 +1,4 @@
-defmodule RefactorexServerTest do
+defmodule RefactorexTest do
   use ExUnit.Case, async: true
 
   import GenLSP.Test
