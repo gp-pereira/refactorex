@@ -1,12 +1,14 @@
 defmodule Refactorex.Application do
   use Application
 
+  @default_port 6890
+
   @impl true
-  def start(_type, _args) do
+  def start(_, _) do
     children = [
       {
         GenLSP.Buffer,
-        [communication: {GenLSP.Communication.TCP, [port: 9000]}]
+        [communication: {GenLSP.Communication.TCP, [port: port()]}]
       },
       {Refactorex, []}
     ]
@@ -14,5 +16,12 @@ defmodule Refactorex.Application do
     opts = [strategy: :one_for_one, name: Refactorex.Supervisor]
 
     Supervisor.start_link(children, opts)
+  end
+
+  defp port do
+    System.argv()
+    |> OptionParser.parse(strict: [port: :integer])
+    |> elem(0)
+    |> Keyword.get(:port, @default_port)
   end
 end
