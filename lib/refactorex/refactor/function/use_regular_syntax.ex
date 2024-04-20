@@ -5,7 +5,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
 
   import Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {id, meta, _}} = zipper, range) when function_id?(id) do
+  def can_refactor?(%{node: {id, _, _} = node} = zipper, range) when function_id?(id) do
     %{node: {{:__block__, block_meta, _}, _}} = go_to_function_block(zipper)
 
     cond do
@@ -13,7 +13,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
       block_meta[:format] != :keyword ->
         :skip
 
-      not same_start_line?(range, meta) ->
+      not SelectionRange.starts_on_node_line?(range, node) ->
         :skip
 
       true ->

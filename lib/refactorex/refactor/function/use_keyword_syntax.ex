@@ -5,13 +5,13 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
 
   import Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {id, meta, _}} = zipper, range) when function_id?(id) do
+  def can_refactor?(%{node: {id, meta, _} = node} = zipper, range) when function_id?(id) do
     cond do
       # keyword functions don't have :do tag
       is_nil(meta[:do]) ->
         :skip
 
-      not range_inside_of?(range, meta, meta[:do]) ->
+      not SelectionRange.starts_on_node_line?(range, node) ->
         :skip
 
       function_has_multiple_statements?(zipper) ->

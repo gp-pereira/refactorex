@@ -3,7 +3,8 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgument do
     title: "Pipe first argument into function",
     kind: "refactor.rewrite"
 
-  import Refactorex.Refactor.Function
+  import Sourceror.Identifier
+  require Logger
 
   def can_refactor?(%{node: {_, _, []}}, _), do: false
 
@@ -11,12 +12,12 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgument do
       when id in [:%{}, :__block__, :fn],
       do: false
 
-  def can_refactor?(%{node: {_, meta, _} = node} = zipper, range) do
+  def can_refactor?(%{node: {_, _, _} = node} = zipper, range) do
     cond do
-      not same_start_line?(range, meta) ->
+      not SelectionRange.starts_on_node_line?(range, node) ->
         false
 
-      not can_pipe_into?(node, range) ->
+      not can_pipe_into?(node) ->
         false
 
       invalid_parent?(zipper) ->
@@ -53,6 +54,10 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgument do
     end)
   end
 
-  defp can_pipe_into?({:case, _, _}, _), do: true
-  defp can_pipe_into?(node, range), do: function_call?(node, range)
+  defp can_pipe_into?({{:., _, [Access | _]}, _, _}), do: false
+  defp can_pipe_into?({:., _, [Access | _]}), do: false
+  defp can_pipe_into?({:case, _, _}), do: true
+
+  defp can_pipe_into?({_, meta, _} = node),
+    do: !!meta[:closing] and is_call(node)
 end

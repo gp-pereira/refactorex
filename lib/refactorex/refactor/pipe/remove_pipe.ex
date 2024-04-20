@@ -3,8 +3,8 @@ defmodule Refactorex.Refactor.Pipe.RemovePipe do
     title: "Remove pipe",
     kind: "refactor.rewrite"
 
-  def can_refactor?(%{node: {:|>, meta, _}}, range),
-    do: same_start_line?(range, meta)
+  def can_refactor?(%{node: {:|>, _, _} = node}, range),
+    do: SelectionRange.starts_on_node_line?(range, node)
 
   def can_refactor?(_, _), do: false
 

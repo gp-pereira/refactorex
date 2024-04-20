@@ -6,9 +6,8 @@ defmodule Refactorex.Refactor do
 
   defmacro __using__(attrs) do
     quote do
+      alias Refactorex.Refactor.SelectionRange
       alias Sourceror.Zipper, as: Z
-
-      import Refactorex.Refactor.Range
 
       @behaviour Refactorex.Refactor
 

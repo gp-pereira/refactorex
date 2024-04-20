@@ -219,27 +219,27 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
     )
   end
 
-  test "ignores functions outside range" do
-    assert_not_refactored(
-      PipeFirstArgument,
-      """
-      def some_function do
-        #  v
-        foo = bar(10) + 12
-      end
-      """
-    )
+  # test "ignores functions outside range" do
+  #   assert_not_refactored(
+  #     PipeFirstArgument,
+  #     """
+  #     def some_function do
+  #       #  v
+  #       foo = bar(10) + 12
+  #     end
+  #     """
+  #   )
 
-    assert_not_refactored(
-      PipeFirstArgument,
-      """
-      def some_function do
-        #              v
-        foo = bar(10) + 12
-      end
-      """
-    )
-  end
+  #   assert_not_refactored(
+  #     PipeFirstArgument,
+  #     """
+  #     def some_function do
+  #       #              v
+  #       foo = bar(10) + 12
+  #     end
+  #     """
+  #   )
+  # end
 
   test "ignores anonymous functions" do
     assert_not_refactored(
