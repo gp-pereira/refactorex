@@ -1,6 +1,8 @@
 defmodule Refactorex.RefactorCase do
   use ExUnit.CaseTemplate
 
+  @marker_regex ~r/\s*#\s*[v\^]/
+
   using(opts) do
     quote do
       use ExUnit.Case, unquote(opts)
@@ -19,13 +21,8 @@ defmodule Refactorex.RefactorCase do
       original = String.trim(unquote(original))
       expected = String.trim(unquote(expected))
 
-      range = range(original)
-
-      zipper =
-        original
-        |> String.replace(~r/\t*#(?:\s*[v^])\n/, "")
-        |> Sourceror.parse_string!()
-        |> Sourceror.Zipper.zip()
+      range = range_from_markers(original)
+      zipper = text_to_zipper(original)
 
       if opts[:range], do: Logger.info("Range: #{inspect(range)}")
 
@@ -44,23 +41,19 @@ defmodule Refactorex.RefactorCase do
   defmacro assert_not_refactored(module, original, _opts \\ []) do
     quote do
       module = unquote(module)
-      original = String.trim(unquote(original))
+      original = unquote(original)
 
-      zipper =
-        original
-        |> String.replace(~r/\t*#(?:\s*[v^])\n/, "")
-        |> Sourceror.parse_string!()
-        |> Sourceror.Zipper.zip()
+      range = range_from_markers(original)
 
-      assert false == module.available?(zipper, range(original))
+      assert false == module.available?(text_to_zipper(original), range)
     end
   end
 
-  def range(text) do
+  def range_from_markers(text) do
     text
     |> String.split("\n")
     |> Enum.with_index()
-    |> Enum.filter(fn {text, _} -> Regex.match?(~r/\s*#(?:\s*[v^])/, text) end)
+    |> Enum.filter(fn {text, _} -> String.match?(text, @marker_regex) end)
     |> then(fn
       [{text, line}] ->
         %{
@@ -81,7 +74,7 @@ defmodule Refactorex.RefactorCase do
             character: String.length(start_text)
           },
           end: %{
-            line: end_line,
+            line: end_line - 1,
             character: String.length(end_text)
           }
         }
@@ -92,9 +85,18 @@ defmodule Refactorex.RefactorCase do
     IO.puts("")
 
     text
-    |> Sourceror.parse_string!()
+    |> text_to_zipper()
     |> Refactorex.TreePrinter.print()
 
     text
+  end
+
+  def text_to_zipper(original) do
+    original
+    |> String.split("\n")
+    |> Enum.reject(&String.match?(&1, @marker_regex))
+    |> Enum.join("\n")
+    |> Sourceror.parse_string!()
+    |> Sourceror.Zipper.zip()
   end
 end
