@@ -28,30 +28,31 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {:&, _, [body]}} = zipper) do
-    deps = Variable.find_used_variables(body)
+    outer_variables = Variable.find_used_variables(body)
 
     # find &{i} usages and replace them with arg{i}
     {%{node: body}, args} =
       body
       |> Z.zip()
-      |> Z.traverse_while([], fn
+      |> Z.traverse_while(MapSet.new(), fn
         %{node: {:&, _, [i]}} = zipper, args when is_number(i) ->
           arg = {String.to_atom("arg#{i}"), [], nil}
-          {:cont, Z.update(zipper, fn _ -> arg end), args ++ [arg]}
+          {:cont, Z.update(zipper, fn _ -> arg end), MapSet.put(args, arg)}
 
         zipper, args ->
           {:cont, zipper, args}
       end)
+      |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
 
-    do_refactor(zipper, args, deps, body)
+    do_refactor(zipper, args, outer_variables, body)
   end
 
   def refactor(%{node: {:fn, _, [{:->, _, [args, body]}]}} = zipper) do
-    deps = Variable.find_used_variables(body, ignore: args)
-    do_refactor(zipper, args, deps, body)
+    outer_variables = Variable.find_used_variables(body, ignore: args)
+    do_refactor(zipper, args, outer_variables, body)
   end
 
-  defp do_refactor(zipper, args, deps, body) do
+  defp do_refactor(zipper, args, outer_variables, body) do
     zipper
     |> Z.update(fn _ ->
       {:&, [],
@@ -60,13 +61,13 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
           args
           |> Stream.with_index()
           |> Enum.map(fn {_, i} -> {:&, [], [i + 1]} end)
-          |> Kernel.++(deps)}
+          |> Kernel.++(outer_variables)}
        ]}
     end)
     |> Module.add_function(
       {:defp, [do: [], end: []],
        [
-         {:extracted_function, [], args ++ deps},
+         {:extracted_function, [], args ++ outer_variables},
          [{{:__block__, [], [:do]}, body}]
        ]}
     )

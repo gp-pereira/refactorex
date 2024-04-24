@@ -100,8 +100,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
       defmodule Foo do
         def power_sum(numbers, power) do
           #                       v
-          Enum.reduce(numbers, 0, & pow(&1, power) + &2)
-          #                                           ^
+          Enum.reduce(numbers, 0, & pow(&1, power) - &1 + &2)
+          #                                                ^
         end
       end
       """,
@@ -112,7 +112,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
         end
 
         defp extracted_function(arg1, arg2, power) do
-          pow(arg1, power) + arg2
+          pow(arg1, power) - arg1 + arg2
         end
       end
       """
