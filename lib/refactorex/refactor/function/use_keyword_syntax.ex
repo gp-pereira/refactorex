@@ -3,18 +3,21 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
     title: "Rewrite function using keyword syntax",
     kind: "refactor.rewrite"
 
-  import Refactorex.Refactor.Function
+  alias Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {id, meta, _} = node} = zipper, range) when function_id?(id) do
+  def can_refactor?(%{node: {_, meta, _} = node} = zipper, range) do
     cond do
+      not Function.definition?(node) ->
+        false
+
       # keyword functions don't have :do tag
       is_nil(meta[:do]) ->
         :skip
 
-      not SelectionRange.starts_on_node_line?(range, node) ->
+      Function.has_multiple_statements?(zipper) ->
         :skip
 
-      function_has_multiple_statements?(zipper) ->
+      not SelectionRange.starts_on_node_line?(range, node) ->
         :skip
 
       true ->
@@ -29,24 +32,9 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
     |> Z.update(fn {id, meta, macro} ->
       {id, Keyword.drop(meta, [:do, :end]), macro}
     end)
-    |> go_to_function_block()
+    |> Function.go_to_block()
     |> Z.update(fn {{:__block__, meta, [:do]}, macro} ->
       {{:__block__, Keyword.put(meta, :format, :keyword), [:do]}, macro}
-    end)
-  end
-
-  defp function_has_multiple_statements?(zipper) do
-    zipper
-    |> go_to_function_block()
-    |> then(fn
-      %{node: {{:__block__, _, _}, {:__block__, _, [{{:__block__, _, _}, _} | _]}}} ->
-        false
-
-      %{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}} ->
-        true
-
-      _ ->
-        false
     end)
   end
 end

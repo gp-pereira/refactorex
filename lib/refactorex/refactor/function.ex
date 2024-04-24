@@ -1,9 +1,33 @@
 defmodule Refactorex.Refactor.Function do
   alias Sourceror.Zipper, as: Z
 
-  defguard function_id?(id) when id in ~w(def defp)a
+  def definition?(node)
+  def definition?({:def, _, _}), do: true
+  def definition?({:defp, _, _}), do: true
+  def definition?(_node), do: false
 
-  def go_to_function_block(%{node: {id, _, _}} = zipper) when function_id?(id) do
+  def anonymous?(node)
+  def anonymous?({:&, _, [i]}) when is_number(i), do: false
+  def anonymous?({:&, _, _}), do: true
+  def anonymous?({:fn, _, _}), do: true
+  def anonymous?(_), do: false
+
+  def has_multiple_statements?(zipper) do
+    zipper
+    |> go_to_block()
+    |> then(fn
+      %{node: {{:__block__, _, _}, {:__block__, _, [{{:__block__, _, _}, _} | _]}}} ->
+        false
+
+      %{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}} ->
+        true
+
+      _ ->
+        false
+    end)
+  end
+
+  def go_to_block(zipper) do
     zipper
     |> Z.down()
     |> Z.right()
