@@ -9,6 +9,8 @@ defmodule Refactorex.Refactor do
       alias Refactorex.Refactor.SelectionRange
       alias Sourceror.Zipper, as: Z
 
+      require Logger
+
       @behaviour Refactorex.Refactor
 
       def available?(zipper, range) do
@@ -55,6 +57,7 @@ defmodule Refactorex.Refactor do
   @refactors [
     __MODULE__.Pipe.PipeFirstArgument,
     __MODULE__.Pipe.RemovePipe,
+    __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax
   ]

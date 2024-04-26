@@ -9,6 +9,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     Variable
   }
 
+  def can_refactor?(%{node: {:fn, _, [{:->, _, [[] | _]}]}}, _), do: false
+
   def can_refactor?(%{node: node} = zipper, range) do
     cond do
       not Function.anonymous?(node) ->
@@ -28,7 +30,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {:&, _, [body]}} = zipper) do
-    outer_variables = Variable.find_used_variables(body)
+    closure_variables = Variable.find_used_variables(body)
 
     # find &{i} usages and replace them with arg{i}
     {%{node: body}, args} =
@@ -44,32 +46,89 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       end)
       |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
 
-    do_refactor(zipper, args, outer_variables, body)
-  end
-
-  def refactor(%{node: {:fn, _, [{:->, _, [args, body]}]}} = zipper) do
-    outer_variables = Variable.find_used_variables(body, ignore: args)
-    do_refactor(zipper, args, outer_variables, body)
-  end
-
-  defp do_refactor(zipper, args, outer_variables, body) do
     zipper
-    |> Z.update(fn _ ->
+    |> anonymous_to_function_call(args, closure_variables)
+    |> add_private_function(args ++ closure_variables, body)
+  end
+
+  def refactor(%{node: {:fn, _, clauses}} = zipper) do
+    outer_scope_variables = find_outer_scope_variables(zipper)
+
+    closure_variables =
+      clauses
+      |> Enum.map(fn {:->, _, [args, body]} ->
+        actual_args = Function.actual_args(args)
+
+        Variable.find_used_variables(
+          [args, body],
+          reject: fn
+            %{node: variable} ->
+              if Variable.member?(actual_args, variable),
+                do: true,
+                else: not Variable.member?(outer_scope_variables, variable)
+
+            _ ->
+              false
+          end
+        )
+      end)
+      |> List.flatten()
+      |> Variable.remove_duplicates()
+
+    # all clauses have the same number of args,
+    # so we can just grab them from the first one
+    {:->, _, [args, _]} = List.first(clauses)
+
+    zipper
+    |> anonymous_to_function_call(args, closure_variables)
+    |> then(
+      &Enum.reduce(clauses, &1, fn {:->, _, [args, body]}, zipper ->
+        add_private_function(zipper, args ++ closure_variables, body)
+      end)
+    )
+  end
+
+  defp anonymous_to_function_call(zipper, args, closure_variables) do
+    Z.update(zipper, fn _ ->
       {:&, [],
        [
          {:extracted_function, [],
-          args
-          |> Stream.with_index()
-          |> Enum.map(fn {_, i} -> {:&, [], [i + 1]} end)
-          |> Kernel.++(outer_variables)}
+          1..length(args)
+          |> Enum.map(&{:&, [], [&1]})
+          |> Kernel.++(closure_variables)}
        ]}
     end)
-    |> Module.add_function(
+  end
+
+  defp add_private_function(zipper, args, body) do
+    Module.add_function(
+      zipper,
       {:defp, [do: [], end: []],
        [
-         {:extracted_function, [], args ++ outer_variables},
+         case Function.unpin_args(args) do
+           [{:when, _, [args, guard]} | other_args] ->
+             {:when, [], [{:extracted_function, [], [args | other_args]}, guard]}
+
+           args ->
+             {:extracted_function, [], args}
+         end,
          [{{:__block__, [], [:do]}, body}]
        ]}
+    )
+  end
+
+  defp find_outer_scope_variables(%{node: node} = zipper) do
+    zipper
+    |> Z.find(:prev, fn
+      {:defmodule, _, _} ->
+        true
+
+      node ->
+        Function.definition?(node)
+    end)
+    |> Z.node()
+    |> Variable.find_used_variables(
+      reject: &(Sourceror.get_line(&1.node) >= Sourceror.get_line(node))
     )
   end
 end

@@ -12,6 +12,27 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?({:fn, _, _}), do: true
   def anonymous?(_), do: false
 
+  def actual_args(args) do
+    Refactorex.Refactor.Variable.find_used_variables(
+      args,
+      # pinned args are not actual args
+      reject: &match?(%{node: {:^, _, _}}, Z.up(&1))
+    )
+  end
+
+  def unpin_args(args) do
+    args
+    |> Z.zip()
+    |> Z.traverse(fn
+      %{node: {:^, _, [arg]}} = zipper ->
+        Z.update(zipper, fn _ -> arg end)
+
+      zipper ->
+        zipper
+    end)
+    |> Z.node()
+  end
+
   def has_multiple_statements?(zipper) do
     zipper
     |> go_to_block()
