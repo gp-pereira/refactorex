@@ -98,6 +98,38 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
       ExtractAnonymousFunction,
       """
       defmodule Foo do
+        def filter_methods(methods) do
+          Enum.filter(
+            methods,
+          # v
+            &(&1["type"] in ~w(clicktopay scheme))
+          #                                      ^
+          )
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def filter_methods(methods) do
+          Enum.filter(
+            methods,
+            &extracted_function(&1)
+          )
+        end
+
+        defp extracted_function(arg1) do
+          arg1["type"] in ~w(clicktopay scheme)
+        end
+      end
+      """
+    )
+  end
+
+  test "extracts anonymous function with capture syntax and N arguments" do
+    assert_refactored(
+      ExtractAnonymousFunction,
+      """
+      defmodule Foo do
         def power_sum(numbers, power) do
           #                       v
           Enum.reduce(numbers, 0, & pow(&1, power) - &1 + &2)

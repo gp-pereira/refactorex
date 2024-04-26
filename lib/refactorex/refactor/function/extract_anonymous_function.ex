@@ -19,7 +19,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       not Module.inside_one?(zipper) ->
         :skip
 
-      not SelectionRange.selects_this_node?(range, node, column_delta: 2) ->
+      not SelectionRange.selects_this_node?(range, zipper, column_delta: 2) ->
         false
 
       true ->
