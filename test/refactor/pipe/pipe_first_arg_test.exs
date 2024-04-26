@@ -1,11 +1,11 @@
-defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
+defmodule Refactorex.Refactor.Pipe.PipeFirstArgTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Pipe.PipeFirstArgument
+  alias Refactorex.Refactor.Pipe.PipeFirstArg
 
   test "pipes the first argument into the function" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def some_function(arg1, arg2) do
         #   v
@@ -22,7 +22,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes outside function blocks" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       defmodule Foo do
         #      v
@@ -39,7 +39,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes without changing the surroundings" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def some_function(arg1) do
         arg2 = :bar
@@ -63,7 +63,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes function inside other structures" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       defmodule Foo do
         #            v
@@ -80,7 +80,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes the fist argument into module function" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def foo do
         #      v
@@ -97,7 +97,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes the first argument into variable module" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def foo(module) do
         #             v
@@ -114,7 +114,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes function from other argument two levels deep" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def foo(map) do
         #             v
@@ -131,7 +131,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes function inside anonymous function" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       list
       #                     v
@@ -146,7 +146,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes argument into case block" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #   v
       case list do
@@ -166,7 +166,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "pipes argument into multiline function" do
     assert_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #  v
       post(
@@ -189,7 +189,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores already piped functions" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #        v
       arg1 |> foo(arg2)
@@ -199,7 +199,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores access operations" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #    v
       foo[:bar]
@@ -209,7 +209,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores functions without at least one argument" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       def bar do
         #  v
@@ -221,7 +221,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   # test "ignores functions outside range" do
   #   assert_not_refactored(
-  #     PipeFirstArgument,
+  #     PipeFirstArg,
   #     """
   #     def some_function do
   #       #  v
@@ -231,7 +231,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
   #   )
 
   #   assert_not_refactored(
-  #     PipeFirstArgument,
+  #     PipeFirstArg,
   #     """
   #     def some_function do
   #       #              v
@@ -243,7 +243,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores anonymous functions" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       list
       #        v
@@ -254,7 +254,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores function declarations" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #    v
       def foo(arg) do
@@ -266,7 +266,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores function declaration with when clause" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #    v
       def into_map(%name{} = struct)
@@ -278,7 +278,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
 
   test "ignores every thing that is not a function call" do
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #    v
       foo = %{list: [1, 2, 3]}
@@ -286,7 +286,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgumentTest do
     )
 
     assert_not_refactored(
-      PipeFirstArgument,
+      PipeFirstArg,
       """
       #    v
       [1, 2, 3]

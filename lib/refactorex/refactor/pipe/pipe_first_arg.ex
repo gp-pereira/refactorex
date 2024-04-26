@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Pipe.PipeFirstArgument do
+defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
   use Refactorex.Refactor,
     title: "Pipe first argument into function",
     kind: "refactor.rewrite"
