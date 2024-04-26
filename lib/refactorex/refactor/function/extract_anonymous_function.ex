@@ -61,14 +61,9 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
         Variable.find_used_variables(
           [args, body],
-          reject: fn
-            %{node: variable} ->
-              if Variable.member?(actual_args, variable),
-                do: true,
-                else: not Variable.member?(outer_scope_variables, variable)
-
-            _ ->
-              false
+          reject: fn %{node: variable} ->
+            Variable.member?(actual_args, variable) or
+              not Variable.member?(outer_scope_variables, variable)
           end
         )
       end)
