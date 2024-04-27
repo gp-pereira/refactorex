@@ -13,6 +13,9 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
   def can_refactor?(%{node: node} = zipper, range) do
     cond do
+      SelectionRange.empty?(range) ->
+        :skip
+
       not Function.anonymous?(node) ->
         false
 

@@ -408,4 +408,21 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
       """
     )
   end
+
+  test "ignores range if it is empty" do
+    assert_not_refactored(
+      ExtractAnonymousFunction,
+      """
+      defmodule Foo do
+        def refactor(zipper) do
+          zipper
+          #             v
+          |> Z.update(fn {:|>, _, [arg, {id, meta, rest}]} ->
+            {id, meta, [arg | rest]}
+          end)
+        end
+      end
+      """
+    )
+  end
 end
