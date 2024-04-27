@@ -292,5 +292,34 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArgTest do
       [1, 2, 3]
       """
     )
+
+    assert_not_refactored(
+      PipeFirstArg,
+      """
+      #    v
+      {1, 2, 3}
+      """
+    )
+
+    assert_not_refactored(
+      PipeFirstArg,
+      """
+      #    v
+      fn {key, _} -> "\#{key}" end
+      """
+    )
+  end
+
+  test "ignores range if it's not empty" do
+    assert_not_refactored(
+      PipeFirstArg,
+      """
+      def some_function(arg1, arg2) do
+        #   v
+        foo(arg1, arg2)
+        #     ^
+      end
+      """
+    )
   end
 end

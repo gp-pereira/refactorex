@@ -3,6 +3,11 @@ defmodule Refactorex.Refactor.SelectionRange do
 
   import Sourceror
 
+  def empty?(range) do
+    range.start.line == range.end.line and
+      range.start.character == range.end.character
+  end
+
   def starts_on_node_line?(range, node),
     do: range.start.line == get_line(node)
 

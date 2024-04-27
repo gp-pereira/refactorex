@@ -39,4 +39,17 @@ defmodule Refactorex.Refactor.Pipe.RemoveTest do
       """
     )
   end
+
+  test "ignores range if it's not empty" do
+    assert_not_refactored(
+      RemovePipe,
+      """
+      def foo(arg1) do
+        # v
+        arg1 |> foo(@arg2)
+        #           ^
+      end
+      """
+    )
+  end
 end

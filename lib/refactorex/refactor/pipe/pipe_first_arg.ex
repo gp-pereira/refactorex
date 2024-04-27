@@ -9,11 +9,14 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
   def can_refactor?(%{node: {_, _, []}}, _), do: false
 
   def can_refactor?(%{node: {id, _, _}}, _)
-      when id in [:%{}, :__block__, :fn],
+      when id in [:%{}, :{}, :__block__, :fn],
       do: false
 
   def can_refactor?(%{node: {_, _, _} = node} = zipper, range) do
     cond do
+      not SelectionRange.empty?(range) ->
+        :skip
+
       not SelectionRange.starts_on_node_line?(range, node) ->
         false
 
@@ -54,6 +57,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
     end)
   end
 
+  defp can_pipe_into?({{:., _, [Kernel, :to_string]}, _, _}), do: false
   defp can_pipe_into?({{:., _, [Access | _]}, _, _}), do: false
   defp can_pipe_into?({:., _, [Access | _]}), do: false
   defp can_pipe_into?({:case, _, _}), do: true
