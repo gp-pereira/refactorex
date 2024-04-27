@@ -5,7 +5,7 @@ defmodule Refactorex.Refactor.Variable do
 
   @not_variable ~w(binary)a
 
-  def find_used_variables(node, opts \\ []) do
+  def find_variables(node, opts \\ []) do
     reject = opts[:reject] || fn _ -> false end
 
     node

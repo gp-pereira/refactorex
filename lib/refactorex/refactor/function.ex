@@ -13,7 +13,7 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?(_), do: false
 
   def actual_args(args) do
-    Refactorex.Refactor.Variable.find_used_variables(
+    Refactorex.Refactor.Variable.find_variables(
       args,
       # pinned args are not actual args
       reject: &match?(%{node: {:^, _, _}}, Z.up(&1))

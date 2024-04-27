@@ -33,7 +33,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {:&, _, [body]}} = zipper) do
-    closure_variables = Variable.find_used_variables(body)
+    closure_variables = Variable.find_variables(body)
 
     # find &{i} usages and replace them with arg{i}
     {%{node: body}, args} =
@@ -62,7 +62,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       |> Enum.map(fn {:->, _, [args, body]} ->
         actual_args = Function.actual_args(args)
 
-        Variable.find_used_variables(
+        Variable.find_variables(
           [args, body],
           reject: fn %{node: variable} ->
             Variable.member?(actual_args, variable) or
@@ -125,8 +125,6 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
         Function.definition?(node)
     end)
     |> Z.node()
-    |> Variable.find_used_variables(
-      reject: &(Sourceror.get_line(&1.node) >= Sourceror.get_line(node))
-    )
+    |> Variable.find_variables(reject: &(Sourceror.get_line(&1.node) >= Sourceror.get_line(node)))
   end
 end
