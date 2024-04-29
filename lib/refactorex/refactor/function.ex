@@ -16,7 +16,9 @@ defmodule Refactorex.Refactor.Function do
     Refactorex.Refactor.Variable.find_variables(
       args,
       # pinned args are not actual args
-      reject: &match?(%{node: {:^, _, _}}, Z.up(&1))
+      reject: &match?(%{node: {:^, _, _}}, Z.up(&1)),
+      # functions can have repeated args
+      unique: false
     )
   end
 

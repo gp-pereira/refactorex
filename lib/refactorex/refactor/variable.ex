@@ -7,11 +7,12 @@ defmodule Refactorex.Refactor.Variable do
 
   def find_variables(node, opts \\ []) do
     reject = opts[:reject] || fn _ -> false end
+    unique = if is_nil(opts[:unique]), do: true, else: opts[:unique]
 
     node
     |> Z.zip()
     |> Z.traverse_while([], fn
-      %{node: {id, _, _} = variable} = zipper, variables when is_identifier(variable) ->
+      %{node: {id, _, nil} = variable} = zipper, variables when is_identifier(variable) ->
         cond do
           Enum.member?(@not_variable, id) ->
             {:cont, zipper, variables}
@@ -30,7 +31,7 @@ defmodule Refactorex.Refactor.Variable do
         {:cont, zipper, variables}
     end)
     |> elem(1)
-    |> remove_duplicates()
+    |> then(&if unique, do: remove_duplicates(&1), else: &1)
   end
 
   def remove_duplicates(variables),
@@ -38,4 +39,6 @@ defmodule Refactorex.Refactor.Variable do
 
   def member?(variables, {variable_id, _, _} = _variable),
     do: Enum.any?(variables, fn {id, _, _} -> id == variable_id end)
+
+  def member?(_, _), do: false
 end
