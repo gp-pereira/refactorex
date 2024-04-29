@@ -30,8 +30,6 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     end
   end
 
-  def can_refactor?(_, _), do: false
-
   def refactor(%{node: {:&, _, [body]}} = zipper) do
     closure_variables = Variable.find_variables(body)
 
