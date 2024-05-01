@@ -26,13 +26,15 @@ defmodule Refactorex do
 
   @impl true
   def init(lsp, _args) do
-    Logger.info("Starting Refactorex server")
+    Logger.info("Starting server")
     {:ok, assign(lsp, documents: %{})}
   end
 
   @impl true
-  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp),
-    do: {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
+    Logger.info("Client connected")
+    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  end
 
   @impl true
   def handle_request(%TextDocumentCodeAction{params: params}, lsp) do
