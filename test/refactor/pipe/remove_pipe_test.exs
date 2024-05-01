@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Pipe.RemoveTest do
+defmodule Refactorex.Refactor.Pipe.RemovePipeTest do
   use Refactorex.RefactorCase
 
   alias Refactorex.Refactor.Pipe.RemovePipe
@@ -35,19 +35,6 @@ defmodule Refactorex.Refactor.Pipe.RemoveTest do
       # v
       def foo(arg1) do
         arg1 |> foo(@arg2)
-      end
-      """
-    )
-  end
-
-  test "ignores range if it's not empty" do
-    assert_not_refactored(
-      RemovePipe,
-      """
-      def foo(arg1) do
-        # v
-        arg1 |> foo(@arg2)
-        #           ^
       end
       """
     )

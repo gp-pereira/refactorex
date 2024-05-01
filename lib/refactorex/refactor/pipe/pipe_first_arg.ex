@@ -1,7 +1,8 @@
 defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
   use Refactorex.Refactor,
     title: "Pipe first argument into function",
-    kind: "refactor.rewrite"
+    kind: "refactor.rewrite",
+    works_on: :line
 
   import Sourceror.Identifier
   require Logger
@@ -12,12 +13,9 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
       when id in [:%{}, :{}, :__block__, :fn],
       do: false
 
-  def can_refactor?(%{node: {_, _, _} = node} = zipper, range) do
+  def can_refactor?(%{node: {_, _, _} = node} = zipper, line) do
     cond do
-      not SelectionRange.empty?(range) ->
-        :skip
-
-      not SelectionRange.starts_on_node_line?(range, node) ->
+      Sourceror.get_line(node) != line ->
         false
 
       not can_pipe_into?(node) ->

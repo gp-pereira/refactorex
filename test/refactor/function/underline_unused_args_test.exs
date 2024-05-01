@@ -101,17 +101,4 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
       """
     )
   end
-
-  test "ignores range if it's not empty" do
-    assert_not_refactored(
-      UnderlineUnusedArgs,
-      """
-      #       v
-      def foo(bar1, bar2, bar3) do
-      #               ^
-        bar1
-      end
-      """
-    )
-  end
 end

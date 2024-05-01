@@ -1,20 +1,11 @@
 defmodule Refactorex.Refactor.Pipe.RemovePipe do
   use Refactorex.Refactor,
     title: "Remove pipe",
-    kind: "refactor.rewrite"
+    kind: "refactor.rewrite",
+    works_on: :line
 
-  def can_refactor?(%{node: {:|>, _, _} = node}, range) do
-    cond do
-      not SelectionRange.empty?(range) ->
-        :skip
-
-      not SelectionRange.starts_on_node_line?(range, node) ->
-        false
-
-      true ->
-        true
-    end
-  end
+  def can_refactor?(%{node: {:|>, _, _} = node}, line),
+    do: Sourceror.get_line(node) == line
 
   def can_refactor?(_, _), do: false
 

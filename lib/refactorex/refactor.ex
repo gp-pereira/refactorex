@@ -5,33 +5,37 @@ defmodule Refactorex.Refactor do
   @callback refactor(Zipper.t()) :: Zipper.t()
 
   defmacro __using__(attrs) do
-    quote do
-      alias Refactorex.Refactor.SelectionRange
-      alias Sourceror.Zipper, as: Z
+    works_on = Keyword.fetch!(attrs, :works_on)
 
-      require Logger
+    quote do
+      alias Sourceror.Zipper, as: Z
 
       @behaviour Refactorex.Refactor
 
-      def available?(zipper, range) do
+      @dialyzer {:no_match, available?: 2, visit: 4}
+
+      def available?(_, node)
+          when is_number(node) and unquote(works_on) == :node,
+          do: false
+
+      def available?(_, line)
+          when not is_number(line) and unquote(works_on) == :line,
+          do: false
+
+      def available?(zipper, node_or_line) do
         zipper
-        |> Z.traverse_while(false, &visit(&1, &2, range, false))
+        |> Z.traverse_while(false, &visit(&1, &2, node_or_line, false))
         |> then(fn {_, available?} -> available? end)
       end
 
-      def refactor(zipper, range) do
+      def refactor(zipper, node_or_line) do
         zipper
-        |> Z.traverse_while(false, &visit(&1, &2, range, true))
+        |> Z.traverse_while(false, &visit(&1, &2, node_or_line, true))
         |> then(fn {%{node: node}, true} -> Sourceror.to_string(node) end)
       end
 
-      @docs """
-      Disabled because some Refactors don't return all three atoms
-      """
-      @dialyzer {:no_match, visit: 4}
-
-      defp visit(zipper, false, range, refactor?) do
-        case can_refactor?(zipper, range) do
+      defp visit(zipper, false, node_or_line, refactor?) do
+        case can_refactor?(zipper, node_or_line) do
           :skip ->
             {:skip, zipper, false}
 
@@ -63,16 +67,18 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UseRegularSyntax
   ]
 
+  alias __MODULE__.Selection
+
   def available_refactorings(original, range, modules \\ @refactors) do
-    case Sourceror.parse_string(original) do
-      {:ok, macro} ->
-        zipper = Sourceror.Zipper.zip(macro)
+    with {:ok, node_or_line} <- Selection.node_or_line(original, range),
+         {:ok, macro} <- Sourceror.parse_string(original) do
+      zipper = Sourceror.Zipper.zip(macro)
 
-        modules
-        |> Stream.map(&{&1, &1.available?(zipper, range)})
-        |> Stream.filter(&match?({_, true}, &1))
-        |> Enum.map(fn {module, _} -> module.refactoring() end)
-
+      modules
+      |> Stream.map(&{&1, &1.available?(zipper, node_or_line)})
+      |> Stream.filter(&match?({_, true}, &1))
+      |> Enum.map(fn {module, _} -> module.refactoring() end)
+    else
       # this error means the file could not be parsed,
       # so there are no refactorings available for it
       {:error, _} ->
@@ -81,12 +87,13 @@ defmodule Refactorex.Refactor do
   end
 
   def refactor(original, range, module) do
+    {:ok, node_or_line} = Selection.node_or_line(original, range)
     module = String.to_atom(module)
 
     original
     |> Sourceror.parse_string!()
     |> Sourceror.Zipper.zip()
-    |> module.refactor(range)
+    |> module.refactor(node_or_line)
     |> then(&Refactorex.Diff.find_diffs(original, &1))
     |> module.refactoring()
   end

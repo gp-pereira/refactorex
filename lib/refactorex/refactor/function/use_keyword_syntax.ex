@@ -1,11 +1,12 @@
 defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
   use Refactorex.Refactor,
     title: "Rewrite function using keyword syntax",
-    kind: "refactor.rewrite"
+    kind: "refactor.rewrite",
+    works_on: :line
 
   alias Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: {_, meta, _} = node} = zipper, range) do
+  def can_refactor?(%{node: {_, meta, _} = node} = zipper, line) do
     cond do
       not Function.definition?(node) ->
         false
@@ -17,8 +18,8 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
       Function.has_multiple_statements?(zipper) ->
         :skip
 
-      not SelectionRange.starts_on_node_line?(range, node) ->
-        :skip
+      Sourceror.get_line(node) != line ->
+        false
 
       true ->
         true

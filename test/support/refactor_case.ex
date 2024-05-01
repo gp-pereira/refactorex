@@ -1,6 +1,8 @@
 defmodule Refactorex.RefactorCase do
   use ExUnit.CaseTemplate
 
+  alias Refactorex.Refactor.Selection
+
   @marker_regex ~r/\s*#\s*[v\^]/
 
   using(opts) do
@@ -22,13 +24,14 @@ defmodule Refactorex.RefactorCase do
       expected = String.trim(unquote(expected))
 
       range = range_from_markers(original)
+      original = remove_markers(original)
       zipper = text_to_zipper(original)
 
-      if opts[:range], do: Logger.info("Range: #{inspect(range)}")
+      {:ok, node_or_line} = Selection.node_or_line(original, range)
 
-      assert true == module.available?(zipper, range)
+      assert true == module.available?(zipper, node_or_line)
 
-      refactored = module.refactor(zipper, range)
+      refactored = module.refactor(zipper, node_or_line)
 
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
@@ -44,8 +47,12 @@ defmodule Refactorex.RefactorCase do
       original = unquote(original)
 
       range = range_from_markers(original)
+      original = remove_markers(original)
+      zipper = text_to_zipper(original)
 
-      assert false == module.available?(text_to_zipper(original), range)
+      {:ok, node_or_line} = Selection.node_or_line(original, range)
+
+      assert false == module.available?(zipper, node_or_line)
     end
   end
 
@@ -59,11 +66,11 @@ defmodule Refactorex.RefactorCase do
         %{
           start: %{
             line: line + 1,
-            character: String.length(text)
+            character: String.length(text) - 1
           },
           end: %{
             line: line + 1,
-            character: String.length(text)
+            character: String.length(text) - 1
           }
         }
 
@@ -71,7 +78,7 @@ defmodule Refactorex.RefactorCase do
         %{
           start: %{
             line: start_line + 1,
-            character: String.length(start_text)
+            character: String.length(start_text) - 1
           },
           end: %{
             line: end_line - 1,
@@ -91,12 +98,16 @@ defmodule Refactorex.RefactorCase do
     text
   end
 
-  def text_to_zipper(original) do
-    original
+  def text_to_zipper(text) do
+    text
+    |> Sourceror.parse_string!()
+    |> Sourceror.Zipper.zip()
+  end
+
+  def remove_markers(text) do
+    text
     |> String.split("\n")
     |> Enum.reject(&String.match?(&1, @marker_regex))
     |> Enum.join("\n")
-    |> Sourceror.parse_string!()
-    |> Sourceror.Zipper.zip()
   end
 end

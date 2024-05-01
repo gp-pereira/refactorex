@@ -1,22 +1,20 @@
 defmodule Refactorex.Refactor.Function.UnderlineUnusedArgs do
   use Refactorex.Refactor,
     title: "Underline unused arguments",
-    kind: "refactor"
+    kind: "refactor",
+    works_on: :line
 
   alias Refactorex.Refactor.{
     Function,
     Variable
   }
 
-  def can_refactor?(%{node: node}, range) do
+  def can_refactor?(%{node: node}, line) do
     cond do
-      not SelectionRange.empty?(range) ->
-        :skip
-
       not (Function.definition?(node) or match?({:->, _, _}, node)) ->
         false
 
-      not SelectionRange.starts_on_node_line?(range, node) ->
+      Sourceror.get_line(node) != line ->
         false
 
       Enum.empty?(find_unused_args(node)) ->

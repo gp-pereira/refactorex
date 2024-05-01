@@ -132,8 +132,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
       defmodule Foo do
         def power_sum(numbers, power) do
           #                       v
-          Enum.reduce(numbers, 0, & pow(&1, power) - &1 + &2)
-          #                                                ^
+          Enum.reduce(numbers, 0, &(pow(&1, power) - &1 + &2))
+          #                                                 ^
         end
       end
       """,
@@ -217,7 +217,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
           #           v
           |> Enum.map(fn filename ->
             file = File.read!("\#{filename}.\#{ext}")
-            String.split(file, "\n")
+            String.split(file, "\\n")
           end)
           # ^
         end
@@ -237,7 +237,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
 
         defp extracted_function(filename, ext) do
           file = File.read!("\#{filename}.\#{ext}")
-          String.split(file, "\n")
+          String.split(file, "\\n")
         end
       end
       """
@@ -387,8 +387,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
       """
       def power_sum(numbers, power) do
         #                       v
-        Enum.reduce(numbers, 0, & pow(&1, power) + &2)
-        #                                           ^
+        Enum.reduce(numbers, 0, &(pow(&1, power) + &2))
+        #                                            ^
       end
       """
     )

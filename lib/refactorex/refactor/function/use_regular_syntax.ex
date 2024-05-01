@@ -1,17 +1,18 @@
 defmodule Refactorex.Refactor.Function.UseRegularSyntax do
   use Refactorex.Refactor,
     title: "Rewrite keyword function using regular syntax",
-    kind: "refactor.rewrite"
+    kind: "refactor.rewrite",
+    works_on: :line
 
   alias Refactorex.Refactor.Function
 
-  def can_refactor?(%{node: node} = zipper, range) do
+  def can_refactor?(%{node: node} = zipper, line) do
     cond do
       not Function.definition?(node) ->
         false
 
-      not SelectionRange.starts_on_node_line?(range, node) ->
-        :skip
+      Sourceror.get_line(node) != line ->
+        false
 
       true ->
         %{node: {{:__block__, block_meta, _}, _}} = Function.go_to_block(zipper)

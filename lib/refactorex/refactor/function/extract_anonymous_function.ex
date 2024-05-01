@@ -1,7 +1,8 @@
 defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   use Refactorex.Refactor,
     title: "Extract anonymous function into private function",
-    kind: "refactor.extract"
+    kind: "refactor.extract",
+    works_on: :node
 
   alias Refactorex.Refactor.{
     Function,
@@ -11,24 +12,20 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
   def can_refactor?(%{node: {:fn, _, [{:->, _, [[] | _]}]}}, _), do: false
 
-  def can_refactor?(%{node: node} = zipper, range) do
+  def can_refactor?(%{node: node} = zipper, node) do
     cond do
-      SelectionRange.empty?(range) ->
-        :skip
-
       not Function.anonymous?(node) ->
         false
 
       not Module.inside_one?(zipper) ->
         :skip
 
-      not SelectionRange.selects_this_node?(range, zipper, column_delta: 2) ->
-        false
-
       true ->
         true
     end
   end
+
+  def can_refactor?(_, _), do: false
 
   def refactor(%{node: {:&, _, [body]}} = zipper) do
     closure_variables = Variable.find_variables(body)
