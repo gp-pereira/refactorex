@@ -55,7 +55,7 @@ defmodule Refactorex.Diff do
         }
         | diffs
       ],
-      line + 1
+      line
     )
   end
 
