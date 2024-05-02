@@ -4,7 +4,10 @@ defmodule Refactorex.Refactor.Module do
   def inside_one?(zipper),
     do: !!go_to_outer_module(zipper)
 
-  def add_function(zipper, function) do
+  def add_function(zipper, function),
+    do: update_scope(zipper, &(&1 ++ [function]))
+
+  def update_scope(zipper, updater) do
     zipper
     |> go_to_outer_module()
     # go to module functions
@@ -14,11 +17,11 @@ defmodule Refactorex.Refactor.Module do
     |> Z.down()
     |> Z.right()
     |> Z.update(fn
-      {:__block__, _, other_functions} ->
-        {:__block__, [], other_functions ++ [function]}
+      {:__block__, _, scope} ->
+        {:__block__, [], updater.(scope)}
 
-      single_function ->
-        {:__block__, [], [single_function, function]}
+      scope ->
+        {:__block__, [], updater.([scope])}
     end)
   end
 

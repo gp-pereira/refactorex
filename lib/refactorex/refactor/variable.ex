@@ -41,4 +41,17 @@ defmodule Refactorex.Refactor.Variable do
     do: Enum.any?(variables, fn {id, _, _} -> id == variable_id end)
 
   def member?(_, _), do: false
+
+  def find_constants(node) do
+    node
+    |> Z.zip()
+    |> Z.traverse_while([], fn
+      %{node: {:@, _, [{_, _, nil} = constant]}} = zipper, constants ->
+        {:cont, zipper, constants ++ [constant]}
+
+      zipper, constants ->
+        {:cont, zipper, constants}
+    end)
+    |> elem(1)
+  end
 end
