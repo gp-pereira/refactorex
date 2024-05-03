@@ -39,7 +39,7 @@ defmodule Refactorex.Refactor.Function do
     zipper
     |> go_to_block()
     |> then(fn
-      %{node: {{:__block__, _, _}, {:__block__, _, [{{:__block__, _, _}, _} | _]}}} ->
+      %{node: {{:__block__, _, _}, {:__block__, _, [_]}}} ->
         false
 
       %{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}} ->

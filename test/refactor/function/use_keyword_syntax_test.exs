@@ -85,6 +85,43 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
     )
   end
 
+  test "refactors function with a list" do
+    assert_refactored(
+      UseKeywordSyntax,
+      """
+      #    v
+      def baz do
+        [
+         :a,
+         :b
+        ]
+      end
+      """,
+      """
+      def baz,
+        do: [
+          :a,
+          :b
+        ]
+      """
+    )
+  end
+
+  test "refactors function with a number" do
+    assert_refactored(
+      UseKeywordSyntax,
+      """
+      #    v
+      def baz do
+        0
+      end
+      """,
+      """
+      def baz, do: 0
+      """
+    )
+  end
+
   test "refactors private function" do
     assert_refactored(
       UseKeywordSyntax,
