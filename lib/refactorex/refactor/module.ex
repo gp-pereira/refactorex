@@ -9,8 +9,23 @@ defmodule Refactorex.Refactor.Module do
 
   def update_scope(zipper, updater) do
     zipper
+    |> go_to_scope()
+    |> Z.update(fn {_, _, scope} ->
+      {:__block__, [], updater.(scope)}
+    end)
+  end
+
+  def find_in_scope(zipper, filter) do
+    zipper
+    |> go_to_scope()
+    |> Z.node()
+    |> Z.children()
+    |> Enum.filter(filter)
+  end
+
+  defp go_to_scope(zipper) do
+    zipper
     |> go_to_outer_module()
-    # go to module functions
     |> Z.down()
     |> Z.right()
     |> Z.down()
@@ -18,14 +33,14 @@ defmodule Refactorex.Refactor.Module do
     |> Z.right()
     |> Z.update(fn
       {:__block__, _, scope} ->
-        {:__block__, [], updater.(scope)}
+        {:__block__, [], scope}
 
       scope ->
-        {:__block__, [], updater.([scope])}
+        {:__block__, [], [scope]}
     end)
   end
 
-  def go_to_outer_module(zipper) do
+  defp go_to_outer_module(zipper) do
     Z.find(zipper, :prev, fn
       {:defmodule, _, _} ->
         true

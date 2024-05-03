@@ -42,8 +42,8 @@ defmodule Refactorex.Refactor.Variable do
 
   def member?(_, _), do: false
 
-  def find_constants(node) do
-    node
+  def find_constants_used(macro) do
+    macro
     |> Z.zip()
     |> Z.traverse_while([], fn
       %{node: {:@, _, [{_, _, nil} = constant]}} = zipper, constants ->

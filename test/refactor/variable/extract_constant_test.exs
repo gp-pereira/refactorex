@@ -50,6 +50,7 @@ defmodule Refactorex.Refactor.Variable.ExtractConstantTest do
       ExtractConstant,
       """
       defmodule Foo do
+        @skipped_constant :skipped
         @first_constant 10
         #                         v
         @second_constant %{range: %{start: @first_constant, end: 14}}
@@ -58,9 +59,33 @@ defmodule Refactorex.Refactor.Variable.ExtractConstantTest do
       """,
       """
       defmodule Foo do
+        @skipped_constant :skipped
         @first_constant 10
         @extracted_constant %{start: @first_constant, end: 14}
         @second_constant %{range: @extracted_constant}
+      end
+      """
+    )
+  end
+
+  test "extracts constant with new unique name" do
+    assert_refactored(
+      ExtractConstant,
+      """
+      defmodule Foo do
+        @extracted_constant "REFUNDED"
+        @extracted_constant1 "AUTHORIZED"
+      #                v
+        @foo %{status: "PAID"}
+      #                     ^
+      end
+      """,
+      """
+      defmodule Foo do
+        @extracted_constant2 "PAID"
+        @extracted_constant "REFUNDED"
+        @extracted_constant1 "AUTHORIZED"
+        @foo %{status: @extracted_constant2}
       end
       """
     )
