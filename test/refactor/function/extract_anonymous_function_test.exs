@@ -381,6 +381,48 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
     )
   end
 
+  test "extracts anonymous function with a new unique name" do
+    assert_refactored(
+      ExtractAnonymousFunction,
+      """
+      defmodule Circles do
+        @pi 3.14
+
+        def areas(circles) do
+          circles
+          |> Enum.with_index()
+          #           v
+          |> Enum.map(fn %{radius: r} -> r end)
+          #                                  ^
+        end
+
+        def extracted_function(_), do: 0
+
+        defp extracted_function1(_), do: 2
+      end
+      """,
+      """
+      defmodule Circles do
+        @pi 3.14
+
+        def areas(circles) do
+          circles
+          |> Enum.with_index()
+          |> Enum.map(&extracted_function2(&1))
+        end
+
+        def extracted_function(_), do: 0
+
+        defp extracted_function1(_), do: 2
+
+        defp extracted_function2(%{radius: r}) do
+          r
+        end
+      end
+      """
+    )
+  end
+
   test "ignores anonymous function that is not inside a module" do
     assert_not_refactored(
       ExtractAnonymousFunction,
@@ -409,17 +451,16 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
     )
   end
 
-  test "ignores range if it is empty" do
+  test "ignores already extracted function" do
     assert_not_refactored(
       ExtractAnonymousFunction,
       """
       defmodule Foo do
-        def refactor(zipper) do
-          zipper
-          #             v
-          |> Z.update(fn {:|>, _, [arg, {id, meta, rest}]} ->
-            {id, meta, [arg | rest]}
-          end)
+        def foo(arg) do
+          arg
+          #           v
+          |> Enum.map(&extracted_function1(&1))
+          #                                  ^
         end
       end
       """
