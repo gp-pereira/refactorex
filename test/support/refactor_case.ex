@@ -31,7 +31,7 @@ defmodule Refactorex.RefactorCase do
 
       assert true == module.available?(zipper, node_or_line)
 
-      refactored = module.refactor(zipper, node_or_line)
+      refactored = module.execute(zipper, node_or_line)
 
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)

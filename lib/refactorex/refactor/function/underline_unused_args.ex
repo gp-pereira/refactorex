@@ -25,7 +25,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgs do
     end
   end
 
-  def refactor(%{node: node} = zipper) do
+  def refactor(%{node: node} = zipper, _) do
     unused_args = find_unused_args(node)
 
     zipper

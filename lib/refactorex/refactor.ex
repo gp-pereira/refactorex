@@ -1,8 +1,10 @@
 defmodule Refactorex.Refactor do
   alias Sourceror.Zipper
 
-  @callback can_refactor?(Zipper.t(), term()) :: :skip | true | false
-  @callback refactor(Zipper.t()) :: Zipper.t()
+  @type node_or_line :: term() | pos_integer()
+
+  @callback can_refactor?(Zipper.t(), node_or_line) :: :skip | true | false
+  @callback refactor(Zipper.t(), node_or_line) :: Zipper.t()
 
   defmacro __using__(attrs) do
     works_on = Keyword.fetch!(attrs, :works_on)
@@ -28,7 +30,7 @@ defmodule Refactorex.Refactor do
         |> then(fn {_, available?} -> available? end)
       end
 
-      def refactor(zipper, node_or_line) do
+      def execute(zipper, node_or_line) do
         zipper
         |> Z.traverse_while(false, &visit(&1, &2, node_or_line, true))
         |> then(fn {%{node: node}, true} -> Sourceror.to_string(node) end)
@@ -43,7 +45,11 @@ defmodule Refactorex.Refactor do
             {:cont, zipper, false}
 
           true ->
-            {:halt, if(refactor?, do: refactor(zipper), else: zipper), true}
+            {
+              :halt,
+              if(refactor?, do: refactor(zipper, node_or_line), else: zipper),
+              true
+            }
         end
       end
 
@@ -94,7 +100,7 @@ defmodule Refactorex.Refactor do
     original
     |> Sourceror.parse_string!()
     |> Sourceror.Zipper.zip()
-    |> module.refactor(node_or_line)
+    |> module.execute(node_or_line)
     |> then(&Refactorex.Diff.find_diffs(original, &1))
     |> module.refactoring()
   end

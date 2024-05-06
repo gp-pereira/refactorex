@@ -9,7 +9,7 @@ defmodule Refactorex.Refactor.Pipe.RemovePipe do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(zipper) do
+  def refactor(zipper, _) do
     zipper
     |> Z.update(fn {:|>, _, [arg, {id, meta, rest}]} ->
       {id, meta, [arg | rest]}

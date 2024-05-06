@@ -24,7 +24,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(zipper) do
+  def refactor(zipper, _) do
     zipper
     |> Z.update(fn {function, meta, macro} ->
       {function, Keyword.merge(meta, do: [], end: []), macro}

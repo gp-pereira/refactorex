@@ -28,7 +28,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(zipper) do
+  def refactor(zipper, _) do
     zipper
     |> Z.update(fn {id, meta, macro} ->
       {id, Keyword.drop(meta, [:do, :end]), macro}

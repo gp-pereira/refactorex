@@ -31,7 +31,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(zipper) do
+  def refactor(zipper, _) do
     zipper
     |> Z.update(fn {id, meta, [arg | rest]} ->
       {:|>, [], [arg, {id, meta, rest}]}

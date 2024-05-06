@@ -30,7 +30,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(%{node: {:&, _, [body]}} = zipper) do
+  def refactor(%{node: {:&, _, [body]}} = zipper, _) do
     closure_variables = Variable.find_variables(body)
 
     # find &{i} usages and replace them with arg{i}
@@ -54,7 +54,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     |> add_private_function(name, args ++ closure_variables, body)
   end
 
-  def refactor(%{node: {:fn, _, clauses}} = zipper) do
+  def refactor(%{node: {:fn, _, clauses}} = zipper, _) do
     outer_scope_variables = find_outer_scope_variables(zipper)
 
     closure_variables =

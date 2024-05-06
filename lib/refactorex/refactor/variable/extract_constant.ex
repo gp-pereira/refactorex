@@ -26,7 +26,7 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(%{node: constant} = zipper) do
+  def refactor(%{node: constant} = zipper, _) do
     constant_name = available_constant_name(zipper)
 
     zipper
