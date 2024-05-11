@@ -27,11 +27,11 @@ defmodule Refactorex.RefactorCase do
       original = remove_markers(original)
       zipper = text_to_zipper(original)
 
-      {:ok, node_or_line} = Selection.node_or_line(original, range)
+      {:ok, selection_or_line} = Selection.selection_or_line(original, range)
 
-      assert true == module.available?(zipper, node_or_line)
+      assert true == module.available?(zipper, selection_or_line)
 
-      refactored = module.execute(zipper, node_or_line)
+      refactored = module.execute(zipper, selection_or_line)
 
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
@@ -50,9 +50,9 @@ defmodule Refactorex.RefactorCase do
       original = remove_markers(original)
       zipper = text_to_zipper(original)
 
-      {:ok, node_or_line} = Selection.node_or_line(original, range)
+      {:ok, selection_or_line} = Selection.selection_or_line(original, range)
 
-      assert false == module.available?(zipper, node_or_line)
+      assert false == module.available?(zipper, selection_or_line)
     end
   end
 

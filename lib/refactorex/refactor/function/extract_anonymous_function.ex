@@ -2,9 +2,10 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   use Refactorex.Refactor,
     title: "Extract anonymous function into private function",
     kind: "refactor.extract",
-    works_on: :node
+    works_on: :selection
 
   alias Refactorex.Refactor.{
+    AST,
     Function,
     Module,
     Variable
@@ -12,13 +13,16 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
   def can_refactor?(%{node: {:fn, _, [{:->, _, [[] | _]}]}}, _), do: false
 
-  def can_refactor?(%{node: node} = zipper, node) do
+  def can_refactor?(%{node: node} = zipper, selection) do
     cond do
+      not AST.equal?(node, selection) ->
+        false
+
       not Function.anonymous?(node) ->
         false
 
       not Module.inside_one?(zipper) ->
-        :skip
+        false
 
       already_extracted_function?(node) ->
         :skip
@@ -27,8 +31,6 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
         true
     end
   end
-
-  def can_refactor?(_, _), do: false
 
   def refactor(%{node: {:&, _, [body]}} = zipper, _) do
     closure_variables = Variable.find_variables(body)

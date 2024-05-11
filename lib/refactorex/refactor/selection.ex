@@ -3,20 +3,16 @@ defmodule Refactorex.Refactor.Selection do
 
   @newline_replacement "$$replacement$$"
 
-  def node_or_line(text, range) do
-    if empty_range?(range) do
-      {:ok, range.start.line}
-    else
-      with {:ok, text} <- erase_outside_range(text, range),
-           {:ok, node} <- Sourceror.parse_string(text) do
-        {:ok, node}
-      end
-    end
-  end
+  def selection_or_line(_text, range)
+      when range.start.line == range.end.line and
+             range.start.character == range.end.character,
+      do: {:ok, range.start.line}
 
-  def empty_range?(range) do
-    range.start.line == range.end.line and
-      range.start.character == range.end.character
+  def selection_or_line(text, range) do
+    with {:ok, text} <- erase_outside_range(text, range),
+         {:ok, node} <- Sourceror.parse_string(text) do
+      {:ok, node}
+    end
   end
 
   def erase_outside_range(text, range) do

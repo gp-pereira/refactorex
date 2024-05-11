@@ -2,19 +2,23 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
   use Refactorex.Refactor,
     title: "Extract module constant",
     kind: "refactor.extract",
-    works_on: :node
+    works_on: :selection
 
   alias Refactorex.Refactor.{
+    AST,
     Module,
     Variable
   }
 
   def can_refactor?(%{node: {:@, _, _}}, _), do: false
 
-  def can_refactor?(%{node: node} = zipper, node) do
+  def can_refactor?(%{node: node} = zipper, selection) do
     cond do
+      not AST.equal?(node, selection) ->
+        false
+
       not Module.inside_one?(zipper) ->
-        :skip
+        false
 
       not Enum.empty?(Variable.find_variables(node)) ->
         :skip
@@ -23,8 +27,6 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
         true
     end
   end
-
-  def can_refactor?(_, _), do: false
 
   def refactor(%{node: constant} = zipper, _) do
     constant_name = available_constant_name(zipper)
