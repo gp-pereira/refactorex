@@ -5,7 +5,6 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
     works_on: :line
 
   import Sourceror.Identifier
-  require Logger
 
   def can_refactor?(%{node: {_, _, []}}, _), do: false
 
@@ -15,7 +14,7 @@ defmodule Refactorex.Refactor.Pipe.PipeFirstArg do
 
   def can_refactor?(%{node: {_, _, _} = node} = zipper, line) do
     cond do
-      Sourceror.get_line(node) != line ->
+      not AST.starts_at?(node, line) ->
         false
 
       not can_pipe_into?(node) ->

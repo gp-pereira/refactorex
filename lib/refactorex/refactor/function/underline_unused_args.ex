@@ -14,7 +14,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgs do
       not (Function.definition?(node) or match?({:->, _, _}, node)) ->
         false
 
-      Sourceror.get_line(node) != line ->
+      not AST.starts_at?(node, line) ->
         false
 
       Enum.empty?(find_unused_args(node)) ->

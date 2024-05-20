@@ -5,7 +5,6 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     works_on: :selection
 
   alias Refactorex.Refactor.{
-    AST,
     Function,
     Module,
     Variable

@@ -5,7 +5,6 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
     works_on: :selection
 
   alias Refactorex.Refactor.{
-    AST,
     Module,
     Pipeline,
     Variable

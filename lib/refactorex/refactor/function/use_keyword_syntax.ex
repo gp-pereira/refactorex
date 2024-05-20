@@ -15,11 +15,11 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
       is_nil(meta[:do]) ->
         :skip
 
+      not AST.starts_at?(node, line) ->
+        false
+
       Function.has_multiple_statements?(zipper) ->
         :skip
-
-      Sourceror.get_line(node) != line ->
-        false
 
       true ->
         true

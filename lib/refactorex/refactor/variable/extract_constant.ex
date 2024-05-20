@@ -5,7 +5,6 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
     works_on: :selection
 
   alias Refactorex.Refactor.{
-    AST,
     Module,
     Variable
   }

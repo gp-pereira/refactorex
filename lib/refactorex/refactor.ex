@@ -11,6 +11,7 @@ defmodule Refactorex.Refactor do
 
     quote do
       alias Sourceror.Zipper, as: Z
+      alias Refactorex.Refactor.AST
 
       @behaviour Refactorex.Refactor
 

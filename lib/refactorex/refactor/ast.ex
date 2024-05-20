@@ -7,6 +7,8 @@ defmodule Refactorex.Refactor.AST do
     trailing_comments
   )a
 
+  def starts_at?(macro, line), do: get_start_line(macro) == line
+
   def get_start_line(macro) do
     macro
     |> Z.zip()

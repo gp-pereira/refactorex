@@ -11,7 +11,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntax do
       not Function.definition?(node) ->
         false
 
-      Sourceror.get_line(node) != line ->
+      not AST.starts_at?(node, line) ->
         false
 
       true ->

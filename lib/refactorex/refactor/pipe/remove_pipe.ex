@@ -5,7 +5,7 @@ defmodule Refactorex.Refactor.Pipe.RemovePipe do
     works_on: :line
 
   def can_refactor?(%{node: {:|>, _, _} = node}, line),
-    do: Sourceror.get_line(node) == line
+    do: AST.starts_at?(node, line)
 
   def can_refactor?(_, _), do: false
 
