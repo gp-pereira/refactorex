@@ -10,6 +10,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     Variable
   }
 
+  @function_name "extracted_function"
+
   def can_refactor?(%{node: {:fn, _, [{:->, _, [[] | _]}]}}, _), do: false
 
   def can_refactor?(%{node: node} = zipper, selection) do
@@ -48,15 +50,15 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       end)
       |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
 
-    name = available_function_name(zipper)
+    name = Module.next_available_function_name(zipper, @function_name)
 
     zipper
     |> anonymous_to_function_call(name, args, closure_variables)
-    |> add_private_function(name, args ++ closure_variables, body)
+    |> Module.add_private_function(name, args ++ closure_variables, body)
   end
 
   def refactor(%{node: {:fn, _, clauses}} = zipper, _) do
-    outer_scope_variables = find_outer_scope_variables(zipper)
+    available_variables = Variable.find_available_variables(zipper)
 
     closure_variables =
       clauses
@@ -67,7 +69,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
           [args, body],
           reject: fn %{node: variable} ->
             Variable.member?(actual_args, variable) or
-              not Variable.member?(outer_scope_variables, variable)
+              not Variable.member?(available_variables, variable)
           end
         )
       end)
@@ -77,13 +79,13 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     # all clauses have the same number of args,
     # so we can just grab them from the first one
     {:->, _, [args, _]} = List.first(clauses)
-    name = available_function_name(zipper)
+    name = Module.next_available_function_name(zipper, @function_name)
 
     zipper
     |> anonymous_to_function_call(name, args, closure_variables)
     |> then(
       &Enum.reduce(clauses, &1, fn {:->, _, [args, body]}, zipper ->
-        add_private_function(zipper, name, args ++ closure_variables, body)
+        Module.add_private_function(zipper, name, args ++ closure_variables, body)
       end)
     )
   end
@@ -100,55 +102,6 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     end)
   end
 
-  defp add_private_function(zipper, name, args, body) do
-    Module.add_function(
-      zipper,
-      {:defp, [do: [], end: []],
-       [
-         case Function.unpin_args(args) do
-           [{:when, _, [args, guard]} | other_args] ->
-             {:when, [], [{name, [], [args | other_args]}, guard]}
-
-           args ->
-             {name, [], args}
-         end,
-         [{{:__block__, [], [:do]}, body}]
-       ]}
-    )
-  end
-
-  defp find_outer_scope_variables(%{node: node} = zipper) do
-    zipper
-    |> Z.find(:prev, fn
-      {:defmodule, _, _} ->
-        true
-
-      node ->
-        Function.definition?(node)
-    end)
-    |> Z.node()
-    |> Variable.find_variables(reject: &(Sourceror.get_line(&1.node) >= Sourceror.get_line(node)))
-  end
-
-  defp available_function_name(zipper) do
-    zipper
-    |> Module.find_in_scope(&Function.definition?/1)
-    |> Enum.reduce("extracted_function", fn
-      {_, _, [{function_name, _, _}, _]}, current_name ->
-        case Atom.to_string(function_name) do
-          "extracted_function" ->
-            "extracted_function1"
-
-          "extracted_function" <> i ->
-            "extracted_function#{String.to_integer(i) + 1}"
-
-          _ ->
-            current_name
-        end
-    end)
-    |> String.to_atom()
-  end
-
   defp already_extracted_function?({_, _, [{name, _, _} | _]}),
-    do: String.starts_with?(Atom.to_string(name), "extracted_function")
+    do: String.starts_with?(Atom.to_string(name), @function_name)
 end
