@@ -1,4 +1,5 @@
 defmodule Refactorex.Refactor.Variable do
+  alias Refactorex.Refactor.AST
   alias Sourceror.Zipper, as: Z
 
   import Sourceror.Identifier
@@ -53,5 +54,18 @@ defmodule Refactorex.Refactor.Variable do
         {:cont, zipper, constants}
     end)
     |> elem(1)
+  end
+
+  def find_available_variables(%{node: node} = zipper) do
+    line = AST.get_start_line(node)
+
+    zipper
+    # go to outer scope
+    |> Z.find(:prev, fn
+      {id, _, _} when id in ~w(defmodule def defp)a -> true
+      _ -> false
+    end)
+    |> Z.node()
+    |> find_variables(reject: &(AST.get_start_line(&1.node) >= line))
   end
 end

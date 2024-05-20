@@ -7,6 +7,21 @@ defmodule Refactorex.Refactor.AST do
     trailing_comments
   )a
 
+  def get_start_line(macro) do
+    macro
+    |> Z.zip()
+    |> Z.traverse(:infinity, fn
+      %{node: {_, meta, _}} = zipper, min_line ->
+        if is_nil(meta[:line]),
+          do: {zipper, min_line},
+          else: {zipper, min(min_line, meta[:line])}
+
+      zipper, min_line ->
+        {zipper, min_line}
+    end)
+    |> elem(1)
+  end
+
   def equal?(macro, macro), do: true
 
   def equal?({id, _, _} = macro1, {id, _, _} = macro2),

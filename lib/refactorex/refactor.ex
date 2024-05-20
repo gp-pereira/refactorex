@@ -66,6 +66,7 @@ defmodule Refactorex.Refactor do
 
   @refactors [
     __MODULE__.Function.ExtractAnonymousFunction,
+    __MODULE__.Function.ExtractFunction,
     __MODULE__.Function.UnderlineUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
@@ -88,8 +89,7 @@ defmodule Refactorex.Refactor do
     else
       # this error means the file could not be parsed,
       # so there are no refactorings available for it
-      {:error, _} ->
-        []
+      {:error, _} -> []
     end
   end
 
