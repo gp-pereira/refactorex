@@ -2,12 +2,10 @@ defmodule Refactorex.Refactor.Module do
   alias Sourceror.Zipper, as: Z
   alias Refactorex.Refactor.Function
 
-  def inside_one?(zipper),
-    do: !!go_to_outer_module(zipper)
+  def inside_one?(zipper), do: !!go_to_definition(zipper)
 
   def add_private_function(zipper, name, args, body) do
-    add_function(
-      zipper,
+    private_function =
       {:defp, [do: [], end: []],
        [
          case Function.unpin_args(args) do
@@ -19,11 +17,17 @@ defmodule Refactorex.Refactor.Module do
          end,
          [{{:__block__, [], [:do]}, body}]
        ]}
-    )
+
+    update_scope(zipper, &(&1 ++ [private_function]))
   end
 
-  def add_function(zipper, function),
-    do: update_scope(zipper, &(&1 ++ [function]))
+  def find_in_scope(zipper, filter) do
+    zipper
+    |> go_to_scope()
+    |> Z.node()
+    |> Z.children()
+    |> Enum.filter(filter)
+  end
 
   def update_scope(zipper, updater) do
     zipper
@@ -33,21 +37,32 @@ defmodule Refactorex.Refactor.Module do
     end)
   end
 
-  def next_available_function_name(zipper, name) do
+  def next_available_function_name(zipper, base_name) do
     next_available_name(
       zipper,
+      base_name,
       &Function.definition?/1,
-      fn {_, _, [{function_name, _, _}, _]} -> function_name end,
-      name
+      fn {_, _, [{name, _, _}, _]} -> name end
     )
   end
 
-  defp next_available_name(zipper, filter, node_namer, base_name) do
+  def next_available_constant_name(zipper, base_name) do
+    next_available_name(
+      zipper,
+      base_name,
+      &match?({:@, _, _}, &1),
+      fn {_, _, [{name, _, _}]} -> name end
+    )
+  end
+
+  defp next_available_name(zipper, base_name, filter, node_namer) do
     zipper
     |> find_in_scope(filter)
     |> Enum.reduce(base_name, fn
       node, current_name ->
-        case Regex.run(~r/#{base_name}(\d*)/, Atom.to_string(node_namer.(node))) do
+        node_name = node |> node_namer.() |> Atom.to_string()
+
+        case Regex.run(~r/#{base_name}(\d*)/, node_name) do
           [_, ""] ->
             "#{base_name}1"
 
@@ -61,17 +76,19 @@ defmodule Refactorex.Refactor.Module do
     |> String.to_atom()
   end
 
-  def find_in_scope(zipper, filter) do
-    zipper
-    |> go_to_scope()
-    |> Z.node()
-    |> Z.children()
-    |> Enum.filter(filter)
+  defp go_to_definition(zipper) do
+    Z.find(zipper, :prev, fn
+      {:defmodule, _, _} ->
+        true
+
+      _ ->
+        false
+    end)
   end
 
   defp go_to_scope(zipper) do
     zipper
-    |> go_to_outer_module()
+    |> go_to_definition()
     |> Z.down()
     |> Z.right()
     |> Z.down()
@@ -83,16 +100,6 @@ defmodule Refactorex.Refactor.Module do
 
       scope ->
         {:__block__, [], [scope]}
-    end)
-  end
-
-  defp go_to_outer_module(zipper) do
-    Z.find(zipper, :prev, fn
-      {:defmodule, _, _} ->
-        true
-
-      _ ->
-        false
     end)
   end
 end
