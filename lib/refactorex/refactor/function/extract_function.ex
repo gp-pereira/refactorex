@@ -10,6 +10,8 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
     Variable
   }
 
+  @function_name "extracted_function"
+
   def can_refactor?(%{node: {id, _, _}}, _)
       when id in ~w(@ & <-)a,
       do: false
@@ -34,7 +36,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
   end
 
   def refactor(%{node: node} = zipper, selection) do
-    name = Module.next_available_function_name(zipper, "extracted_function")
+    name = Module.next_available_function_name(zipper, @function_name)
     args = find_function_args(zipper, selection)
 
     cond do
