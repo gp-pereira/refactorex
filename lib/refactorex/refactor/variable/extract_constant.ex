@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Variable.ExtractConstant do
   use Refactorex.Refactor,
-    title: "Extract module constant",
+    title: "Extract constant",
     kind: "refactor.extract",
     works_on: :selection
 
@@ -8,6 +8,8 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
     Module,
     Variable
   }
+
+  @constant_name "extracted_constant"
 
   def can_refactor?(%{node: {:@, _, _}}, _), do: false
 
@@ -19,7 +21,7 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
       not Module.inside_one?(zipper) ->
         false
 
-      not Enum.empty?(Variable.find_variables(node)) ->
+      Enum.any?(Variable.find_variables(node)) ->
         :skip
 
       true ->
@@ -28,15 +30,15 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
   end
 
   def refactor(%{node: constant} = zipper, _) do
-    constant_name = available_constant_name(zipper)
+    name = Module.next_available_constant_name(zipper, @constant_name)
 
     zipper
-    |> Z.update(fn _ -> {:@, [], [{constant_name, [], nil}]} end)
+    |> Z.update(fn _ -> {:@, [], [{name, [], nil}]} end)
     |> Module.update_scope(fn module_scope ->
       position = where_to_place_constant(module_scope, constant)
       {before, rest} = Enum.split(module_scope, position)
 
-      before ++ [{:@, [], [{constant_name, [], [constant]}]} | rest]
+      before ++ [{:@, [], [{name, [], [constant]}]} | rest]
     end)
   end
 
@@ -59,24 +61,5 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
         0
     end)
     |> Enum.max()
-  end
-
-  defp available_constant_name(zipper) do
-    zipper
-    |> Module.find_in_scope(&match?({:@, _, _}, &1))
-    |> Enum.reduce("extracted_constant", fn
-      {_, _, [{constant_name, _, _}]}, current_name ->
-        case Atom.to_string(constant_name) do
-          "extracted_constant" ->
-            "extracted_constant1"
-
-          "extracted_constant" <> i ->
-            "extracted_constant#{String.to_integer(i) + 1}"
-
-          _ ->
-            current_name
-        end
-    end)
-    |> String.to_atom()
   end
 end
