@@ -1,11 +1,11 @@
-defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
+defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Function.UnderlineUnusedArgs
+  alias Refactorex.Refactor.Function.UnderscoreUnusedArgs
 
   test "underlines unused args on function header" do
     assert_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       #       v
       def foo(bar1, bar2, bar3) do
@@ -22,7 +22,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "underlines unused args on anonymous function" do
     assert_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       fn
       #       v
@@ -39,7 +39,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "underlines unused args inside pattern matching" do
     assert_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       #       v
       def foo(%{bar1: bar1, bar2: bar2}) do
@@ -56,7 +56,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "ignores repeated args used for pattern matching" do
     assert_not_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       #       v
       def foo(bar1, bar2, bar2) do
@@ -68,7 +68,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "ignores already underlined args" do
     assert_not_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       #       v
       def foo(bar1, _bar2) do
@@ -80,7 +80,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "ignores pinned args" do
     assert_not_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       def foo(bar) do
         #       v
@@ -92,7 +92,7 @@ defmodule Refactorex.Refactor.Function.UnderlineUnusedArgsTest do
 
   test "ignores args used on guards" do
     assert_not_refactored(
-      UnderlineUnusedArgs,
+      UnderscoreUnusedArgs,
       """
       #       v
       def foo(bar1, bar2) when bar2 == 2 do

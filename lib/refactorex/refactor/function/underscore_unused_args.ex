@@ -1,7 +1,7 @@
-defmodule Refactorex.Refactor.Function.UnderlineUnusedArgs do
+defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgs do
   use Refactorex.Refactor,
-    title: "Underline unused arguments",
-    kind: "refactor",
+    title: "Underscore arguments not used",
+    kind: "quickfix",
     works_on: :line
 
   alias Refactorex.Refactor.{

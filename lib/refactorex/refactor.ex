@@ -68,7 +68,7 @@ defmodule Refactorex.Refactor do
   @refactors [
     __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.ExtractFunction,
-    __MODULE__.Function.UnderlineUnusedArgs,
+    __MODULE__.Function.UnderscoreUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
     __MODULE__.Pipeline.PipeFirstArg,
