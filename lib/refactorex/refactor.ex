@@ -66,6 +66,7 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
+    __MODULE__.Function.ExpandAnonymousFunction,
     __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.ExtractFunction,
     __MODULE__.Function.UnderscoreUnusedArgs,
