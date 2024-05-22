@@ -1,7 +1,7 @@
-defmodule Refactorex.Refactor.Pipe.RemovePipeTest do
+defmodule Refactorex.Refactor.Pipeline.RemovePipeTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Pipe.RemovePipe
+  alias Refactorex.Refactor.Pipeline.RemovePipe
 
   test "removes pipe operator" do
     assert_refactored(

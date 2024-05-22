@@ -71,8 +71,8 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UnderlineUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
-    __MODULE__.Pipe.PipeFirstArg,
-    __MODULE__.Pipe.RemovePipe,
+    __MODULE__.Pipeline.PipeFirstArg,
+    __MODULE__.Pipeline.RemovePipe,
     __MODULE__.Variable.ExtractConstant
   ]
 

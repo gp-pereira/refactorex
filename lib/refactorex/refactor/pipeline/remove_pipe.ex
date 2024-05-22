@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Pipe.RemovePipe do
+defmodule Refactorex.Refactor.Pipeline.RemovePipe do
   use Refactorex.Refactor,
     title: "Remove pipe",
     kind: "refactor.rewrite",
