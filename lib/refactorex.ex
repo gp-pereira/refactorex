@@ -4,12 +4,15 @@ defmodule Refactorex do
   alias GenLSP.Requests.{
     Initialize,
     TextDocumentCodeAction,
-    CodeActionResolve
+    CodeActionResolve,
+    Shutdown
   }
 
   alias GenLSP.Notifications.{
+    Exit,
     TextDocumentDidOpen,
-    TextDocumentDidChange
+    TextDocumentDidChange,
+    TextDocumentDidClose
   }
 
   alias __MODULE__.{
@@ -74,6 +77,18 @@ defmodule Refactorex do
   end
 
   @impl true
+  def handle_request(%Shutdown{}, lsp) do
+    Logger.info("Client disconnected")
+    {:reply, nil, lsp}
+  end
+
+  @impl true
+  def handle_notification(%Exit{}, lsp) do
+    System.halt(0)
+    {:noreply, lsp}
+  end
+
+  @impl true
   def handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
     %{uri: uri, text: text} = params.text_document
 
@@ -86,6 +101,13 @@ defmodule Refactorex do
     [%{text: text}] = params.content_changes
 
     {:noreply, replace_document(lsp, uri, text)}
+  end
+
+  @impl true
+  def handle_notification(%TextDocumentDidClose{params: params}, lsp) do
+    %{uri: uri} = params.text_document
+
+    {:noreply, replace_document(lsp, uri, "")}
   end
 
   @impl true
