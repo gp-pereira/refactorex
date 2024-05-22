@@ -11,7 +11,9 @@ defmodule Refactorex.Refactor.Variable.ExtractConstant do
 
   @constant_name "extracted_constant"
 
-  def can_refactor?(%{node: {:@, _, _}}, _), do: false
+  def can_refactor?(%{node: {id, _, _}}, _)
+      when id in ~w(@ &)a,
+      do: false
 
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do

@@ -173,6 +173,23 @@ defmodule Refactorex.Refactor.Variable.ExtractConstantTest do
     )
   end
 
+  test "ignores anonymous function" do
+    assert_not_refactored(
+      ExtractConstant,
+      """
+      defmodule Foo do
+        @other_constant 10
+
+        def foo(arg) do
+        #               v
+          Enum.map(arg, &(&1 + 2))
+        #                       ^
+        end
+      end
+      """
+    )
+  end
+
   test "ignores selection ranges with variables" do
     assert_not_refactored(
       ExtractConstant,
