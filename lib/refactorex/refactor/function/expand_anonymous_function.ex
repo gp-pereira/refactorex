@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Function.ExpandAnonymousFunction do
   use Refactorex.Refactor,
-    title: "Extract anonymous function",
+    title: "Expand anonymous function",
     kind: "refactor.rewrite",
     works_on: :selection
 
