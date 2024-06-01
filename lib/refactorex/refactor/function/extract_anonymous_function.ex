@@ -102,6 +102,9 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     end)
   end
 
-  defp already_extracted_function?({_, _, [{name, _, _} | _]}),
-    do: String.starts_with?(Atom.to_string(name), @function_name)
+  defp already_extracted_function?({_, _, [{name, _, _} | _]})
+       when is_atom(name),
+       do: String.starts_with?(Atom.to_string(name), @function_name)
+
+  defp already_extracted_function?(_), do: false
 end

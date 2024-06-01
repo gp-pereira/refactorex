@@ -423,6 +423,32 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
     )
   end
 
+  test "extracts anonymous function from other modules" do
+    assert_refactored(
+      ExtractAnonymousFunction,
+      """
+      defmodule Chef do
+        def grab_ingredients(recipe, pantry) do
+          #                   v
+          Enum.filter(pantry, &Enum.member?(recipe.ingredients, &1))
+          #                                                       ^
+        end
+      end
+      """,
+      """
+      defmodule Chef do
+        def grab_ingredients(recipe, pantry) do
+          Enum.filter(pantry, &extracted_function(&1, recipe))
+        end
+
+        defp extracted_function(arg1, recipe) do
+          Enum.member?(recipe.ingredients, arg1)
+        end
+      end
+      """
+    )
+  end
+
   test "ignores anonymous function that is not inside a module" do
     assert_not_refactored(
       ExtractAnonymousFunction,
