@@ -1,21 +1,32 @@
 # Refactorex
 
-**TODO: Add description**
+Refactorex is a TCP server that implements the Language Server Protocol
+to enhance editors with Elixir refactoring code actions
 
-## Installation
+- [VS Code extension](https://github.com/gp-pereira/refactorex-vscode)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `refactorex` to your list of dependencies in `mix.exs`:
+## How it works
 
-```elixir
-def deps do
-  [
-    {:refactorex, "~> 0.1.0"}
-  ]
-end
+```mermaid
+sequenceDiagram 
+	participant A as Editor
+	participant B as LanguageServer
+	participant C as All Refactors
+	participant D as Selected Refactor
+	
+	A--)B: file opened
+	A->>B: show refactorings for line or selection
+	B->>C: can refactor line or selection?
+	C-->>B: yes or no
+	B-->>A: list of available refactorings
+	
+	A->>B: use this refactoring
+	B->>D: refactor line or selection
+	D-->>B: refactored code
+	B-->>A: file diffs
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/refactorex>.
+## Acknowledgements
 
+- [Sourceror](https://github.com/doorgan/sourceror) which made traversing and updating the Elixir AST super simple
+- [GenLSP](https://github.com/elixir-tools/gen_lsp) for providing much of the infrastructure to create an Elixir language server
