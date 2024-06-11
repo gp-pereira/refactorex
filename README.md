@@ -1,7 +1,8 @@
 # Refactorex
 
 Refactorex is a TCP server that implements the Language Server Protocol
-to enhance editors with Elixir refactoring code actions
+to enhance editors with Elixir refactoring code actions, inspired on the 
+[catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings)
 
 - [VS Code extension](https://github.com/gp-pereira/refactorex-vscode)
 
