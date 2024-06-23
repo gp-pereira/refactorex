@@ -66,6 +66,26 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
     )
   end
 
+  test "ignores functions with no args" do
+    assert_not_refactored(
+      UnderscoreUnusedArgs,
+      """
+      #       v
+      def foo, do: 25
+      """
+    )
+  end
+
+  test "ignores anonymous functions with no args" do
+    assert_not_refactored(
+      UnderscoreUnusedArgs,
+      """
+      #       v
+      fn -> 25 end
+      """
+    )
+  end
+
   test "ignores already underlined args" do
     assert_not_refactored(
       UnderscoreUnusedArgs,

@@ -29,8 +29,8 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgs do
     unused_args = find_unused_args(node)
 
     zipper
-    |> Z.update(fn {id, meta, [args, body]} ->
-      args
+    |> Z.update(fn {id, meta, [header, body]} ->
+      header
       |> Z.zip()
       |> Z.traverse(fn %{node: variable} = zipper ->
         if Variable.member?(unused_args, variable),
@@ -42,10 +42,16 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgs do
     end)
   end
 
-  defp find_unused_args({id, meta, [{:when, _, [args, guard]}, body]}),
-    do: find_unused_args({id, meta, [args, [guard, body]]})
+  defp find_unused_args({_, _, [{:when, _, [{_, _, args}, guard]}, body]}),
+    do: find_unused_args(args, [body, guard])
 
-  defp find_unused_args({_, _, [args, body]}) do
+  defp find_unused_args({_, _, [{_, _, args}, body]}),
+    do: find_unused_args(args, body)
+
+  defp find_unused_args({:->, _, [args, body]}),
+    do: find_unused_args(args, body)
+
+  defp find_unused_args(args, body) do
     used_variables = Variable.find_variables(body)
     actual_args = Function.actual_args(args)
 
