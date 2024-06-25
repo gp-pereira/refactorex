@@ -50,7 +50,7 @@ defmodule Refactorex.Refactor.Selection do
       |> Z.zip()
       |> Z.traverse(fn
         %{node: {id, meta, [string]}} = zipper when is_bitstring(string) ->
-          string = String.replace(string, "\n", @newline_replacement)
+          string = String.replace(string, "\n", "#{@newline_replacement}\n")
           Z.update(zipper, fn _ -> {id, meta, [string]} end)
 
         zipper ->
