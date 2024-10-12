@@ -17,12 +17,14 @@ defmodule Refactorex.Refactor do
 
       @dialyzer {:no_match, available?: 2, visit: 4}
 
-      def available?(_, node)
-          when is_number(node) and unquote(works_on) == :selection,
+      defguardp line?(selection_or_line) when is_number(selection_or_line)
+
+      def available?(_, selection_or_line)
+          when line?(selection_or_line) and unquote(works_on != :line),
           do: false
 
-      def available?(_, line)
-          when not is_number(line) and unquote(works_on) == :line,
+      def available?(_, selection_or_line)
+          when not line?(selection_or_line) and unquote(works_on != :selection),
           do: false
 
       def available?(zipper, selection_or_line) do
@@ -80,6 +82,7 @@ defmodule Refactorex.Refactor do
   alias __MODULE__.Selection
 
   def available_refactorings(original, range, modules \\ @refactors) do
+    # this is input and error handling so it should be moved to the server code
     with {:ok, selection_or_line} <- Selection.selection_or_line(original, range),
          {:ok, macro} <- Sourceror.parse_string(original) do
       zipper = Sourceror.Zipper.zip(macro)
