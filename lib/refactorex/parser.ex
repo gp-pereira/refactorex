@@ -22,4 +22,32 @@ defmodule Refactorex.Parser do
   end
 
   def parse_metadata(not_map), do: not_map
+
+  def position_to_range(original, %{line: line, character: character}) do
+    {left, right} =
+      original
+      |> String.split("\n")
+      |> Enum.at(line)
+      |> String.split("")
+      |> Enum.split(character)
+
+    %{
+      start: %{
+        line: line,
+        character: character - 1 - count_while_identifier(Enum.reverse(left))
+      },
+      end: %{
+        line: line,
+        character: character - 1 + count_while_identifier(right)
+      }
+    }
+  end
+
+  defp count_while_identifier(characters) do
+    Enum.reduce_while(characters, 0, fn i, count ->
+      if String.match?(i, ~r/^[a-zA-Z0-9_?!]+$/),
+        do: {:cont, count + 1},
+        else: {:halt, count}
+    end)
+  end
 end
