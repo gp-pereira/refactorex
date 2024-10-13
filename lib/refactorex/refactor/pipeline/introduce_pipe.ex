@@ -1,6 +1,6 @@
-defmodule Refactorex.Refactor.Pipeline.PipeFirstArg do
+defmodule Refactorex.Refactor.Pipeline.IntroducePipe do
   use Refactorex.Refactor,
-    title: "Pipe first argument into function",
+    title: "Introduce pipe",
     kind: "refactor.rewrite",
     works_on: :line
 

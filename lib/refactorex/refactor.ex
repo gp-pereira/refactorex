@@ -79,7 +79,7 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UnderscoreUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
-    __MODULE__.Pipeline.PipeFirstArg,
+    __MODULE__.Pipeline.IntroducePipe,
     __MODULE__.Pipeline.RemovePipe
   ]
 
