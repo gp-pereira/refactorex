@@ -110,4 +110,7 @@ defmodule Refactorex.RefactorCase do
     |> Enum.reject(&String.match?(&1, @marker_regex))
     |> Enum.join("\n")
   end
+
+  def placeholder,
+    do: Refactorex.Refactor.Function.ExpandAnonymousFunction.placeholder()
 end
