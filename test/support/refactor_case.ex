@@ -1,7 +1,7 @@
 defmodule Refactorex.RefactorCase do
   use ExUnit.CaseTemplate
 
-  alias Refactorex.Refactor.Selection
+  alias Refactorex.Parser
 
   @marker_regex ~r/\s*#\s*[v\^]/
 
@@ -27,7 +27,7 @@ defmodule Refactorex.RefactorCase do
       original = remove_markers(original)
       zipper = text_to_zipper(original)
 
-      {:ok, selection_or_line} = Selection.selection_or_line(original, range)
+      {:ok, selection_or_line} = Parser.selection_or_line(original, range)
 
       assert true == module.available?(zipper, selection_or_line)
 
@@ -50,7 +50,7 @@ defmodule Refactorex.RefactorCase do
       original = remove_markers(original)
       zipper = text_to_zipper(original)
 
-      {:ok, selection_or_line} = Selection.selection_or_line(original, range)
+      {:ok, selection_or_line} = Parser.selection_or_line(original, range)
 
       assert false == module.available?(zipper, selection_or_line)
     end
