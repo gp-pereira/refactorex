@@ -136,7 +136,7 @@ defmodule Refactorex do
     %{
       text_document: %{uri: uri},
       position: position,
-      new_name: new_identifier
+      new_name: new_name
     } = params
 
     range = Parser.position_to_range(lsp.assigns.documents[uri], position)
@@ -146,7 +146,7 @@ defmodule Refactorex do
         {
           :reply,
           zipper
-          |> Refactor.rename(selection, new_identifier)
+          |> Refactor.rename(selection, new_name)
           |> Diff.find_diffs2(lsp.assigns.documents[uri])
           |> Response.perform_renaming(uri),
           lsp

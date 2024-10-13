@@ -6,7 +6,7 @@ defmodule Refactorex.Refactor do
   @callback can_refactor?(Zipper.t(), selection_or_line) :: :skip | true | false
   @callback refactor(Zipper.t(), selection_or_line) :: Zipper.t()
 
-  @identifier_placeholder :under_refactor11112023
+  @placeholder :name_being_refactored_31_08_2024
 
   defmacro __using__(attrs) do
     works_on = Keyword.fetch!(attrs, :works_on)
@@ -67,7 +67,7 @@ defmodule Refactorex.Refactor do
         }
       end
 
-      def identifier_placeholder, do: unquote(@identifier_placeholder)
+      def placeholder, do: unquote(@placeholder)
     end
   end
 
@@ -105,12 +105,12 @@ defmodule Refactorex.Refactor do
   def rename_available?(zipper, selection),
     do: Enum.any?(available_refactorings(zipper, selection, @renamers))
 
-  def rename(zipper, selection, new_identifier) do
+  def rename(zipper, selection, new_name) do
     [%{module: module} | _] = available_refactorings(zipper, selection, @renamers)
 
     zipper
     |> module.execute(selection)
-    |> String.replace("#{@identifier_placeholder}", new_identifier)
+    |> String.replace("#{@placeholder}", new_name)
     |> module.refactoring()
   end
 end
