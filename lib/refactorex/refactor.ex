@@ -56,12 +56,12 @@ defmodule Refactorex.Refactor do
         end
       end
 
-      def refactoring(diffs \\ []) do
+      def refactoring(refactored \\ nil) do
         %Refactorex.Refactoring{
           module: __MODULE__,
           title: unquote(Keyword.fetch!(attrs, :title)),
           kind: unquote(Keyword.fetch!(attrs, :kind)),
-          diffs: diffs
+          refactored: refactored
         }
       end
     end
@@ -79,34 +79,18 @@ defmodule Refactorex.Refactor do
     __MODULE__.Variable.ExtractConstant
   ]
 
-  alias __MODULE__.Selection
-
-  def available_refactorings(original, range, modules \\ @refactors) do
-    # this is input and error handling so it should be moved to the server code
-    with {:ok, selection_or_line} <- Selection.selection_or_line(original, range),
-         {:ok, macro} <- Sourceror.parse_string(original) do
-      zipper = Sourceror.Zipper.zip(macro)
-
-      modules
-      |> Stream.map(&{&1, &1.available?(zipper, selection_or_line)})
-      |> Stream.filter(&match?({_, true}, &1))
-      |> Enum.map(fn {module, _} -> module.refactoring() end)
-    else
-      # this error means the file could not be parsed,
-      # so there are no refactorings available for it
-      {:error, _} -> []
-    end
+  def available_refactorings(zipper, selection_or_line) do
+    @refactors
+    |> Stream.map(&{&1, &1.available?(zipper, selection_or_line)})
+    |> Stream.filter(&match?({_, true}, &1))
+    |> Enum.map(fn {module, _} -> module.refactoring() end)
   end
 
-  def refactor(original, range, module) do
-    {:ok, selection_or_line} = Selection.selection_or_line(original, range)
+  def refactor(zipper, selection_or_line, module) do
     module = String.to_atom(module)
 
-    original
-    |> Sourceror.parse_string!()
-    |> Sourceror.Zipper.zip()
+    zipper
     |> module.execute(selection_or_line)
-    |> then(&Refactorex.Diff.find_diffs(original, &1))
     |> module.refactoring()
   end
 end

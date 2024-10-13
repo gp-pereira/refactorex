@@ -13,6 +13,8 @@ defmodule Refactorex.Refactoring do
     # - source
     # - source.organizeImports
     :kind,
+    # This will contain the code after the refactor execution
+    :refactored,
     # This will contain the changes required to perform the
     # refactoring. Each diff carries some new text and its range
     :diffs

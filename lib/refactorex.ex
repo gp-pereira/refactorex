@@ -4,6 +4,7 @@ defmodule Refactorex do
   alias GenLSP.Requests.{
     Initialize,
     TextDocumentCodeAction,
+    # TextDocumentPrepareRename,
     CodeActionResolve,
     Shutdown
   }
@@ -16,11 +17,12 @@ defmodule Refactorex do
   }
 
   alias __MODULE__.{
+    Diff,
+    Logger,
+    Parser,
     Refactor,
     Response
   }
-
-  require Logger
 
   def start_link(args) do
     {args, opts} = Keyword.split(args, [])
@@ -28,96 +30,125 @@ defmodule Refactorex do
   end
 
   @impl true
-  def init(lsp, _args), do: {:ok, assign(lsp, documents: %{})}
-
-  @impl true
-  def handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
-    GenLSP.info(lsp, "Client connected to the server")
-    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  def init(lsp, _args) do
+    Logger.info(lsp, "Server started")
+    {:ok, assign(lsp, documents: %{})}
   end
 
   @impl true
-  def handle_request(%TextDocumentCodeAction{params: params}, lsp) do
+  def handle_request(request, lsp) do
+    prevent_crash(
+      lsp,
+      &do_handle_request(request, &1),
+      # add error invalid request?
+      {:reply, nil, lsp}
+    )
+  end
+
+  @impl true
+  def handle_notification(notification, lsp) do
+    prevent_crash(
+      lsp,
+      &do_handle_notification(notification, &1),
+      {:noreply, lsp}
+    )
+  end
+
+  def do_handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
+    Logger.info(lsp, "Client connected")
+    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+  end
+
+  def do_handle_request(%Shutdown{}, lsp) do
+    Logger.info(lsp, "Client disconnected")
+    {:reply, nil, lsp}
+  end
+
+  def do_handle_request(%TextDocumentCodeAction{params: params}, lsp) do
     case params do
       %{
         context: %{trigger_kind: 1},
         text_document: %{uri: uri},
         range: range
       } ->
-        range = update_in(range.start.line, &(&1 + 1))
-        range = update_in(range.end.line, &(&1 + 1))
+        case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+          {:ok, zipper, selection_or_line} ->
+            {
+              :reply,
+              zipper
+              |> Refactor.available_refactorings(selection_or_line)
+              |> Response.suggest_refactorings(uri, range),
+              lsp
+            }
 
-        {
-          :reply,
-          lsp.assigns.documents[uri]
-          |> Refactor.available_refactorings(range)
-          |> Response.suggest_refactorings(uri, range),
-          lsp
-        }
+          {:error, :parse_error} ->
+            # add error
+            # maybe an error response can be a better message
+            {:reply, [], lsp}
+        end
 
       _ ->
+        # add error invalid request?
         {:reply, [], lsp}
     end
   end
 
-  @impl true
-  def handle_request(%CodeActionResolve{params: params}, lsp) do
-    %{module: module, uri: uri, range: range} = atom_map(params.data)
+  def do_handle_request(%CodeActionResolve{params: %{data: data}}, lsp) do
+    %{module: module, uri: uri, range: range} = Parser.parse_metadata(data)
 
-    {
-      :reply,
-      lsp.assigns.documents[uri]
-      |> Refactor.refactor(range, module)
-      |> Response.perform_refactoring(uri),
-      lsp
-    }
+    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+      {:ok, zipper, selection_or_line} ->
+        {
+          :reply,
+          zipper
+          |> Refactor.refactor(selection_or_line, module)
+          |> Diff.find_diffs2(lsp.assigns.documents[uri])
+          |> Response.perform_refactoring(uri),
+          lsp
+        }
+
+      {:error, :parse_error} ->
+        # add error
+        {:reply, [], lsp}
+    end
   end
 
-  @impl true
-  def handle_request(%Shutdown{}, lsp) do
-    Logger.info("Client disconnected")
-    {:reply, nil, lsp}
-  end
-
-  @impl true
-  def handle_notification(%Exit{}, lsp) do
-    System.halt(0)
+  def do_handle_notification(%Exit{}, lsp) do
+    if Mix.env() == :prod, do: System.halt(0)
     {:noreply, lsp}
   end
 
-  @impl true
-  def handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
+  def do_handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
     %{uri: uri, text: text} = params.text_document
 
     {:noreply, replace_document(lsp, uri, text)}
   end
 
-  @impl true
-  def handle_notification(%TextDocumentDidChange{params: params}, lsp) do
+  def do_handle_notification(%TextDocumentDidChange{params: params}, lsp) do
     %{uri: uri} = params.text_document
     [%{text: text}] = params.content_changes
 
     {:noreply, replace_document(lsp, uri, text)}
   end
 
-  @impl true
-  def handle_notification(%TextDocumentDidClose{params: params}, lsp) do
+  def do_handle_notification(%TextDocumentDidClose{params: params}, lsp) do
     %{uri: uri} = params.text_document
 
     {:noreply, replace_document(lsp, uri, "")}
   end
 
-  @impl true
-  def handle_notification(_, lsp), do: {:noreply, lsp}
+  def do_handle_notification(_, lsp), do: {:noreply, lsp}
 
   defp replace_document(lsp, uri, text),
     do: put_in(lsp.assigns.documents[uri], text)
 
-  defp atom_map(%{} = map) do
-    map
-    |> Enum.map(fn {k, v} -> {String.to_atom(k), atom_map(v)} end)
-    |> Map.new()
+  defp prevent_crash(lsp, func, default) do
+    try do
+      func.(lsp)
+    rescue
+      e ->
+        Logger.error(lsp, Exception.format(:error, e, __STACKTRACE__))
+        default
+    end
   end
-
-  defp atom_map(not_map), do: not_map
 end
