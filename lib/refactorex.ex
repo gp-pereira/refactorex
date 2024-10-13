@@ -3,9 +3,10 @@ defmodule Refactorex do
 
   alias GenLSP.Requests.{
     Initialize,
-    TextDocumentCodeAction,
-    # TextDocumentPrepareRename,
     CodeActionResolve,
+    TextDocumentCodeAction,
+    TextDocumentPrepareRename,
+    TextDocumentRename,
     Shutdown
   }
 
@@ -104,6 +105,50 @@ defmodule Refactorex do
           |> Refactor.refactor(selection_or_line, module)
           |> Diff.find_diffs2(lsp.assigns.documents[uri])
           |> Response.perform_refactoring(uri),
+          lsp
+        }
+
+      {:error, :parse_error} ->
+        # add error
+        {:reply, [], lsp}
+    end
+  end
+
+  def do_handle_request(%TextDocumentPrepareRename{params: params}, lsp) do
+    %{text_document: %{uri: uri}, position: position} = params
+
+    range = Parser.position_to_range(lsp.assigns.documents[uri], position)
+
+    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+      {:ok, zipper, selection} ->
+        if Refactor.rename_available?(zipper, selection),
+          do: {:reply, Response.send_rename_range(range), lsp},
+          # add error ??
+          else: {:reply, nil, lsp}
+
+      {:error, :parse_error} ->
+        # add error
+        {:reply, [], lsp}
+    end
+  end
+
+  def do_handle_request(%TextDocumentRename{params: params}, lsp) do
+    %{
+      text_document: %{uri: uri},
+      position: position,
+      new_name: new_identifier
+    } = params
+
+    range = Parser.position_to_range(lsp.assigns.documents[uri], position)
+
+    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+      {:ok, zipper, selection} ->
+        {
+          :reply,
+          zipper
+          |> Refactor.rename(selection, new_identifier)
+          |> Diff.find_diffs2(lsp.assigns.documents[uri])
+          |> Response.perform_renaming(uri),
           lsp
         }
 

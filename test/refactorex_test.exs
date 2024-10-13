@@ -91,8 +91,8 @@ defmodule RefactorexTest do
             "module" => "Elixir.Refactorex.Refactor.Function.UseKeywordSyntax",
             "uri" => ^file_uri,
             "range" => %{
-              "start" => %{"line" => 2, "character" => 4},
-              "end" => %{"line" => 2, "character" => 4}
+              "start" => %{"line" => 1, "character" => 4},
+              "end" => %{"line" => 1, "character" => 4}
             }
           }
         } = code_action
@@ -148,6 +148,71 @@ defmodule RefactorexTest do
     :ok = request_code_actions(client, file_uri)
 
     assert_result(2, [], @timeout)
+  end
+
+  test "responds Rename for some identifier", %{
+    client: client,
+    file_uri: file_uri
+  } do
+    :ok =
+      notify(client, %{
+        method: "textDocument/didChange",
+        jsonrpc: "2.0",
+        params: %{
+          textDocument: %{version: 2, uri: file_uri},
+          contentChanges: [%{text: "defmodule Foo do\n  @foo :foo\nend"}]
+        }
+      })
+
+    :ok =
+      request(client, %{
+        method: "textDocument/prepareRename",
+        id: 2,
+        jsonrpc: "2.0",
+        params: %{
+          textDocument: %{uri: file_uri},
+          position: %{line: 1, character: 5}
+        }
+      })
+
+    assert_result(
+      2,
+      %{
+        "start" => %{"line" => 1, "character" => 3},
+        "end" => %{"line" => 1, "character" => 6}
+      },
+      @timeout
+    )
+
+    :ok =
+      request(client, %{
+        method: "textDocument/rename",
+        id: 3,
+        jsonrpc: "2.0",
+        params: %{
+          newName: "bar",
+          textDocument: %{uri: file_uri},
+          position: %{line: 1, character: 5}
+        }
+      })
+
+    assert_result(
+      3,
+      %{
+        "changes" => %{
+          ^file_uri => [
+            %{
+              "newText" => "  @bar :foo",
+              "range" => %{
+                "start" => %{"line" => 1, "character" => 0},
+                "end" => %{"line" => 1, "character" => 11}
+              }
+            }
+          ]
+        }
+      },
+      @timeout
+    )
   end
 
   defp request_code_actions(client, file_uri) do

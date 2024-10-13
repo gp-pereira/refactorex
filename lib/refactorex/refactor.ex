@@ -6,6 +6,8 @@ defmodule Refactorex.Refactor do
   @callback can_refactor?(Zipper.t(), selection_or_line) :: :skip | true | false
   @callback refactor(Zipper.t(), selection_or_line) :: Zipper.t()
 
+  @identifier_placeholder :under_refactor11112023
+
   defmacro __using__(attrs) do
     works_on = Keyword.fetch!(attrs, :works_on)
 
@@ -64,6 +66,8 @@ defmodule Refactorex.Refactor do
           refactored: refactored
         }
       end
+
+      def identifier_placeholder, do: unquote(@identifier_placeholder)
     end
   end
 
@@ -79,8 +83,12 @@ defmodule Refactorex.Refactor do
     __MODULE__.Variable.ExtractConstant
   ]
 
-  def available_refactorings(zipper, selection_or_line) do
-    @refactors
+  @renamers [
+    __MODULE__.Constant.RenameConstant
+  ]
+
+  def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
+    modules
     |> Stream.map(&{&1, &1.available?(zipper, selection_or_line)})
     |> Stream.filter(&match?({_, true}, &1))
     |> Enum.map(fn {module, _} -> module.refactoring() end)
@@ -91,6 +99,18 @@ defmodule Refactorex.Refactor do
 
     zipper
     |> module.execute(selection_or_line)
+    |> module.refactoring()
+  end
+
+  def rename_available?(zipper, selection),
+    do: Enum.any?(available_refactorings(zipper, selection, @renamers))
+
+  def rename(zipper, selection, new_identifier) do
+    [%{module: module} | _] = available_refactorings(zipper, selection, @renamers)
+
+    zipper
+    |> module.execute(selection)
+    |> String.replace("#{@identifier_placeholder}", new_identifier)
     |> module.refactoring()
   end
 end
