@@ -1,19 +1,7 @@
 defmodule Refactorex.Parser do
   alias Sourceror.Zipper, as: Z
 
-  @newline_replacement "$$replacement$$"
-
-  def parse_inputs(original, range) do
-    range = update_in(range.start.line, &(&1 + 1))
-    range = update_in(range.end.line, &(&1 + 1))
-
-    with {:ok, macro} <- Sourceror.parse_string(original),
-         {:ok, selection_or_line} <- selection_or_line(original, range) do
-      {:ok, Z.zip(macro), selection_or_line}
-    else
-      {:error, _} -> {:error, :parse_error}
-    end
-  end
+  @newline_placeholder "-----placeholder-----"
 
   def parse_metadata(%{} = map) do
     map
@@ -23,9 +11,23 @@ defmodule Refactorex.Parser do
 
   def parse_metadata(not_map), do: not_map
 
-  def position_to_range(original, %{line: line, character: character}) do
+  def parse_inputs(text, range) do
+    range = update_in(range.start.line, &(&1 + 1))
+    range = update_in(range.end.line, &(&1 + 1))
+
+    with {:ok, macro} <- Sourceror.parse_string(text),
+         {:ok, selection_or_line} <- selection_or_line(text, range) do
+      {:ok, Z.zip(macro), selection_or_line}
+    else
+      {:error, _} -> {:error, :parse_error}
+    end
+  end
+
+  def position_to_range(text, %{line: line, character: character}) do
+    text = replace_newline_with_placeholder(text)
+
     {left, right} =
-      original
+      text
       |> String.split("\n")
       |> Enum.at(line)
       |> String.split("")
@@ -43,72 +45,70 @@ defmodule Refactorex.Parser do
     }
   end
 
-  def selection_or_line(_original, range)
+  def selection_or_line(_text, range)
       when range.start == range.end,
       do: {:ok, range.start.line}
 
-  def selection_or_line(original, range) do
-    with {:ok, selected_text} <- erase_outside_range(original, range),
-         {:ok, selection} <- Sourceror.parse_string(selected_text) do
-      {:ok, selection}
-    end
+  def selection_or_line(text, range) do
+    text
+    |> erase_outside_range(range)
+    |> Sourceror.parse_string()
   end
 
   def erase_outside_range(text, range) do
-    without_newlines(
-      text,
-      &(&1
-        |> String.split("\n")
-        |> Stream.with_index()
-        |> Stream.map(fn {line, i} -> {line, i + 1} end)
-        |> Stream.map(fn
-          {line, i} when i > range.start.line and i < range.end.line ->
-            line
+    text
+    |> replace_newline_with_placeholder()
+    |> String.split("\n")
+    |> Stream.with_index()
+    |> Stream.map(fn {line, i} -> {line, i + 1} end)
+    |> Stream.map(fn
+      {line, i} when i > range.start.line and i < range.end.line ->
+        line
 
-          {line, i} when i == range.start.line and i == range.end.line ->
-            line
-            |> remove_start(range)
-            |> remove_end(range)
+      {line, i} when i == range.start.line and i == range.end.line ->
+        line
+        |> remove_line_start(range)
+        |> remove_line_end(range)
 
-          {line, i} when i == range.start.line ->
-            remove_start(line, range)
+      {line, i} when i == range.start.line ->
+        remove_line_start(line, range)
 
-          {line, i} when i == range.end.line ->
-            remove_end(line, range)
+      {line, i} when i == range.end.line ->
+        remove_line_end(line, range)
 
-          _ ->
-            ""
-        end)
-        |> Enum.join("\n"))
-    )
+      _ ->
+        ""
+    end)
+    |> Enum.join("\n")
+    |> replace_placeholder_with_newline()
   end
 
-  defp without_newlines(text, func) do
-    with {:ok, macro} <- Sourceror.parse_string(text) do
-      macro
-      |> Z.zip()
-      |> Z.traverse(fn
-        %{node: {id, meta, [string]}} = zipper when is_bitstring(string) ->
-          string = String.replace(string, "\n", "#{@newline_replacement}\n")
-          Z.update(zipper, fn _ -> {id, meta, [string]} end)
+  defp replace_newline_with_placeholder(text) do
+    {:ok, macro} = Sourceror.parse_string(text)
 
-        zipper ->
-          zipper
-      end)
-      |> Z.node()
-      |> Sourceror.to_string()
-      |> func.()
-      |> String.replace(@newline_replacement, "\n")
-      |> then(&{:ok, &1})
-    end
+    macro
+    |> Z.zip()
+    |> Z.traverse(fn
+      %{node: {id, meta, [string]}} = zipper when is_bitstring(string) ->
+        string = String.replace(string, "\n", "#{@newline_placeholder}\n")
+        Z.replace(zipper, {id, meta, [string]})
+
+      zipper ->
+        zipper
+    end)
+    |> Z.node()
+    |> Sourceror.to_string()
   end
 
-  defp remove_start(line, %{start: %{character: character}}) do
+  defp replace_placeholder_with_newline(text),
+    do: String.replace(text, @newline_placeholder, "\n")
+
+  defp remove_line_start(line, %{start: %{character: character}}) do
     {_, line} = String.split_at(line, character)
     String.pad_leading(line, character + String.length(line), " ")
   end
 
-  defp remove_end(line, %{end: %{character: character}}) do
+  defp remove_line_end(line, %{end: %{character: character}}) do
     {line, _} = String.split_at(line, character)
     line
   end
