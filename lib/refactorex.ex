@@ -97,13 +97,15 @@ defmodule Refactorex do
   def do_handle_request(%CodeActionResolve{params: %{data: data}}, lsp) do
     %{module: module, uri: uri, range: range} = Parser.parse_metadata(data)
 
-    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+    original = lsp.assigns.documents[uri]
+
+    case Parser.parse_inputs(original, range) do
       {:ok, zipper, selection_or_line} ->
         {
           :reply,
           zipper
           |> Refactor.refactor(selection_or_line, module)
-          |> Diff.find_diffs2(lsp.assigns.documents[uri])
+          |> Diff.find_diffs_from_original(original)
           |> Response.perform_refactoring(uri),
           lsp
         }
@@ -139,15 +141,16 @@ defmodule Refactorex do
       new_name: new_name
     } = params
 
-    range = Parser.position_to_range(lsp.assigns.documents[uri], position)
+    original = lsp.assigns.documents[uri]
+    range = Parser.position_to_range(original, position)
 
-    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
+    case Parser.parse_inputs(original, range) do
       {:ok, zipper, selection} ->
         {
           :reply,
           zipper
           |> Refactor.rename(selection, new_name)
-          |> Diff.find_diffs2(lsp.assigns.documents[uri])
+          |> Diff.find_diffs_from_original(original)
           |> Response.perform_renaming(uri),
           lsp
         }

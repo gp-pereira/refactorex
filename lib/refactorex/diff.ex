@@ -1,5 +1,5 @@
 defmodule Refactorex.Diff do
-  def find_diffs2(%{refactored: refactored} = refactoring, original),
+  def find_diffs_from_original(%{refactored: refactored} = refactoring, original),
     do: %{refactoring | diffs: find_diffs(original, refactored)}
 
   def find_diffs(original, refactored) do
