@@ -1,4 +1,4 @@
-defmodule Refactorex.Refactor.Variable.ExtractConstant do
+defmodule Refactorex.Refactor.Constant.ExtractConstant do
   use Refactorex.Refactor,
     title: "Extract constant",
     kind: "refactor.extract",

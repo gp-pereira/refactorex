@@ -1,7 +1,7 @@
-defmodule Refactorex.Refactor.Variable.ExtractConstantTest do
+defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Variable.ExtractConstant
+  alias Refactorex.Refactor.Constant.ExtractConstant
 
   test "extracts selection range into a module constant" do
     assert_refactored(

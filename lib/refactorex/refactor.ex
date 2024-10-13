@@ -72,6 +72,7 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
+    __MODULE__.Constant.ExtractConstant,
     __MODULE__.Function.ExpandAnonymousFunction,
     __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.ExtractFunction,
@@ -79,8 +80,7 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
     __MODULE__.Pipeline.PipeFirstArg,
-    __MODULE__.Pipeline.RemovePipe,
-    __MODULE__.Variable.ExtractConstant
+    __MODULE__.Pipeline.RemovePipe
   ]
 
   @renamers [
