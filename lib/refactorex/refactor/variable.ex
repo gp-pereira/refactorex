@@ -43,19 +43,6 @@ defmodule Refactorex.Refactor.Variable do
 
   def member?(_, _), do: false
 
-  def find_constants_used(macro) do
-    macro
-    |> Z.zip()
-    |> Z.traverse_while([], fn
-      %{node: {:@, _, [{_, _, nil} = constant]}} = zipper, constants ->
-        {:cont, zipper, constants ++ [constant]}
-
-      zipper, constants ->
-        {:cont, zipper, constants}
-    end)
-    |> elem(1)
-  end
-
   def find_available_variables(%{node: node} = zipper) do
     line = AST.get_start_line(node)
 

@@ -31,21 +31,21 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
     end
   end
 
-  def refactor(%{node: constant} = zipper, _) do
+  def refactor(%{node: to_be_constant} = zipper, _) do
     name = Module.next_available_constant_name(zipper, @constant_name)
 
     zipper
     |> Z.update(fn _ -> {:@, [], [{name, [], nil}]} end)
     |> Module.update_scope(fn module_scope ->
-      position = where_to_place_constant(module_scope, constant)
+      position = where_to_place_constant(module_scope, to_be_constant)
       {before, rest} = Enum.split(module_scope, position)
 
-      before ++ [{:@, [], [{name, [], [constant]}]} | rest]
+      before ++ [{:@, [], [{name, [], [to_be_constant]}]} | rest]
     end)
   end
 
-  defp where_to_place_constant(module_scope, constant) do
-    constants_used = Variable.find_constants_used(constant)
+  defp where_to_place_constant(module_scope, to_be_constant) do
+    constants_used = find_constants_used(to_be_constant)
 
     module_scope
     |> Stream.with_index()
@@ -63,5 +63,11 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
         0
     end)
     |> Enum.max()
+  end
+
+  defp find_constants_used(to_be_constant) do
+    to_be_constant
+    |> AST.find(&match?({:@, _, [{_, _, nil}]}, &1))
+    |> Enum.map(fn {:@, _, [constant]} -> constant end)
   end
 end
