@@ -25,21 +25,11 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntax do
 
   def refactor(zipper, _) do
     Z.update(zipper, fn
-      {:if, meta, [condition, [if_block, else_block]]} ->
+      {:if, meta, [condition, blocks]} ->
         {:if, Keyword.drop(meta, [:do, :end]),
          [
            condition,
-           [
-             use_keyword_syntax(if_block),
-             use_keyword_syntax(else_block)
-           ]
-         ]}
-
-      {:if, meta, [condition, [if_block]]} ->
-        {:if, Keyword.drop(meta, [:do, :end]),
-         [
-           condition,
-           [use_keyword_syntax(if_block)]
+           Enum.map(blocks, &use_keyword_syntax/1)
          ]}
     end)
   end

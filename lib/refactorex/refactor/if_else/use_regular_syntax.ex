@@ -7,7 +7,7 @@ defmodule Refactorex.Refactor.IfElse.UseRegularSyntax do
   def can_refactor?(%{node: {:if, _, [_, [if_block | _]]} = node}, line) do
     {{:__block__, meta, _}, _} = if_block
 
-    # only keyword functions have format tag
+    # only keyword if else has format tag
     AST.starts_at?(node, line) and meta[:format] == :keyword
   end
 
@@ -15,21 +15,11 @@ defmodule Refactorex.Refactor.IfElse.UseRegularSyntax do
 
   def refactor(zipper, _) do
     Z.update(zipper, fn
-      {:if, meta, [condition, [if_block, else_block]]} ->
+      {:if, meta, [condition, blocks]} ->
         {:if, Keyword.merge(meta, do: [], end: []),
          [
            condition,
-           [
-             remove_keyword_syntax(if_block),
-             remove_keyword_syntax(else_block)
-           ]
-         ]}
-
-      {:if, meta, [condition, [if_block]]} ->
-        {:if, Keyword.merge(meta, do: [], end: []),
-         [
-           condition,
-           [remove_keyword_syntax(if_block)]
+           Enum.map(blocks, &remove_keyword_syntax/1)
          ]}
     end)
   end
