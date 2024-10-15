@@ -43,4 +43,15 @@ defmodule Refactorex.Refactor.AST do
     end)
     |> Z.node()
   end
+
+  def find(zipper, finder) do
+    zipper
+    |> Z.top()
+    |> Z.traverse([], fn %{node: node} = zipper, nodes ->
+      if finder.(node),
+        do: {zipper, [node | nodes]},
+        else: {zipper, nodes}
+    end)
+    |> elem(1)
+  end
 end
