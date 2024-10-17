@@ -82,7 +82,9 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UseRegularSyntax,
     __MODULE__.IfElse.UseKeywordSyntax,
     __MODULE__.IfElse.UseRegularSyntax,
+    __MODULE__.Pipeline.IntroduceIOInspect,
     __MODULE__.Pipeline.IntroducePipe,
+    __MODULE__.Pipeline.RemoveIOInspect,
     __MODULE__.Pipeline.RemovePipe
   ]
 
