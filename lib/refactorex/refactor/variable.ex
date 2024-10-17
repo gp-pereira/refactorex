@@ -55,4 +55,24 @@ defmodule Refactorex.Refactor.Variable do
     |> Z.node()
     |> find_variables(reject: &(AST.get_start_line(&1.node) >= line))
   end
+
+  def inside_declaration?(%{node: node} = zipper) do
+    case parent = Z.up(zipper) do
+      %{node: {id, _, [^node, _]}}
+      when id in ~w(def defp <- -> when =)a ->
+        true
+
+      %{node: {_, _, [_ | _]}} ->
+        inside_declaration?(parent)
+
+      %{node: [_ | _]} ->
+        inside_declaration?(parent)
+
+      %{node: {_, _}} ->
+        inside_declaration?(parent)
+
+      _ ->
+        false
+    end
+  end
 end
