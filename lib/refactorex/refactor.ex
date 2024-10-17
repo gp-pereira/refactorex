@@ -108,10 +108,10 @@ defmodule Refactorex.Refactor do
   end
 
   def rename_available?(zipper, selection),
-    do: Enum.any?(available_refactorings(zipper, selection, @renamers))
+    do: length(available_refactorings(zipper, selection, @renamers)) == 1
 
   def rename(zipper, selection, new_name) do
-    [%{module: module} | _] = available_refactorings(zipper, selection, @renamers)
+    [%{module: module}] = available_refactorings(zipper, selection, @renamers)
 
     zipper
     |> module.execute(selection)
