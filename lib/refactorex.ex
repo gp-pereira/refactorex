@@ -105,7 +105,7 @@ defmodule Refactorex do
           :reply,
           zipper
           |> Refactor.refactor(selection_or_line, module)
-          |> Diff.find_diffs_from_original(original)
+          |> Diff.from_original(original)
           |> Response.perform_refactoring(uri),
           lsp
         }
@@ -150,7 +150,7 @@ defmodule Refactorex do
           :reply,
           zipper
           |> Refactor.rename(selection, new_name)
-          |> Diff.find_diffs_from_original(original)
+          |> Diff.from_original(original)
           |> Response.perform_renaming(uri),
           lsp
         }
