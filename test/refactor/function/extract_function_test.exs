@@ -243,4 +243,21 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
       """
     )
   end
+
+  test "ignore variable declaration functions" do
+    assert_not_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+        @bar 42
+
+        #       v
+        def foo(arg) do
+        #         ^
+          Enum.map(arg, &(&1 + 1))
+        end
+      end
+      """
+    )
+  end
 end

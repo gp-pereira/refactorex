@@ -12,13 +12,14 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
 
   @function_name "extracted_function"
 
-  def can_refactor?(%{node: {id, _, _}}, _)
-      when id in ~w(@ & <-)a,
-      do: false
+  def can_refactor?(_, {id, _, _}) when id in ~w(@ & <-)a, do: :skip
 
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do
       not Module.inside_one?(zipper) ->
+        false
+
+      Variable.inside_declaration?(zipper) ->
         false
 
       AST.equal?(node, selection) ->
