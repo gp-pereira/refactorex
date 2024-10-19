@@ -55,7 +55,7 @@ defmodule Refactorex.Refactor.Module do
     )
   end
 
-  defp next_available_name(zipper, base_name, filter, node_namer) do
+  def next_available_name(zipper, base_name, filter, node_namer) do
     zipper
     |> find_in_scope(filter)
     |> Enum.reduce(base_name, fn

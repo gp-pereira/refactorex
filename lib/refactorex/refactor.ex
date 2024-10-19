@@ -80,6 +80,7 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.UnderscoreUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
+    __MODULE__.Guard.ExtractGuard,
     __MODULE__.IfElse.UseKeywordSyntax,
     __MODULE__.IfElse.UseRegularSyntax,
     __MODULE__.Pipeline.IntroduceIOInspect,
