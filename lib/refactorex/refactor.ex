@@ -86,7 +86,8 @@ defmodule Refactorex.Refactor do
     __MODULE__.Pipeline.IntroduceIOInspect,
     __MODULE__.Pipeline.IntroducePipe,
     __MODULE__.Pipeline.RemoveIOInspect,
-    __MODULE__.Pipeline.RemovePipe
+    __MODULE__.Pipeline.RemovePipe,
+    __MODULE__.Variable.ExtractVariable
   ]
 
   @renamers [

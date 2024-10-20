@@ -56,4 +56,17 @@ defmodule Refactorex.Refactor.AST do
   end
 
   def find(not_zipper, finder), do: find(Z.zip(not_zipper), finder)
+
+  def go_to_node(zipper, node) do
+    zipper
+    |> Z.top()
+    |> Z.traverse_while(nil, fn
+      %{node: ^node} = zipper, nil ->
+        {:halt, zipper, zipper}
+
+      zipper, nil ->
+        {:cont, zipper, nil}
+    end)
+    |> elem(1)
+  end
 end
