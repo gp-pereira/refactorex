@@ -4,8 +4,11 @@ defmodule Refactorex.Refactor.Function.ExpandAnonymousFunction do
     kind: "refactor.rewrite",
     works_on: :selection
 
-  def can_refactor?(%{node: {:&, _, [_ | _]} = node}, selection),
-    do: AST.equal?(node, selection)
+  alias Refactorex.Refactor.Variable
+
+  def can_refactor?(%{node: {:&, _, [body]} = node}, selection)
+      when not is_number(body),
+      do: AST.equal?(node, selection)
 
   def can_refactor?(_, _), do: false
 
@@ -22,21 +25,7 @@ defmodule Refactorex.Refactor.Function.ExpandAnonymousFunction do
   end
 
   def refactor(%{node: {:&, _, [body]}} = zipper, _) do
-    # find &{i} usages and replace them with arg{i}
-    {%{node: body}, args} =
-      body
-      |> Z.zip()
-      |> Z.traverse_while(MapSet.new(), fn
-        %{node: {:&, _, [i]}} = zipper, args when is_number(i) ->
-          arg = {String.to_atom("arg#{i}"), [], nil}
-          {:cont, Z.update(zipper, fn _ -> arg end), MapSet.put(args, arg)}
-
-        zipper, args ->
-          {:cont, zipper, args}
-      end)
-      |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
-
-    zipper
-    |> Z.update(fn {:&, meta, _} -> {:fn, meta, [{:->, [], [args, body]}]} end)
+    {%{node: body}, variables} = Variable.turn_captures_into_variables(body)
+    Z.replace(zipper, {:fn, [], [{:->, [], [Enum.into(variables, []), body]}]})
   end
 end

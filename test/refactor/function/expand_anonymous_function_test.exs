@@ -35,17 +35,50 @@ defmodule Refactorex.Refactor.Function.ExpandAnonymousFunctionTest do
     )
   end
 
+  test "expands anonymous function with multiple usages of same arg" do
+    assert_refactored(
+      ExpandAnonymousFunction,
+      """
+      def foo(modules) do
+        modules
+        #             v
+        |> Stream.map(&{&1, &1.available?(zipper)})
+        #                                        ^
+      end
+      """,
+      """
+       def foo(modules) do
+        modules
+        |> Stream.map(fn arg1 -> {arg1, arg1.available?(zipper)} end)
+      end
+      """
+    )
+  end
+
   test "expands anonymous function with zero arguments" do
     assert_refactored(
       ExpandAnonymousFunction,
       """
-
       #     v
       query(&connection/0)
       #                 ^
       """,
       """
       query(fn -> connection() end)
+      """
+    )
+  end
+
+  test "ignores capture variables" do
+    assert_not_refactored(
+      ExpandAnonymousFunction,
+      """
+      def foo(modules) do
+        modules
+        #                   v
+        |> Stream.map(&{&1, &1.available?(zipper)})
+        #                    ^
+      end
       """
     )
   end

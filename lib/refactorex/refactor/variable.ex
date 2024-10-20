@@ -75,4 +75,18 @@ defmodule Refactorex.Refactor.Variable do
         false
     end
   end
+
+  # find &{i} usages and replace them with arg{i}
+  def turn_captures_into_variables(node) do
+    node
+    |> Z.zip()
+    |> Z.traverse(MapSet.new(), fn
+      %{node: {:&, _, [i]}} = zipper, variables when is_number(i) ->
+        arg = {String.to_atom("arg#{i}"), [], nil}
+        {Z.replace(zipper, arg), MapSet.put(variables, arg)}
+
+      zipper, variables ->
+        {zipper, variables}
+    end)
+  end
 end
