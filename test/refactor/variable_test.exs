@@ -30,10 +30,11 @@ defmodule Refactorex.Refactor.VariableTest do
       assert Variable.inside_declaration?(zipper)
     end
 
-    test "marks case clause arg as declaration" do
+    test "marks CASE clause arg as declaration" do
       zipper =
         go_to_selection("""
         case arg do
+          %{foo: 32} -> 32
           #      v
           %{foo: foo} -> foo + 4
           #        ^
@@ -44,7 +45,7 @@ defmodule Refactorex.Refactor.VariableTest do
       assert Variable.inside_declaration?(zipper)
     end
 
-    test "marks with clause arg as declaration" do
+    test "marks WITH clause arg as declaration" do
       zipper =
         go_to_selection("""
         #          v
@@ -57,7 +58,7 @@ defmodule Refactorex.Refactor.VariableTest do
       assert Variable.inside_declaration?(zipper)
     end
 
-    test "marks with anonymous function arg as declaration" do
+    test "marks anonymous function arg as declaration" do
       zipper =
         go_to_selection("""
         #  v
@@ -110,6 +111,25 @@ defmodule Refactorex.Refactor.VariableTest do
         # v
           bar(foo) + 10
         #        ^
+        end
+        """)
+
+      refute Variable.inside_declaration?(zipper)
+    end
+
+    test "doesn't mark COND clause as declaration" do
+      zipper =
+        go_to_selection("""
+        def foo(arg) do
+          cond do
+          # v
+            arg == 10 ->
+          #   ^
+              arg
+
+            true ->
+              arg + 10
+          end
         end
         """)
 

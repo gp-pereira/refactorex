@@ -69,4 +69,9 @@ defmodule Refactorex.Refactor.AST do
     end)
     |> elem(1)
   end
+
+  def up(zipper, times \\ 1)
+  def up(nil, _), do: nil
+  def up(zipper, 0), do: zipper
+  def up(zipper, times), do: zipper |> Z.up() |> up(times - 1)
 end

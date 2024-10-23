@@ -58,9 +58,15 @@ defmodule Refactorex.Refactor.Variable do
 
   def inside_declaration?(%{node: node} = zipper) do
     case parent = Z.up(zipper) do
-      %{node: {id, _, [^node, _]}}
-      when id in ~w(def defp <- -> when =)a ->
+      %{node: {id, _, [^node, _]}} when id in ~w(def defp <- when =)a ->
         true
+
+      %{node: {:->, _, [^node, _]}} ->
+        cond do
+          match?(%{node: {:fn, _, _}}, Z.up(parent)) -> true
+          match?(%{node: {:case, _, _}}, AST.up(parent, 4)) -> true
+          true -> false
+        end
 
       %{node: {_, _, [_ | _]}} ->
         inside_declaration?(parent)
