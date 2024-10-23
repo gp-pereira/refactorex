@@ -36,6 +36,11 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
           {:->, [], [args, extract_and_assign(parent, [node], node, selection)]}
         )
 
+      # selection is inside a COND clause
+      %{node: {:->, _, [^node, _]}} ->
+        %{node: {:cond, _, _}} = zipper_at_cond = AST.up(parent, 4)
+        refactor(zipper_at_cond, selection)
+
       %{node: {:__block__, meta, statements}} ->
         # if there is a closing tag, the block is probably a tuple
         if meta[:closing],
@@ -43,7 +48,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
           else: Z.replace(parent, extract_and_assign(parent, statements, node, selection))
 
       %{node: {{:__block__, _, [_]}, ^node}} ->
-        upper_structure = parent |> Z.up() |> Z.up()
+        upper_structure = AST.up(parent, 2)
         line = AST.get_start_line(upper_structure.node)
 
         cond do
@@ -92,26 +97,28 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
   defp next_available_name(zipper) do
     zipper
     |> Z.top()
-    |> Z.traverse(@variable_name, fn
-      %{node: {id, _, nil}} = zipper, current_name when is_atom(id) ->
+    |> Z.traverse([0], fn
+      %{node: {id, _, nil}} = zipper, used_numbers when is_atom(id) ->
         {
           zipper,
           case Regex.run(~r/#{@variable_name}(\d*)/, Atom.to_string(id)) do
             [_, ""] ->
-              "#{@variable_name}2"
+              [1 | used_numbers]
 
             [_, i] ->
-              "#{@variable_name}#{String.to_integer(i) + 1}"
+              [String.to_integer(i) | used_numbers]
 
             _ ->
-              current_name
+              used_numbers
           end
         }
 
-      zipper, current_name ->
-        {zipper, current_name}
+      zipper, used_numbers ->
+        {zipper, used_numbers}
     end)
     |> elem(1)
+    |> Enum.max()
+    |> then(&"#{@variable_name}#{if &1 == 0, do: "", else: &1 + 1}")
     |> String.to_atom()
   end
 

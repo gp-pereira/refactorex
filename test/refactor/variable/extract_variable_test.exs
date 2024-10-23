@@ -24,20 +24,30 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
     assert_refactored(
       ExtractVariable,
       """
-      def foo() do
-        arg = 10
-        extracted_variable = arg.test
-        #   v
-        foo(arg.test)
-        #          ^
+      def available_refactorings(zipper, selection_or_line, modules) do
+        modules
+        |> Stream.map(fn arg1 ->
+          extracted_variable = zipper
+          extracted_variable4 = extracted_variable
+          extracted_variable2 = extracted_variable4
+          extracted_variable3 = extracted_variable2
+      #                                               v
+          {arg1, arg1.available?(extracted_variable3, selection_or_line)}
+      #                                                               ^
+        end)
       end
       """,
       """
-      def foo() do
-        arg = 10
-        extracted_variable = arg.test
-        extracted_variable2 = arg.test
-        foo(extracted_variable2)
+      def available_refactorings(zipper, selection_or_line, modules) do
+        modules
+        |> Stream.map(fn arg1 ->
+          extracted_variable = zipper
+          extracted_variable4 = extracted_variable
+          extracted_variable2 = extracted_variable4
+          extracted_variable3 = extracted_variable2
+          extracted_variable5 = selection_or_line
+          {arg1, arg1.available?(extracted_variable3, extracted_variable5)}
+        end)
       end
       """
     )
@@ -107,6 +117,38 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
       def foo(arg) do
         extracted_variable = 20
         arg + extracted_variable
+      end
+      """
+    )
+  end
+
+  test "extracts variable inside COND clause" do
+    assert_refactored(
+      ExtractVariable,
+      """
+      def foo(arg) do
+        cond do
+      #   v
+          arg + 10 < 50 ->
+      #          ^
+            arg
+
+          true ->
+            false
+        end
+      end
+      """,
+      """
+      def foo(arg) do
+        extracted_variable = arg + 10
+
+        cond do
+          extracted_variable < 50 ->
+            arg
+
+          true ->
+            false
+        end
       end
       """
     )
@@ -194,8 +236,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
         _ ->
           arg + 10
       end
-      """,
-      raw: true
+      """
     )
   end
 
