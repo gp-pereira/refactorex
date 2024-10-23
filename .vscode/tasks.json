@@ -22,6 +22,16 @@
         "reveal": "always",
         "panel": "shared"
       }
+    },
+    {
+      "label": "mix test only",
+      "type": "shell",
+      "command": "mix test --only only",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
     }
   ]
 }
