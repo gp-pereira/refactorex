@@ -240,6 +240,36 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
     )
   end
 
+  test "extracts variable that is inside whole block tuple" do
+    assert_refactored(
+      ExtractVariable,
+      """
+      with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
+        {
+          :ok,
+        # v
+          zipper
+        #      ^
+          |> Refactor.available_refactorings(selection_or_line)
+          |> Response.suggest_refactorings(uri, range)
+        }
+      end
+      """,
+      """
+       with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
+        extracted_variable = zipper
+
+        {
+          :ok,
+          extracted_variable
+          |> Refactor.available_refactorings(selection_or_line)
+          |> Response.suggest_refactorings(uri, range)
+        }
+      end
+      """
+    )
+  end
+
   test "ignores variable declarations" do
     assert_not_refactored(
       ExtractVariable,

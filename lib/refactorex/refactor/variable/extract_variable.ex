@@ -47,7 +47,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
           do: refactor(parent, selection),
           else: Z.replace(parent, extract_and_assign(parent, statements, node, selection))
 
-      %{node: {{:__block__, _, [_]}, ^node}} ->
+      %{node: {{:__block__, _, [tag]}, ^node}} when tag in ~w(do else)a ->
         upper_structure = AST.up(parent, 2)
         line = AST.get_start_line(upper_structure.node)
 
