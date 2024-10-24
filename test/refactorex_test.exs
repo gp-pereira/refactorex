@@ -131,7 +131,7 @@ defmodule RefactorexTest do
     )
   end
 
-  test "responds no CodeActions for syntactically broken file", %{
+  test "responds an ErrorResponse for syntactically broken file", %{
     client: client,
     file_uri: file_uri
   } do
@@ -147,7 +147,7 @@ defmodule RefactorexTest do
 
     :ok = request_code_actions(client, file_uri)
 
-    assert_result(2, [], @timeout)
+    assert_error(2, %{"code" => -32_700, "message" => _}, @timeout)
   end
 
   test "responds Rename for some identifier", %{

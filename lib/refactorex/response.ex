@@ -1,6 +1,7 @@
 defmodule Refactorex.Response do
   alias GenLSP.{
     Enumerations,
+    ErrorResponse,
     Structures
   }
 
@@ -101,4 +102,19 @@ defmodule Refactorex.Response do
       }
     }
   end
+
+  def error(:parse_error),
+    do: %ErrorResponse{code: -32_700, message: ""}
+
+  def error(:invalid_request),
+    do: %ErrorResponse{code: -32_600, message: ""}
+
+  def error(:method_not_found),
+    do: %ErrorResponse{code: -32_601, message: ""}
+
+  def error(:invalid_params),
+    do: %ErrorResponse{code: -32_602, message: ""}
+
+  def error(:internal_error),
+    do: %ErrorResponse{code: -32_603, message: ""}
 end

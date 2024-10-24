@@ -37,32 +37,55 @@ defmodule Refactorex do
   end
 
   @impl true
-  def handle_request(request, lsp) do
-    prevent_crash(
-      lsp,
-      &do_handle_request(request, &1),
-      # add error invalid request?
-      {:reply, nil, lsp}
-    )
+  def handle_notification(%Exit{}, lsp) do
+    if Mix.env() == :prod, do: System.halt(0)
+    {:noreply, lsp}
   end
 
   @impl true
-  def handle_notification(notification, lsp) do
-    prevent_crash(
-      lsp,
-      &do_handle_notification(notification, &1),
-      {:noreply, lsp}
-    )
+  def handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
+    %{uri: uri, text: text} = params.text_document
+    {:noreply, put_in(lsp.assigns.documents[uri], text)}
   end
 
-  def do_handle_request(%Initialize{params: %{root_uri: root_uri}}, lsp) do
+  @impl true
+  def handle_notification(%TextDocumentDidChange{params: params}, lsp) do
+    %{uri: uri} = params.text_document
+    [%{text: text}] = params.content_changes
+    {:noreply, put_in(lsp.assigns.documents[uri], text)}
+  end
+
+  @impl true
+  def handle_notification(%TextDocumentDidClose{params: params}, lsp) do
+    %{uri: uri} = params.text_document
+    {:noreply, put_in(lsp.assigns.documents[uri], "")}
+  end
+
+  @impl true
+  def handle_notification(_, lsp), do: {:noreply, lsp}
+
+  @impl true
+  def handle_request(request, lsp) do
+    try do
+      case do_handle_request(request, lsp) do
+        {:ok, reply} -> {:reply, reply, lsp}
+        {:error, error} -> {:reply, Response.error(error), lsp}
+      end
+    rescue
+      e ->
+        Logger.error(lsp, Exception.format(:error, e, __STACKTRACE__))
+        {:reply, Response.error(:internal_error), lsp}
+    end
+  end
+
+  def do_handle_request(%Initialize{}, lsp) do
     Logger.info(lsp, "Client connected")
-    {:reply, Response.initialize(), assign(lsp, root_uri: root_uri)}
+    {:ok, Response.initialize()}
   end
 
   def do_handle_request(%Shutdown{}, lsp) do
     Logger.info(lsp, "Client disconnected")
-    {:reply, nil, lsp}
+    {:ok, nil}
   end
 
   def do_handle_request(%TextDocumentCodeAction{params: params}, lsp) do
@@ -72,25 +95,19 @@ defmodule Refactorex do
         text_document: %{uri: uri},
         range: range
       } ->
-        case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
-          {:ok, zipper, selection_or_line} ->
-            {
-              :reply,
-              zipper
-              |> Refactor.available_refactorings(selection_or_line)
-              |> Response.suggest_refactorings(uri, range),
-              lsp
-            }
+        original = lsp.assigns.documents[uri]
 
-          {:error, :parse_error} ->
-            # add error
-            # maybe an error response can be a better message
-            {:reply, [], lsp}
+        with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
+          {
+            :ok,
+            zipper
+            |> Refactor.available_refactorings(selection_or_line)
+            |> Response.suggest_refactorings(uri, range)
+          }
         end
 
       _ ->
-        # add error invalid request?
-        {:reply, [], lsp}
+        {:ok, []}
     end
   end
 
@@ -99,38 +116,27 @@ defmodule Refactorex do
 
     original = lsp.assigns.documents[uri]
 
-    case Parser.parse_inputs(original, range) do
-      {:ok, zipper, selection_or_line} ->
-        {
-          :reply,
-          zipper
-          |> Refactor.refactor(selection_or_line, module)
-          |> Diff.from_original(original)
-          |> Response.perform_refactoring(uri),
-          lsp
-        }
-
-      {:error, :parse_error} ->
-        # add error
-        {:reply, [], lsp}
+    with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
+      {
+        :ok,
+        zipper
+        |> Refactor.refactor(selection_or_line, module)
+        |> Diff.from_original(original)
+        |> Response.perform_refactoring(uri)
+      }
     end
   end
 
   def do_handle_request(%TextDocumentPrepareRename{params: params}, lsp) do
     %{text_document: %{uri: uri}, position: position} = params
 
-    range = Parser.position_to_range(lsp.assigns.documents[uri], position)
+    original = lsp.assigns.documents[uri]
+    range = Parser.position_to_range(original, position)
 
-    case Parser.parse_inputs(lsp.assigns.documents[uri], range) do
-      {:ok, zipper, selection} ->
-        if Refactor.rename_available?(zipper, selection),
-          do: {:reply, Response.send_rename_range(range), lsp},
-          # add error ??
-          else: {:reply, nil, lsp}
-
-      {:error, :parse_error} ->
-        # add error
-        {:reply, [], lsp}
+    with {:ok, zipper, selection} <- Parser.parse_inputs(original, range) do
+      if Refactor.rename_available?(zipper, selection),
+        do: {:ok, Response.send_rename_range(range)},
+        else: {:ok, nil}
     end
   end
 
@@ -144,59 +150,14 @@ defmodule Refactorex do
     original = lsp.assigns.documents[uri]
     range = Parser.position_to_range(original, position)
 
-    case Parser.parse_inputs(original, range) do
-      {:ok, zipper, selection} ->
-        {
-          :reply,
-          zipper
-          |> Refactor.rename(selection, new_name)
-          |> Diff.from_original(original)
-          |> Response.perform_renaming(uri),
-          lsp
-        }
-
-      {:error, :parse_error} ->
-        # add error
-        {:reply, [], lsp}
-    end
-  end
-
-  def do_handle_notification(%Exit{}, lsp) do
-    if Mix.env() == :prod, do: System.halt(0)
-    {:noreply, lsp}
-  end
-
-  def do_handle_notification(%TextDocumentDidOpen{params: params}, lsp) do
-    %{uri: uri, text: text} = params.text_document
-
-    {:noreply, replace_document(lsp, uri, text)}
-  end
-
-  def do_handle_notification(%TextDocumentDidChange{params: params}, lsp) do
-    %{uri: uri} = params.text_document
-    [%{text: text}] = params.content_changes
-
-    {:noreply, replace_document(lsp, uri, text)}
-  end
-
-  def do_handle_notification(%TextDocumentDidClose{params: params}, lsp) do
-    %{uri: uri} = params.text_document
-
-    {:noreply, replace_document(lsp, uri, "")}
-  end
-
-  def do_handle_notification(_, lsp), do: {:noreply, lsp}
-
-  defp replace_document(lsp, uri, text),
-    do: put_in(lsp.assigns.documents[uri], text)
-
-  defp prevent_crash(lsp, func, default) do
-    try do
-      func.(lsp)
-    rescue
-      e ->
-        Logger.error(lsp, Exception.format(:error, e, __STACKTRACE__))
-        default
+    with {:ok, zipper, selection} <- Parser.parse_inputs(original, range) do
+      {
+        :ok,
+        zipper
+        |> Refactor.rename(selection, new_name)
+        |> Diff.from_original(original)
+        |> Response.perform_renaming(uri)
+      }
     end
   end
 end
