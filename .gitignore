@@ -24,3 +24,8 @@ refactorex-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+/extensions/vscode/node_modules/
+/extensions/vscode/out/
+/extensions/vscode/refactorex/
+/extensions/vscode/**/*.vsix

@@ -1,0 +1,52 @@
+{
+	"name": "refatorex",
+	"publisher": "gp-pereira",
+	"displayName": "Refactorex",
+	"version": "0.0.8",
+	"author": {
+		"name": "gp-pereira",
+		"url": "https://www.github.com/gp-pereira"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/gp-pereira/refactorex-vscode"
+	},
+	"bugs": {
+		"url": "https://github.com/gp-pereira/refactorex-vscode/issues"
+	},
+	"engines": {
+		"vscode": "^1.73.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:elixir"
+	],
+	"keywords": [
+		"elixir",
+		"refactor",
+		"code actions",
+		"keybindings"
+	],
+	"icon": "icon.png",
+	"main": "./out/extension.js",
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint \"src/**/*.ts\"",
+		"watch": "tsc -watch -p ./"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^9.0.1"
+	},
+	"devDependencies": {
+		"@types/node": "^18",
+		"@types/vscode": "^1.73.0",
+		"@typescript-eslint/eslint-plugin": "^6.7.0",
+		"@typescript-eslint/parser": "^6.7.0",
+		"eslint": "^8.26.0",
+		"typescript": "^5.4.2"
+	}
+}
