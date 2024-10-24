@@ -13,22 +13,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Move necessary files
-        run: mkdir extensions/vscode/refactorex
-        run: cp -r lib bin deps mix.exs mix.lock extensions/vscode/refactorex
-        run: cp README.md LICENSE.md extensions/vscode
+      - name: Setup elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: 1.13.4
+          otp-version: 24.3.4
 
-      - name: Go to extension folder
-        run: cd extensions/vscode
+      - name: Install elixir deps
+        run: mix deps.get
+
+      - name: Move necessary files
+        run: |
+          mkdir extensions/vscode/refactorex
+          cp -r lib bin deps mix.exs mix.lock extensions/vscode/refactorex
+          cp README.md LICENSE.md extensions/vscode
 
       - name: Install node deps
-        run: npm install
+        run: npm install --prefix extensions/vscode
 
       - name: Update package.json version
         uses: maxgfr/github-change-json@main
         with:
           key: 'version'
           value: '${{ github.ref_name }}'
-          path: package.json
-          commit: true 
-          
+          path: extensions/vscode/package.json
+
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          packagePath: extensions/vscode
+          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
