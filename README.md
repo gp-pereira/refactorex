@@ -13,32 +13,32 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `alias` | Merge aliases | selection | |
 | `alias` | Expand aliases | selection | |
 | | | |
-| `constant` | [Extract constant](#variable-extract-constant) | selection | ✔ |
-| `constant` | Inline constant | selection | ✔ |
-| `constant` | Rename constant | selection | ✔ |
+| `constant` | [Extract constant](#variable-extract-constant) | selection | ✅ |
+| `constant` | Inline constant | selection | ✅ |
+| `constant` | Rename constant | selection | ✅ |
 | | | |
-| `function` | [Expand anonymous function](#function-expand-anonymous-function)  | selection | ✔ |
-| `function` | [Extract anonymous function](#function-extract-anonymous-function)  | selection | ✔ |
-| `function` | [Extract function](#function-extract-function)  | selection | ✔ |
+| `function` | [Expand anonymous function](#function-expand-anonymous-function)  | selection | ✅ |
+| `function` | [Extract anonymous function](#function-extract-anonymous-function)  | selection | ✅ |
+| `function` | [Extract function](#function-extract-function)  | selection | ✅ |
 | `function` | Inline function | selection |
 | `function` | Rename function | selection |
-| `function` | [Underscore unused args](#function-underscore-unused-args)  | line | ✔ |
-| `function` | [Use keyword syntax](#function-use-keyword-syntax)  | line | ✔ |
-| `function` | [Use regular syntax](#function-use-regular-syntax)  | line | ✔ |
+| `function` | [Underscore unused args](#function-underscore-unused-args)  | line | ✅ |
+| `function` | [Use keyword syntax](#function-use-keyword-syntax)  | line | ✅ |
+| `function` | [Use regular syntax](#function-use-regular-syntax)  | line | ✅ |
 | | | |
-| `guard` | Extract guard | selection | ✔ |
+| `guard` | Extract guard | selection | ✅ |
 | `guard` | Inline guard | selection | |
 | `guard` | Rename guard | selection | |
 | | | |
-| `if else` | Use keyword syntax | line | ✔ |
-| `if else` | Use regular syntax | line | ✔ |
+| `if else` | Use keyword syntax | line | ✅ |
+| `if else` | Use regular syntax | line | ✅ |
 | | | |
-| `pipeline` | Introduce IO.inspect | selection | ✔ |
-| `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✔ |
-| `pipeline` | Remove IO.inspect | line | ✔ |
-| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✔ |
+| `pipeline` | Introduce IO.inspect | selection | ✅ |
+| `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✅ |
+| `pipeline` | Remove IO.inspect | line | ✅ |
+| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✅ |
 | | | |
-| `variable` | Extract variable | selection | ✔ |
+| `variable` | Extract variable | selection | ✅ |
 | `variable` | Inline variable | selection |
 | `variable` | Rename variable | selection |
 
