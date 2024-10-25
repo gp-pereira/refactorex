@@ -97,13 +97,17 @@ defmodule Refactorex do
       } ->
         original = lsp.assigns.documents[uri]
 
-        with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
-          {
-            :ok,
-            zipper
-            |> Refactor.available_refactorings(selection_or_line)
-            |> Response.suggest_refactorings(uri, range)
-          }
+        case Parser.parse_inputs(original, range) do
+          {:ok, zipper, selection_or_line} ->
+            {
+              :ok,
+              zipper
+              |> Refactor.available_refactorings(selection_or_line)
+              |> Response.suggest_refactorings(uri, range)
+            }
+
+          {:error, :parse_error} ->
+            {:ok, []}
         end
 
       _ ->
@@ -133,10 +137,14 @@ defmodule Refactorex do
     original = lsp.assigns.documents[uri]
     range = Parser.position_to_range(original, position)
 
-    with {:ok, zipper, selection} <- Parser.parse_inputs(original, range) do
-      if Refactor.rename_available?(zipper, selection),
-        do: {:ok, Response.send_rename_range(range)},
-        else: {:ok, nil}
+    case Parser.parse_inputs(original, range) do
+      {:ok, zipper, selection} ->
+        if Refactor.rename_available?(zipper, selection),
+          do: {:ok, Response.send_rename_range(range)},
+          else: {:ok, nil}
+
+      {:error, :parse_error} ->
+        {:ok, nil}
     end
   end
 
