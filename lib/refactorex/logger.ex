@@ -1,15 +1,25 @@
 defmodule Refactorex.Logger do
+  use Agent
+
   require Logger
 
-  def info(lsp, message) do
-    if connected?(lsp), do: GenLSP.info(lsp, message)
+  def start_link(_), do: Agent.start_link(fn -> nil end, name: __MODULE__)
+
+  def set_lsp(lsp), do: Agent.update(__MODULE__, fn _ -> lsp end)
+
+  def info(message) do
     Logger.info(message)
+
+    if Mix.env() != :test do
+      Agent.get(__MODULE__, &if(&1, do: GenLSP.info(&1, message)))
+    end
   end
 
-  def error(lsp, message) do
-    if connected?(lsp), do: GenLSP.error(lsp, message)
+  def error(message) do
     Logger.error(message)
-  end
 
-  def connected?(lsp), do: match?(%{socket: _}, lsp)
+    if Mix.env() != :test do
+      Agent.get(__MODULE__, &if(&1, do: GenLSP.error(&1, message)))
+    end
+  end
 end

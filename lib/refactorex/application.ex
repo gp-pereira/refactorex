@@ -10,6 +10,7 @@ defmodule Refactorex.Application do
         GenLSP.Buffer,
         [communication: {GenLSP.Communication.TCP, [port: port()]}]
       },
+      {Refactorex.Logger, []},
       {Refactorex, []}
     ]
 

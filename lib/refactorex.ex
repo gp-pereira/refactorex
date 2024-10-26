@@ -32,7 +32,7 @@ defmodule Refactorex do
 
   @impl true
   def init(lsp, _args) do
-    Logger.info(lsp, "Server started")
+    Logger.info("Server started")
     {:ok, assign(lsp, documents: %{})}
   end
 
@@ -73,18 +73,20 @@ defmodule Refactorex do
       end
     rescue
       e ->
-        Logger.error(lsp, Exception.format(:error, e, __STACKTRACE__))
+        Logger.error(Exception.format(:error, e, __STACKTRACE__))
         {:reply, Response.error(:internal_error), lsp}
     end
   end
 
   def do_handle_request(%Initialize{}, lsp) do
-    Logger.info(lsp, "Client connected")
+    Logger.set_lsp(lsp)
+    Logger.info("Client connected")
     {:ok, Response.initialize()}
   end
 
-  def do_handle_request(%Shutdown{}, lsp) do
-    Logger.info(lsp, "Client disconnected")
+  def do_handle_request(%Shutdown{}, _lsp) do
+    Logger.set_lsp(nil)
+    Logger.info("Client disconnected")
     {:ok, nil}
   end
 
