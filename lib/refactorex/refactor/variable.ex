@@ -2,9 +2,25 @@ defmodule Refactorex.Refactor.Variable do
   alias Refactorex.Refactor.AST
   alias Sourceror.Zipper, as: Z
 
-  import Sourceror.Identifier
-
   @not_variable ~w(binary)a
+
+  def at_one?(%{node: {id, _, nil}} = zipper) do
+    cond do
+      not is_atom(id) ->
+        false
+
+      id in @not_variable ->
+        false
+
+      match?(%{node: {:@, _, _}}, Z.up(zipper)) ->
+        false
+
+      true ->
+        true
+    end
+  end
+
+  def at_one?(_zipper), do: false
 
   def find_variables(node, opts \\ []) do
     reject = opts[:reject] || fn _ -> false end
@@ -13,23 +29,17 @@ defmodule Refactorex.Refactor.Variable do
     node
     |> Z.zip()
     |> Z.traverse_while([], fn
-      %{node: {id, _, nil} = variable} = zipper, variables when is_identifier(variable) ->
+      %{node: node} = zipper, variables ->
         cond do
-          Enum.member?(@not_variable, id) ->
-            {:cont, zipper, variables}
-
-          match?(%{node: {:@, _, _}}, Z.up(zipper)) ->
+          not at_one?(zipper) ->
             {:cont, zipper, variables}
 
           reject.(zipper) ->
             {:cont, zipper, variables}
 
           true ->
-            {:cont, zipper, variables ++ [variable]}
+            {:cont, zipper, variables ++ [node]}
         end
-
-      zipper, variables ->
-        {:cont, zipper, variables}
     end)
     |> elem(1)
     |> then(&if unique, do: remove_duplicates(&1), else: &1)
