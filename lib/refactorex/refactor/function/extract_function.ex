@@ -99,10 +99,9 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
   defp find_function_args(zipper, selection) do
     available_variables = Variable.find_available_variables(zipper)
 
-    Variable.find_variables(
-      selection,
-      reject: &(not Variable.member?(available_variables, &1.node))
-    )
+    selection
+    |> Variable.find_variables()
+    |> Enum.reject(&(not Variable.member?(available_variables, &1)))
   end
 
   defp extract_and_add_function(zipper, name, args, selection) do

@@ -1,4 +1,5 @@
 defmodule Refactorex.Refactor.Function do
+  alias Refactorex.Refactor.Variable
   alias Sourceror.Zipper, as: Z
 
   def definition?(node)
@@ -13,13 +14,23 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?(_), do: false
 
   def actual_args(args) do
-    Refactorex.Refactor.Variable.find_variables(
-      args,
-      # pinned args are not actual args
-      reject: &match?(%{node: {:^, _, _}}, Z.up(&1)),
-      # functions can have repeated args
-      unique: false
-    )
+    args
+    |> Z.zip()
+    |> Z.traverse_while([], fn
+      %{node: node} = zipper, actual_args ->
+        cond do
+          not Variable.at_one?(zipper) ->
+            {:cont, zipper, actual_args}
+
+          # pinned args are not actual args
+          match?(%{node: {:^, _, _}}, Z.up(zipper)) ->
+            {:cont, zipper, actual_args}
+
+          true ->
+            {:cont, zipper, actual_args ++ [node]}
+        end
+    end)
+    |> elem(1)
   end
 
   def unpin_args(args) do

@@ -65,12 +65,11 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       |> Enum.map(fn {:->, _, [args, body]} ->
         actual_args = Function.actual_args(args)
 
-        Variable.find_variables(
-          [args, body],
-          reject: fn %{node: variable} ->
-            Variable.member?(actual_args, variable) or
-              not Variable.member?(available_variables, variable)
-          end
+        [args, body]
+        |> Variable.find_variables()
+        |> Enum.reject(
+          &(Variable.member?(actual_args, &1) or
+              not Variable.member?(available_variables, &1))
         )
       end)
       |> List.flatten()

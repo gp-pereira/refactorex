@@ -22,27 +22,17 @@ defmodule Refactorex.Refactor.Variable do
 
   def at_one?(_zipper), do: false
 
-  def find_variables(node, opts \\ []) do
-    reject = opts[:reject] || fn _ -> false end
-    unique = if is_nil(opts[:unique]), do: true, else: opts[:unique]
-
+  def find_variables(node) do
     node
     |> Z.zip()
     |> Z.traverse_while([], fn
       %{node: node} = zipper, variables ->
-        cond do
-          not at_one?(zipper) ->
-            {:cont, zipper, variables}
-
-          reject.(zipper) ->
-            {:cont, zipper, variables}
-
-          true ->
-            {:cont, zipper, variables ++ [node]}
-        end
+        if at_one?(zipper),
+          do: {:cont, zipper, variables ++ [node]},
+          else: {:cont, zipper, variables}
     end)
     |> elem(1)
-    |> then(&if unique, do: remove_duplicates(&1), else: &1)
+    |> remove_duplicates()
   end
 
   def remove_duplicates(variables),
@@ -63,7 +53,8 @@ defmodule Refactorex.Refactor.Variable do
       _ -> false
     end)
     |> Z.node()
-    |> find_variables(reject: &(AST.get_start_line(&1.node) >= line))
+    |> find_variables()
+    |> Enum.reject(&(AST.get_start_line(&1) >= line))
   end
 
   def inside_declaration?(%{node: node} = zipper) do
