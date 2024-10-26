@@ -96,9 +96,19 @@ defmodule Refactorex.Refactor do
 
   def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
     modules
-    |> Stream.map(&{&1, &1.available?(zipper, selection_or_line)})
-    |> Stream.filter(&match?({_, true}, &1))
-    |> Enum.map(fn {module, _} -> module.refactoring() end)
+    |> Stream.map(fn module ->
+      # if a refactor crashes, it must not impact the others
+      try do
+        if module.available?(zipper, selection_or_line),
+          do: module.refactoring(),
+          else: nil
+      rescue
+        e ->
+          Refactorex.Logger.error(Exception.format(:error, e, __STACKTRACE__))
+          nil
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
   def refactor(zipper, selection_or_line, module) do
