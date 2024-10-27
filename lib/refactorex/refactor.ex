@@ -96,7 +96,7 @@ defmodule Refactorex.Refactor do
 
   def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
     modules
-    |> Stream.map(fn module ->
+    |> Task.async_stream(fn module ->
       # if a refactor crashes, it must not impact the others
       try do
         if module.available?(zipper, selection_or_line),
@@ -108,7 +108,8 @@ defmodule Refactorex.Refactor do
           nil
       end
     end)
-    |> Enum.reject(&is_nil/1)
+    |> Stream.reject(&(match?({:ok, nil}, &1) or match?({:error, _}, &1)))
+    |> Enum.map(fn {:ok, refactoring} -> refactoring end)
   end
 
   def refactor(zipper, selection_or_line, module) do
