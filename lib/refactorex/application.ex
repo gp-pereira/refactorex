@@ -5,18 +5,18 @@ defmodule Refactorex.Application do
 
   @impl true
   def start(_, _) do
-    children = [
-      {
-        GenLSP.Buffer,
-        [communication: {GenLSP.Communication.TCP, [port: port()]}]
-      },
-      {Refactorex.Logger, []},
-      {Refactorex, []}
-    ]
-
-    opts = [strategy: :one_for_one, name: Refactorex.Supervisor]
-
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(
+      [
+        {
+          GenLSP.Buffer,
+          [communication: {GenLSP.Communication.TCP, [port: port()]}]
+        },
+        {Refactorex.Logger, []},
+        {Refactorex, []}
+      ],
+      strategy: :one_for_one,
+      name: Refactorex.Supervisor
+    )
   end
 
   defp port do
