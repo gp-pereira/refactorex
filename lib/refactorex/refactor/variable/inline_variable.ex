@@ -33,6 +33,9 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
     %{node: {:=, _, [{name, _, _}, value]} = assignment} = parent = Z.up(zipper)
 
     case outer_scope = Z.up(parent) do
+      %{node: {:->, meta, [args, ^assignment]}} ->
+        Z.replace(outer_scope, {:->, meta, [args, value]})
+
       %{node: {{:__block__, meta, [tag]}, ^assignment}} when tag in ~w(do else)a ->
         Z.replace(outer_scope, {{:__block__, meta, [tag]}, value})
 
@@ -52,9 +55,6 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
           outer_scope,
           {id, meta, [value, replace_usages_by_value(clauses, name, value)]}
         )
-
-      %{node: {:->, meta, [args, ^assignment]}} ->
-        Z.replace(outer_scope, {:->, meta, [args, value]})
     end
   end
 
@@ -63,27 +63,24 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
     |> Z.zip()
     |> Z.traverse_while(fn
       %{node: {:->, _, [args, _]}} = zipper ->
-        actual_args = Function.actual_args(args)
-
-        # the name was redefined so don't change this clause
-        if Variable.member?(actual_args, {name, [], nil}),
+        if was_name_reassigned?(args, name),
           do: {:skip, zipper},
           else: {:cont, zipper}
 
-      %{node: {:=, meta, [{^name, _, nil}, new_value]}} = zipper ->
-        {
-          :skip,
-          zipper
-          |> Z.replace(
-            {:=, meta,
-             [
-               {name, [], nil},
-               replace_usages_by_value(new_value, name, value)
-             ]}
-          )
-          # go up to skip traversing right siblings
-          |> Z.up()
-        }
+      %{node: {:=, meta, [args, new_value]}} = zipper ->
+        if was_name_reassigned?(args, name),
+          do: {
+            :skip,
+            zipper
+            |> Z.replace({
+              :=,
+              meta,
+              [args, replace_usages_by_value(new_value, name, value)]
+            })
+            # go up to skip traversing right siblings
+            |> Z.up()
+          },
+          else: {:cont, zipper}
 
       %{node: {^name, _, nil}} = zipper ->
         {:cont, Z.replace(zipper, value)}
@@ -92,5 +89,11 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
         {:cont, zipper}
     end)
     |> Z.node()
+  end
+
+  defp was_name_reassigned?(args, name) do
+    args
+    |> Function.actual_args()
+    |> Variable.member?({name, [], nil})
   end
 end

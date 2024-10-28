@@ -39,7 +39,7 @@ defmodule Refactorex.Refactor.Variable.InlineVariableTest do
             case arg * sum do
               40 ->
                 arg2 = arg - sum
-                sum = arg2 + 10
+                [%{sum: sum}] = [%{sum: arg2 + 10 - sum}]
                 arg * sum
 
               30 ->
@@ -57,7 +57,7 @@ defmodule Refactorex.Refactor.Variable.InlineVariableTest do
             case arg * (arg + 4) do
               40 ->
                 arg2 = arg - (arg + 4)
-                sum = arg2 + 10
+                [%{sum: sum}] = [%{sum: arg2 + 10 - (arg + 4)}]
                 arg * sum
 
               30 ->
