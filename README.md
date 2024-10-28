@@ -9,25 +9,28 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | Scope | Refactoring | Target | Published? |
 | :-: | - | :-: | :-: |
-| `alias` | Sort aliases | selection | |
-| `alias` | Merge aliases | selection | |
 | `alias` | Expand aliases | selection | |
+| `alias` | Extract alias | selection | |
+| `alias` | Merge aliases | selection | |
+| `alias` | Inline alias | selection | |
+| `alias` | Sort aliases | selection | |
 | | | |
 | `constant` | [Extract constant](#variable-extract-constant) | selection | ✅ |
 | `constant` | Inline constant | selection | ✅ |
 | `constant` | Rename constant | selection | ✅ |
 | | | |
-| `function` | [Expand anonymous function](#function-expand-anonymous-function)  | selection | ✅ |
-| `function` | [Extract anonymous function](#function-extract-anonymous-function)  | selection | ✅ |
-| `function` | [Extract function](#function-extract-function)  | selection | ✅ |
+| `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection | ✅ |
+| `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | ✅ |
+| `function` | [Extract function](#function-extract-function) | selection | ✅ |
+| `function` | Collapse anonymous function | selection |
 | `function` | Inline function | selection |
 | `function` | Rename function | selection |
-| `function` | [Underscore unused args](#function-underscore-unused-args)  | line | ✅ |
-| `function` | [Use keyword syntax](#function-use-keyword-syntax)  | line | ✅ |
-| `function` | [Use regular syntax](#function-use-regular-syntax)  | line | ✅ |
+| `function` | [Underscore unused args](#function-underscore-unused-args) | line | ✅ |
+| `function` | [Use keyword syntax](#function-use-keyword-syntax) | line | ✅ |
+| `function` | [Use regular syntax](#function-use-regular-syntax) | line | ✅ |
 | | | |
 | `guard` | Extract guard | selection | ✅ |
-| `guard` | Inline guard | selection | |
+| `guard` | Inline guard | selection | ✅ |
 | `guard` | Rename guard | selection | |
 | | | |
 | `if else` | Use keyword syntax | line | ✅ |
@@ -39,7 +42,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✅ |
 | | | |
 | `variable` | Extract variable | selection | ✅ |
-| `variable` | Inline variable | selection |
+| `variable` | Inline variable | selection | ✅ |
 | `variable` | Rename variable | selection |
 
 ## How to use each refactoring
