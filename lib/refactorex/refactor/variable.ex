@@ -2,14 +2,9 @@ defmodule Refactorex.Refactor.Variable do
   alias Refactorex.Refactor.AST
   alias Sourceror.Zipper, as: Z
 
-  @not_variable ~w(binary)a
-
-  def at_one?(%{node: {id, _, nil}} = zipper) do
+  def at_one?(%{node: {name, _, nil}} = zipper) do
     cond do
-      not is_atom(id) ->
-        false
-
-      id in @not_variable ->
+      not is_atom(name) or name in ~w(binary)a ->
         false
 
       match?(%{node: {:@, _, _}}, Z.up(zipper)) ->
@@ -36,10 +31,10 @@ defmodule Refactorex.Refactor.Variable do
   end
 
   def remove_duplicates(variables),
-    do: Enum.uniq_by(variables, fn {id, _, _} -> id end)
+    do: Enum.uniq_by(variables, fn {name, _, _} -> name end)
 
-  def member?(variables, {variable_id, _, _} = _variable),
-    do: Enum.any?(variables, fn {id, _, _} -> id == variable_id end)
+  def member?(variables, {name, _, _} = _variable),
+    do: Enum.any?(variables, &match?({^name, _, _}, &1))
 
   def member?(_, _), do: false
 
@@ -95,5 +90,72 @@ defmodule Refactorex.Refactor.Variable do
       zipper, variables ->
         {zipper, variables}
     end)
+  end
+
+  def replace_usages_by_value(node, name, value) do
+    node
+    |> Z.zip()
+    |> Z.traverse_while(fn
+      %{node: {:@, _, [{^name, _, nil}]}} = zipper ->
+        {:skip, zipper}
+
+      %{node: {:cond, meta, [[{block, clauses}]]}} = zipper ->
+        clauses =
+          Enum.map(clauses, fn {:->, meta, [condition, _] = clause} ->
+            if was_variable_reassigned?(condition, name),
+              do: {:->, meta, clause},
+              else: {:->, meta, replace_usages_by_value(clause, name, value)}
+          end)
+
+        {:skip, Z.replace(zipper, {:cond, meta, [[{block, clauses}]]})}
+
+      %{node: {:->, _, [args, _]}} = zipper ->
+        if was_variable_used?(args, name),
+          do: {:skip, zipper},
+          else: {:cont, zipper}
+
+      %{node: {:=, meta, [args, new_value]}} = zipper ->
+        if was_variable_used?(args, name),
+          do: {
+            :skip,
+            zipper
+            |> Z.replace({
+              :=,
+              meta,
+              [args, replace_usages_by_value(new_value, name, value)]
+            })
+            # go up to skip traversing right siblings
+            |> Z.up()
+          },
+          else: {:cont, zipper}
+
+      %{node: {^name, _, nil}} = zipper ->
+        {:cont, Z.replace(zipper, value)}
+
+      zipper ->
+        {:cont, zipper}
+    end)
+    |> Z.node()
+  end
+
+  defp was_variable_used?(node, name) do
+    node
+    |> Refactorex.Refactor.Function.actual_args()
+    |> member?({name, [], nil})
+  end
+
+  defp was_variable_reassigned?(node, name) do
+    node
+    |> Z.zip()
+    |> Z.traverse_while(false, fn
+      %{node: {:=, _, [args, _]}} = zipper, false ->
+        if was_variable_used?(args, name),
+          do: {:halt, zipper, true},
+          else: {:cont, zipper, false}
+
+      zipper, false ->
+        {:cont, zipper, false}
+    end)
+    |> elem(1)
   end
 end
