@@ -43,7 +43,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | | |
 | `variable` | Extract variable | selection | ✅ |
 | `variable` | Inline variable | selection | ✅ |
-| `variable` | Rename variable | selection |
+| `variable` | Rename variable | selection | ✅ |
 
 ## How to use each refactoring
 

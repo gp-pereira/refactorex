@@ -93,7 +93,8 @@ defmodule Refactorex.Refactor do
   ]
 
   @renamers [
-    __MODULE__.Constant.RenameConstant
+    __MODULE__.Constant.RenameConstant,
+    __MODULE__.Variable.RenameVariable
   ]
 
   def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
