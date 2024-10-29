@@ -7,8 +7,18 @@ defmodule Refactorex.Refactor.Constant.RenameConstant do
   def can_refactor?(zipper, {:@, _, [selection]}),
     do: can_refactor?(zipper, selection)
 
-  def can_refactor?(%{node: {id, meta, _}}, selection),
-    do: AST.equal?({id, meta, nil}, selection)
+  def can_refactor?(%{node: {id, meta, _}} = zipper, selection) do
+    cond do
+      not AST.equal?({id, meta, nil}, selection) ->
+        false
+
+      not match?(%{node: {:@, _, _}}, Z.up(zipper)) ->
+        false
+
+      true ->
+        true
+    end
+  end
 
   def can_refactor?(_, _), do: false
 

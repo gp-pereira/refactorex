@@ -106,4 +106,21 @@ defmodule Refactorex.Refactor.Constant.RenameConstantTest do
       """
     )
   end
+
+  test "ignores variables" do
+    assert_not_refactored(
+      RenameConstant,
+      """
+      defmodule Foo do
+        @foo 42
+
+        def foo(foo) do
+        # v
+          foo + @foo
+        #   ^
+        end
+      end
+      """
+    )
+  end
 end
