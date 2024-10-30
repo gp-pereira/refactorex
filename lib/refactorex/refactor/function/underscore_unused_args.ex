@@ -52,15 +52,15 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgs do
     do: find_unused_args(args, body)
 
   defp find_unused_args(args, body) do
-    used_variables = Variable.find_variables(body)
-    actual_args = Function.actual_args(args)
+    used_variables = Variable.list_unique_variables(body)
+    unpinned_args = Variable.list_unpinned_variables(args)
 
-    Enum.filter(actual_args, fn {arg_id, _, _} = arg ->
+    Enum.filter(unpinned_args, fn {arg_id, _, _} = arg ->
       cond do
         arg_id |> Atom.to_string() |> String.starts_with?("_") ->
           false
 
-        Enum.count(actual_args, fn {id, _, _} -> id == arg_id end) > 1 ->
+        Enum.count(unpinned_args, fn {id, _, _} -> id == arg_id end) > 1 ->
           false
 
         Variable.member?(used_variables, arg) ->

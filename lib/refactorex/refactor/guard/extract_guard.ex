@@ -31,7 +31,7 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
 
   def refactor(%{node: node} = zipper, _) do
     name = next_available_guard_name(zipper)
-    args = Variable.find_variables(node)
+    args = Variable.list_unique_variables(node)
 
     zipper
     |> Z.replace({name, [], args})

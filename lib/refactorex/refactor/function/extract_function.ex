@@ -100,7 +100,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
     available_variables = Variable.find_available_variables(zipper)
 
     selection
-    |> Variable.find_variables()
+    |> Variable.list_unique_variables()
     |> Enum.reject(&(not Variable.member?(available_variables, &1)))
   end
 

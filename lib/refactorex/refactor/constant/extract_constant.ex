@@ -23,7 +23,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
       not Module.inside_one?(zipper) ->
         false
 
-      Enum.any?(Variable.find_variables(node)) ->
+      Enum.any?(Variable.list_variables(node)) ->
         :skip
 
       true ->

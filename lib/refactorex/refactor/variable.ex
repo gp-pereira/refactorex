@@ -17,27 +17,7 @@ defmodule Refactorex.Refactor.Variable do
 
   def at_one?(_zipper), do: false
 
-  def find_variables(node) do
-    node
-    |> Z.zip()
-    |> Z.traverse_while([], fn
-      %{node: node} = zipper, variables ->
-        if at_one?(zipper),
-          do: {:cont, zipper, variables ++ [node]},
-          else: {:cont, zipper, variables}
-    end)
-    |> elem(1)
-    |> remove_duplicates()
-  end
-
-  def remove_duplicates(variables),
-    do: Enum.uniq_by(variables, fn {name, _, _} -> name end)
-
-  def member?(variables, {name, _, _} = _variable),
-    do: Enum.any?(variables, &match?({^name, _, _}, &1))
-
-  def member?(_, _), do: false
-
+  # remove later ?
   def find_available_variables(%{node: node} = zipper) do
     line = AST.get_start_line(node)
 
@@ -48,9 +28,45 @@ defmodule Refactorex.Refactor.Variable do
       _ -> false
     end)
     |> Z.node()
-    |> find_variables()
+    |> list_unique_variables()
     |> Enum.reject(&(AST.get_start_line(&1) >= line))
   end
+
+  def list_unique_variables(node, filter_fn \\ fn _zipper -> true end) do
+    node
+    |> list_variables(filter_fn)
+    |> remove_duplicates()
+  end
+
+  def list_unpinned_variables(node),
+    do: list_variables(node, &(not match?(%{node: {:^, _, _}}, Z.up(&1))))
+
+  def list_variables(node, filter_fn \\ fn _zipper -> true end) do
+    node
+    |> Z.zip()
+    |> Z.traverse_while([], fn
+      %{node: node} = zipper, variables ->
+        cond do
+          not at_one?(zipper) ->
+            {:cont, zipper, variables}
+
+          not filter_fn.(zipper) ->
+            {:cont, zipper, variables}
+
+          true ->
+            {:cont, zipper, variables ++ [node]}
+        end
+    end)
+    |> elem(1)
+  end
+
+  def remove_duplicates(variables),
+    do: Enum.uniq_by(variables, fn {name, _, _} -> name end)
+
+  def member?(variables, {name, _, _} = _variable),
+    do: Enum.any?(variables, &match?({^name, _, _}, &1))
+
+  def member?(_, _), do: false
 
   def inside_declaration?(%{node: node} = zipper) do
     case parent = Z.up(zipper) do
@@ -140,7 +156,7 @@ defmodule Refactorex.Refactor.Variable do
 
   defp was_variable_used?(node, name) do
     node
-    |> Refactorex.Refactor.Function.actual_args()
+    |> list_unpinned_variables()
     |> member?({name, [], nil})
   end
 

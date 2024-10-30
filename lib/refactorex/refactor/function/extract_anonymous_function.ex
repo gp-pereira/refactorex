@@ -34,7 +34,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   end
 
   def refactor(%{node: {:&, _, [body]}} = zipper, _) do
-    closure_variables = Variable.find_variables(body)
+    closure_variables = Variable.list_unique_variables(body)
 
     # find &{i} usages and replace them with arg{i}
     {%{node: body}, args} =
@@ -62,14 +62,13 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
 
     closure_variables =
       clauses
-      |> Enum.map(fn {:->, _, [args, body]} ->
-        actual_args = Function.actual_args(args)
+      |> Enum.map(fn {:->, _, [args, _] = clause} ->
+        unpinned_args = Variable.list_unpinned_variables(args)
 
-        [args, body]
-        |> Variable.find_variables()
-        |> Enum.reject(
-          &(Variable.member?(actual_args, &1) or
-              not Variable.member?(available_variables, &1))
+        Variable.list_variables(
+          clause,
+          &(Variable.member?(available_variables, &1.node) and
+              not Variable.member?(unpinned_args, &1.node))
         )
       end)
       |> List.flatten()

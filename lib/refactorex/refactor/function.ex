@@ -1,5 +1,4 @@
 defmodule Refactorex.Refactor.Function do
-  alias Refactorex.Refactor.Variable
   alias Sourceror.Zipper, as: Z
 
   def definition?(node)
@@ -12,26 +11,6 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?({:&, _, _}), do: true
   def anonymous?({:fn, _, _}), do: true
   def anonymous?(_), do: false
-
-  def actual_args(args) do
-    args
-    |> Z.zip()
-    |> Z.traverse_while([], fn
-      %{node: node} = zipper, actual_args ->
-        cond do
-          not Variable.at_one?(zipper) ->
-            {:cont, zipper, actual_args}
-
-          # pinned args are not actual args
-          match?(%{node: {:^, _, _}}, Z.up(zipper)) ->
-            {:cont, zipper, actual_args}
-
-          true ->
-            {:cont, zipper, actual_args ++ [node]}
-        end
-    end)
-    |> elem(1)
-  end
 
   def unpin_args(args) do
     args
