@@ -14,6 +14,11 @@ defmodule Refactorex.Refactor.Pipeline.RemoveIOInspect do
       %{node: {^io_inspect, _, [{id, _, _} = arg | _]}} when id != :__block__ ->
         Z.replace(parent, arg)
 
+      %{node: {^io_inspect, _, [value | _]}} ->
+        if match?(%{node: {:|>, _, _}}, Z.up(parent)),
+          do: refactor(parent, line),
+          else: Z.replace(parent, value)
+
       %{node: {^io_inspect, _, _}} ->
         refactor(parent, line)
 

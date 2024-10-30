@@ -75,6 +75,7 @@ defmodule Refactorex.Refactor.Pipeline.RemoveIOInspectTest do
     )
   end
 
+  @tag :only
   test "removes piped IO.inspect function call in the middle of pipeline with opts" do
     assert_refactored(
       RemoveIOInspect,
@@ -140,6 +141,33 @@ defmodule Refactorex.Refactor.Pipeline.RemoveIOInspectTest do
       foo
       |> then(& &1)
       |> bar()
+      """
+    )
+  end
+
+  test "removes IO.inspect from block" do
+    assert_refactored(
+      RemoveIOInspect,
+      """
+      case arg do
+        %{node: {:->, _, [args, _]}} = zipper ->
+          # v
+          IO.inspect("hello")
+
+          if was_variable_used?(args, name),
+            do: {:skip, zipper},
+            else: {:cont, zipper}
+      end
+      """,
+      """
+          case arg do
+        %{node: {:->, _, [args, _]}} = zipper ->
+          "hello"
+
+          if was_variable_used?(args, name),
+            do: {:skip, zipper},
+            else: {:cont, zipper}
+      end
       """
     )
   end
