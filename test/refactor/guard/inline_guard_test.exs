@@ -57,7 +57,6 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
     )
   end
 
-  @tag :only
   test "inlines guard call with correctly reassigned args" do
     assert_refactored(
       InlineGuard,

@@ -5,7 +5,6 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
     works_on: :selection
 
   alias Refactorex.Refactor.{
-    Function,
     Guard,
     Module,
     Variable
@@ -35,25 +34,15 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
 
     zipper
     |> Z.replace({name, [], args})
-    |> Module.update_scope(fn module_scope ->
-      {before, rest} = where_to_place_guard(module_scope)
-
-      before ++ [{:defguardp, [], [{:when, [], [{name, [], args}, node]}]} | rest]
-    end)
+    |> Guard.new_private_guard(name, args, node)
   end
 
   defp next_available_guard_name(zipper) do
     Module.next_available_name(
       zipper,
       @guard_name,
-      &match?({id, _, _} when id in ~w(defguard defguardp)a, &1),
+      &Guard.definition?/1,
       fn {_, _, [{:when, _, [{name, _, _} | _]}]} -> name end
     )
-  end
-
-  defp where_to_place_guard(module_scope) do
-    module_scope
-    |> Enum.find_index(&Function.definition?/1)
-    |> then(&Enum.split(module_scope, &1 || 0))
   end
 end

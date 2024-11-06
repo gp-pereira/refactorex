@@ -21,7 +21,7 @@ defmodule Refactorex.Refactor.Guard.InlineGuard do
       not Guard.guard_statement?(zipper) ->
         false
 
-      is_nil(find_definition(zipper)) ->
+      is_nil(Guard.find_definition(zipper)) ->
         false
 
       true ->
@@ -31,22 +31,8 @@ defmodule Refactorex.Refactor.Guard.InlineGuard do
 
   def refactor(zipper, _), do: Z.replace(zipper, replace_guard_args_by_call_values(zipper))
 
-  defp find_definition(%{node: {guard_name, _, call_values}} = zipper) do
-    zipper
-    |> Module.find_in_scope(fn
-      {guard_id, _, [{:when, _, [{^guard_name, _, guard_args}, _]}]}
-      when guard_id in ~w(defguard defguardp)a and
-             length(call_values) == length(guard_args) ->
-        true
-
-      _ ->
-        false
-    end)
-    |> List.first()
-  end
-
   defp replace_guard_args_by_call_values(%{node: {_, _, call_values}} = zipper) do
-    {_, _, [{_, _, [{_, _, guard_args}, guard_block]}]} = find_definition(zipper)
+    {_, _, [{_, _, [{_, _, guard_args}, guard_block]}]} = Guard.find_definition(zipper)
 
     args_to_values =
       [guard_args, call_values]

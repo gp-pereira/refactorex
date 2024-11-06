@@ -105,11 +105,10 @@ defmodule Refactorex.Refactor.Guard.ExtractGuardTest do
       """,
       """
       defmodule Foo do
+        defguardp extracted_guard2(arg) when arg == true
         defguard extracted_guard(arg) when arg == true
 
         defguardp extracted_guard1(arg) when arg == true
-
-        defguardp extracted_guard2(arg) when arg == true
 
         def foo(arg) when extracted_guard2(arg) do
           arg
