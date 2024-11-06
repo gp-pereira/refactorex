@@ -1,62 +1,30 @@
 defmodule Refactorex.Refactor.Module do
   alias Sourceror.Zipper, as: Z
 
-  alias Refactorex.Refactor.{
-    AST,
-    Function
-  }
-
   def inside_one?(zipper), do: !!go_to_definition(zipper)
 
-  def add_private_function(zipper, name, args, body) do
-    private_function =
-      {:defp, [do: [], end: []],
-       [
-         case Function.unpin_args(args) do
-           [{:when, _, [args, guard]} | other_args] ->
-             {:when, [], [{name, [], [args | other_args]}, guard]}
-
-           args ->
-             {name, [], args}
-         end,
-         [{{:__block__, [], [:do]}, body}]
-       ]}
-
-    update_scope(zipper, &(&1 ++ [private_function]))
-  end
-
-  def find_in_scope(zipper, filter) do
+  def find_in_scope(zipper, filter_fn) do
     zipper
     |> go_to_scope()
     |> Z.node()
     |> Z.children()
-    |> Enum.filter(filter)
+    |> Enum.filter(filter_fn)
   end
 
-  def update_scope(%{node: node} = zipper, updater) do
+  def update_scope(zipper, updater_fn) do
     zipper
     |> go_to_scope()
     |> Z.update(fn {_, _, scope} ->
-      {:__block__, [], updater.(scope)}
+      {:__block__, [], updater_fn.(scope)}
     end)
-    |> AST.go_to_node(node)
   end
 
-  def next_available_function_name(zipper, base_name) do
-    next_available_name(
-      zipper,
-      base_name,
-      &Function.definition?/1,
-      fn {_, _, [{name, _, _}, _]} -> name end
-    )
-  end
-
-  def next_available_name(zipper, base_name, filter, node_namer) do
+  def next_available_name(zipper, base_name, filter_fn, node_namer_fn) do
     zipper
-    |> find_in_scope(filter)
+    |> find_in_scope(filter_fn)
     |> Enum.reduce(base_name, fn
       node, current_name ->
-        node_name = node |> node_namer.() |> Atom.to_string()
+        node_name = node |> node_namer_fn.() |> Atom.to_string()
 
         case Regex.run(~r/#{base_name}(\d*)/, node_name) do
           [_, ""] ->
@@ -72,16 +40,6 @@ defmodule Refactorex.Refactor.Module do
     |> String.to_atom()
   end
 
-  defp go_to_definition(zipper) do
-    Z.find(zipper, :prev, fn
-      {:defmodule, _, _} ->
-        true
-
-      _ ->
-        false
-    end)
-  end
-
   defp go_to_scope(zipper) do
     zipper
     |> go_to_definition()
@@ -91,11 +49,15 @@ defmodule Refactorex.Refactor.Module do
     |> Z.down()
     |> Z.right()
     |> Z.update(fn
-      {:__block__, _, scope} ->
-        {:__block__, [], scope}
+      {:__block__, meta, scope} ->
+        {:__block__, meta, scope}
 
       scope ->
         {:__block__, [], [scope]}
     end)
   end
+
+  defp go_to_definition(nil), do: nil
+  defp go_to_definition(%{node: {:defmodule, _, _}} = zipper), do: zipper
+  defp go_to_definition(zipper), do: zipper |> Z.up() |> go_to_definition()
 end

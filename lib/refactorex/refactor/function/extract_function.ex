@@ -5,6 +5,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
     works_on: :selection
 
   alias Refactorex.Refactor.{
+    Function,
     Module,
     Pipeline,
     Variable
@@ -37,7 +38,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
   end
 
   def refactor(%{node: node} = zipper, selection) do
-    name = Module.next_available_function_name(zipper, @function_name)
+    name = Function.next_available_function_name(zipper, @function_name)
     args = find_function_args(zipper, selection)
 
     cond do
@@ -47,7 +48,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
         zipper
         |> Pipeline.go_to_top(selection)
         |> Z.replace({:|>, [], [before, {name, [], args}]})
-        |> Module.add_private_function(
+        |> Function.new_private_function(
           name,
           [{:arg1, [], nil} | args],
           Pipeline.update_start(selection, &{:|>, [], [{:arg1, [], nil}, &1]})
@@ -109,7 +110,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
 
     zipper
     |> Z.replace(call)
-    |> Module.add_private_function(name, args, body)
+    |> Function.new_private_function(name, args, body)
   end
 
   defp maybe_fix_assignment(name, args, {:__block__, meta, children} = block) do

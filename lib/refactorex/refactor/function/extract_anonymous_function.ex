@@ -50,11 +50,11 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
       end)
       |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
 
-    name = Module.next_available_function_name(zipper, @function_name)
+    name = Function.next_available_function_name(zipper, @function_name)
 
     zipper
     |> anonymous_to_function_call(name, args, closure_variables)
-    |> Module.add_private_function(name, args ++ closure_variables, body)
+    |> Function.new_private_function(name, args ++ closure_variables, body)
   end
 
   def refactor(%{node: {:fn, _, clauses}} = zipper, _) do
@@ -77,13 +77,13 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     # all clauses have the same number of args,
     # so we can just grab them from the first one
     {:->, _, [args, _]} = List.first(clauses)
-    name = Module.next_available_function_name(zipper, @function_name)
+    name = Function.next_available_function_name(zipper, @function_name)
 
     zipper
     |> anonymous_to_function_call(name, args, closure_variables)
     |> then(
       &Enum.reduce(clauses, &1, fn {:->, _, [args, body]}, zipper ->
-        Module.add_private_function(zipper, name, args ++ closure_variables, body)
+        Function.new_private_function(zipper, name, args ++ closure_variables, body)
       end)
     )
   end
