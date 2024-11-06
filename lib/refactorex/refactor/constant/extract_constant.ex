@@ -32,7 +32,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
   end
 
   def refactor(%{node: to_be_constant} = zipper, _) do
-    name = Module.next_available_constant_name(zipper, @constant_name)
+    name = next_available_constant_name(zipper)
 
     zipper
     |> Z.update(fn _ -> {:@, [], [{name, [], nil}]} end)
@@ -42,6 +42,15 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
 
       before ++ [{:@, [], [{name, [], [to_be_constant]}]} | rest]
     end)
+  end
+
+  def next_available_constant_name(zipper) do
+    Module.next_available_name(
+      zipper,
+      @constant_name,
+      &match?({:@, _, _}, &1),
+      fn {_, _, [{name, _, _}]} -> name end
+    )
   end
 
   defp where_to_place_constant(module_scope, to_be_constant) do

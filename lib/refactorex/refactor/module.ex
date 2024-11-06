@@ -1,6 +1,10 @@
 defmodule Refactorex.Refactor.Module do
   alias Sourceror.Zipper, as: Z
-  alias Refactorex.Refactor.Function
+
+  alias Refactorex.Refactor.{
+    AST,
+    Function
+  }
 
   def inside_one?(zipper), do: !!go_to_definition(zipper)
 
@@ -29,12 +33,13 @@ defmodule Refactorex.Refactor.Module do
     |> Enum.filter(filter)
   end
 
-  def update_scope(zipper, updater) do
+  def update_scope(%{node: node} = zipper, updater) do
     zipper
     |> go_to_scope()
     |> Z.update(fn {_, _, scope} ->
       {:__block__, [], updater.(scope)}
     end)
+    |> AST.go_to_node(node)
   end
 
   def next_available_function_name(zipper, base_name) do
@@ -43,15 +48,6 @@ defmodule Refactorex.Refactor.Module do
       base_name,
       &Function.definition?/1,
       fn {_, _, [{name, _, _}, _]} -> name end
-    )
-  end
-
-  def next_available_constant_name(zipper, base_name) do
-    next_available_name(
-      zipper,
-      base_name,
-      &match?({:@, _, _}, &1),
-      fn {_, _, [{name, _, _}]} -> name end
     )
   end
 
