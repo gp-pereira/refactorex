@@ -31,7 +31,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | | |
 | `guard` | Extract guard | selection | ✅ |
 | `guard` | Inline guard | selection | ✅ |
-| `guard` | Rename guard | selection | |
+| `guard` | Rename guard | selection | ✅ |
 | | | |
 | `if else` | Use keyword syntax | line | ✅ |
 | `if else` | Use regular syntax | line | ✅ |

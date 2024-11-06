@@ -94,6 +94,7 @@ defmodule Refactorex.Refactor do
 
   @renamers [
     __MODULE__.Constant.RenameConstant,
+    __MODULE__.Guard.RenameGuard,
     __MODULE__.Variable.RenameVariable
   ]
 
