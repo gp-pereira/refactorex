@@ -37,9 +37,9 @@ defmodule Refactorex do
   end
 
   @impl true
-  def handle_notification(%Exit{}, lsp) do
-    if Mix.env() == :prod, do: System.halt(0)
-    {:noreply, lsp}
+  def handle_notification(%Exit{}, _lsp) do
+    Logger.info("Server stopped")
+    System.halt(0)
   end
 
   @impl true
