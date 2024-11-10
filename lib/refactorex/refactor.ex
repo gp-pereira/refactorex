@@ -6,7 +6,7 @@ defmodule Refactorex.Refactor do
   @callback can_refactor?(Zipper.t(), selection_or_line) :: :skip | true | false
   @callback refactor(Zipper.t(), selection_or_line) :: Zipper.t()
 
-  @placeholder :name_being_refactored_31_08_2024
+  @placeholder :name_being_refactored_31_08_2003
 
   defmacro __using__(attrs) do
     works_on = Keyword.fetch!(attrs, :works_on)
@@ -94,6 +94,7 @@ defmodule Refactorex.Refactor do
 
   @renamers [
     __MODULE__.Constant.RenameConstant,
+    __MODULE__.Function.RenameFunction,
     __MODULE__.Guard.RenameGuard,
     __MODULE__.Variable.RenameVariable
   ]
