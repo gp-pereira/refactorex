@@ -59,8 +59,7 @@ defmodule Refactorex.Parser do
     text
     |> replace_newline_with_placeholder()
     |> String.split("\n")
-    |> Stream.with_index()
-    |> Stream.map(fn {line, i} -> {line, i + 1} end)
+    |> Stream.with_index(1)
     |> Stream.map(fn
       {line, i} when i > range.start.line and i < range.end.line ->
         line
