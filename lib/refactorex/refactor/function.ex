@@ -13,6 +13,32 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?({:fn, _, _}), do: true
   def anonymous?(_), do: false
 
+  def find_definitions(%{node: {name, _, args}} = zipper) do
+    num_args =
+      case Z.up(zipper) do
+        %{node: {:/, _, [_, {:__block__, _, [num_args]}]}} ->
+          num_args
+
+        %{node: {:|>, _, _}} ->
+          length(args) + 1
+
+        _ ->
+          length(args)
+      end
+
+    zipper
+    |> Module.find_in_scope(fn
+      {_, _, [{:when, _, [{^name, _, function_args}, _]}, _]} = node ->
+        definition?(node) and length(function_args) == num_args
+
+      {_, _, [{^name, _, function_args}, _]} = node ->
+        definition?(node) and length(function_args) == num_args
+
+      _ ->
+        false
+    end)
+  end
+
   def new_private_function(zipper, name, args, body) do
     private_function =
       {:defp, [do: [], end: []],
@@ -20,6 +46,9 @@ defmodule Refactorex.Refactor.Function do
          case unpin_args(args) do
            [{:when, _, [args, guard]} | other_args] ->
              {:when, [], [{name, [], [args | other_args]}, guard]}
+
+           {:when, _, [{_, _, args}, guard]} ->
+             {:when, [], [{name, [], args}, guard]}
 
            args ->
              {name, [], args}
