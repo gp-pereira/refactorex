@@ -4,9 +4,9 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
     kind: "refactor.rewrite",
     works_on: :line
 
-  alias Refactorex.Refactor.Function
+  alias Refactorex.Refactor.{Block, Function}
 
-  def can_refactor?(%{node: {_, meta, _} = node} = zipper, line) do
+  def can_refactor?(%{node: {_, meta, [_, [body]]} = node}, line) do
     cond do
       not Function.definition?(node) ->
         false
@@ -18,7 +18,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntax do
       not AST.starts_at?(node, line) ->
         false
 
-      Function.has_multiple_statements?(zipper) ->
+      Block.has_multiple_statements?(body) ->
         :skip
 
       true ->

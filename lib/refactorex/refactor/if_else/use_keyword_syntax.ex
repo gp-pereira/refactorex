@@ -4,6 +4,8 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntax do
     kind: "refactor.rewrite",
     works_on: :line
 
+  alias Refactorex.Refactor.Block
+
   def can_refactor?(%{node: {:if, meta, [_, blocks]} = node}, line) do
     cond do
       not AST.starts_at?(node, line) ->
@@ -13,7 +15,7 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntax do
       is_nil(meta[:do]) ->
         :skip
 
-      Enum.any?(blocks, &has_multiple_statements?/1) ->
+      Enum.any?(blocks, &Block.has_multiple_statements?/1) ->
         false
 
       true ->
@@ -36,17 +38,4 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntax do
 
   defp use_keyword_syntax({{:__block__, meta, tag}, inner_block}),
     do: {{:__block__, Keyword.put(meta, :format, :keyword), tag}, inner_block}
-
-  defp has_multiple_statements?(block) do
-    case block do
-      {{:__block__, _, _}, {:__block__, _, [_]}} ->
-        false
-
-      {{:__block__, _, _}, {:__block__, _, [_ | _]}} ->
-        true
-
-      _ ->
-        false
-    end
-  end
 end

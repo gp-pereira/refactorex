@@ -68,21 +68,6 @@ defmodule Refactorex.Refactor.Function do
     )
   end
 
-  def has_multiple_statements?(zipper) do
-    zipper
-    |> go_to_block()
-    |> then(fn
-      %{node: {{:__block__, _, _}, {:__block__, _, [_]}}} ->
-        false
-
-      %{node: {{:__block__, _, _}, {:__block__, _, [_ | _]}}} ->
-        true
-
-      _ ->
-        false
-    end)
-  end
-
   def go_to_block(zipper) do
     zipper
     |> Z.down()
