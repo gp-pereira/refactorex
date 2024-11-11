@@ -74,6 +74,7 @@ defmodule Refactorex.Refactor do
   @refactors [
     __MODULE__.Constant.ExtractConstant,
     __MODULE__.Constant.InlineConstant,
+    __MODULE__.Function.CollapseAnonymousFunction,
     __MODULE__.Function.ExpandAnonymousFunction,
     __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.ExtractFunction,

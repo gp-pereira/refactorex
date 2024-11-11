@@ -22,7 +22,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection | ✅ |
 | `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | ✅ |
 | `function` | [Extract function](#function-extract-function) | selection | ✅ |
-| `function` | Collapse anonymous function | selection |
+| `function` | Collapse anonymous function | selection | ✅ |
 | `function` | Inline function | selection |
 | `function` | Rename function | selection | ✅ |
 | `function` | [Underscore unused args](#function-underscore-unused-args) | line | ✅ |
@@ -49,8 +49,12 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 ### Function: expand anonymous function
 
-* __Description__: expand an anonymous function from & to fn -> end syntax
-* __Works on__: anonymous function selection
+| | |
+|-|-|
+| Description | Rewrite an anonymous function using `& &1` syntax to `fn arg1 -> arg1 end` |
+| Inverse of | [Collapse anonymous function](#function-collapse-anonymous-function) |
+| Target | Anonymous function selection |
+| Notes | - |
 
 ![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/expand_anonymous_function.gif?raw=true)
 
@@ -81,7 +85,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 <br>
 
-### Function: underscore unused args
+
+### Variable: underscore unused args
 
 * __Description__: places an underscore in front of function args not used.
 * __Works on__: function definition line or function clause line
