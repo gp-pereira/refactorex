@@ -72,6 +72,7 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
+    __MODULE__.Alias.SortNestedAliases,
     __MODULE__.Constant.ExtractConstant,
     __MODULE__.Constant.InlineConstant,
     __MODULE__.Function.CollapseAnonymousFunction,
