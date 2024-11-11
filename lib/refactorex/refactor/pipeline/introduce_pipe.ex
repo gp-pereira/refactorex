@@ -12,6 +12,9 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipe do
       when id in [:%{}, :{}, :__block__, :fn],
       do: false
 
+  def can_refactor?(%{node: {:alias, _, _}}, _),
+    do: :skip
+
   def can_refactor?(%{node: {_, _, _} = node} = zipper, line) do
     cond do
       not AST.starts_at?(node, line) ->

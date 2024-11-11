@@ -252,6 +252,16 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
     )
   end
 
+  test "ignores alias" do
+    assert_not_refactored(
+      IntroducePipe,
+      """
+      #        v
+      alias Foo.{Bar, Delta}
+      """
+    )
+  end
+
   test "ignores function declarations" do
     assert_not_refactored(
       IntroducePipe,
