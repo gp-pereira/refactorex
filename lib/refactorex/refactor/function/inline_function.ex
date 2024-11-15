@@ -35,7 +35,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(zipper, _) do
-    statements = replaced_statements(zipper)
+    statements = statements_to_inline(zipper)
 
     case Z.up(zipper) do
       %{node: {:__block__, _, _}} ->
@@ -76,50 +76,33 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
   defp inline_statements_before_node(zipper, statements),
     do: Enum.reduce(statements, zipper, &Z.insert_left(&2, &1))
 
-  defp replaced_statements(%{node: {_, _, call_values}} = zipper) do
+  defp statements_to_inline(%{node: {_, _, call_values}} = zipper) do
     case Function.find_definitions(zipper) do
       [{_, _, [{:when, _, _}, _]} = guarded_definition] ->
         merge_definitions_as_case_statement([guarded_definition], call_values)
 
-      [definition] ->
-        if are_args_just_variables?(definition) do
-          [
-            function_args(definition),
-            call_values
-          ]
-          |> Enum.zip()
+      [{_, _, [{_, _, args}, _]} = definition] ->
+        statements =
+          case definition do
+            {_, _, [_, [{_, {:__block__, _, statements}}]]} -> statements
+            {_, _, [_, [{_, statement}]]} -> [statement]
+          end
+
+        if Enum.all?(args, &match?({_, _, nil}, &1)) do
+          args
+          |> Stream.zip(call_values)
           |> Enum.reduce(
-            function_statements(definition),
+            statements,
             fn {{arg_name, _, _}, call_value}, statements ->
               Variable.replace_usages_by_value(statements, arg_name, call_value)
             end
           )
         else
-          [
-            {:=, [],
-             [
-               {:{}, [], function_args(definition)},
-               {:{}, [], call_values}
-             ]}
-            | function_statements(definition)
-          ]
+          [{:=, [], [{:{}, [], args}, {:{}, [], call_values}]} | statements]
         end
 
       definitions ->
         merge_definitions_as_case_statement(definitions, call_values)
-    end
-  end
-
-  defp function_args({_, _, [{:when, _, [{_, _, args}, _]}, _]}), do: args
-  defp function_args({_, _, [{_, _, args}, _]}), do: args
-
-  defp are_args_just_variables?(definition),
-    do: Enum.all?(function_args(definition), &match?({_, _, nil}, &1))
-
-  defp function_statements(definition) do
-    case definition do
-      {_, _, [_, [{_, {:__block__, _, statements}}]]} -> statements
-      {_, _, [_, [{_, statement}]]} -> [statement]
     end
   end
 
