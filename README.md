@@ -50,12 +50,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 ### Function: expand anonymous function
 
-| | |
-|-|-|
-| Description | Rewrite an anonymous function using `& &1` syntax to `fn arg1 -> arg1 end` |
-| Inverse of | [Collapse anonymous function](#function-collapse-anonymous-function) |
-| Target | Anonymous function selection |
-| Notes | - |
+* __Description__: expand an anonymous function from & to fn -> end syntax
+* __Works on__: anonymous function selection
 
 ![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/expand_anonymous_function.gif?raw=true)
 
