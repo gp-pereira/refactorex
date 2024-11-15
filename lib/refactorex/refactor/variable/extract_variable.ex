@@ -31,10 +31,9 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
   def refactor(%{node: node} = zipper, selection) do
     case parent = Z.up(zipper) do
       %{node: {:->, _, [args, ^node]}} ->
-        Z.replace(
-          parent,
-          {:->, [], [args, extract_and_assign(parent, [node], node, selection)]}
-        )
+        parent
+        |> Z.replace({:->, [], [args, extract_and_assign(parent, [node], node, selection)]})
+        |> AST.go_to_node(selection)
 
       # selection is inside a COND clause
       %{node: {:->, _, [^node, _]}} ->
@@ -43,9 +42,13 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
 
       %{node: {:__block__, meta, statements}} ->
         # if there is a closing tag, the block is probably a tuple
-        if meta[:closing],
-          do: refactor(parent, selection),
-          else: Z.replace(parent, extract_and_assign(parent, statements, node, selection))
+        if meta[:closing] do
+          refactor(parent, selection)
+        else
+          parent
+          |> Z.replace(extract_and_assign(parent, statements, node, selection))
+          |> AST.go_to_node(selection)
+        end
 
       %{node: {{:__block__, _, [tag]}, ^node}} when tag in ~w(do else)a ->
         upper_structure = AST.up(parent, 2)
@@ -69,6 +72,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
               {block, extract_and_assign(parent, [statement], statement, selection)}
             end)
         end
+        |> AST.go_to_node(selection)
 
       # same pattern matching as ExpandAnonymousFunction.can_refactor?/2
       %{node: {:&, _, [body]}} when not is_number(body) ->

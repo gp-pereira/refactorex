@@ -54,5 +54,6 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
           {id, meta, [value, Variable.replace_usages_by_value(clauses, name, value)]}
         )
     end
+    |> AST.go_to_node(value)
   end
 end
