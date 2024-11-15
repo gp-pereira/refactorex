@@ -1,0 +1,151 @@
+defmodule Refactorex.Refactor.Function.InlineFunction do
+  use Refactorex.Refactor,
+    title: "Inline function",
+    kind: "refactor.inline",
+    works_on: :selection
+
+  alias Refactorex.Refactor.{
+    Function,
+    Module,
+    Variable
+  }
+
+  def can_refactor?(%{node: node} = zipper, selection) do
+    cond do
+      not AST.equal?(node, selection) ->
+        false
+
+      not Module.inside_one?(zipper) ->
+        false
+
+      not Function.call?(node) ->
+        false
+
+      invalid_parent?(Z.up(zipper)) ->
+        false
+
+      Enum.empty?(Function.find_definitions(zipper)) ->
+        false
+
+      true ->
+        true
+    end
+  end
+
+  def can_refactor?(_, _), do: false
+
+  def refactor(zipper, _) do
+    statements = replaced_statements(zipper)
+
+    case Z.up(zipper) do
+      %{node: {:__block__, _, _}} ->
+        inline_statements(zipper, statements)
+
+      _not_block when length(statements) > 1 ->
+        extract_then_inline_statements(zipper, statements)
+
+      _default ->
+        inline_statements(zipper, statements)
+    end
+  end
+
+  defp inline_statements(%{node: node} = zipper, statements) do
+    zipper
+    # just ensure enough space
+    |> Variable.ExtractVariable.refactor(node)
+    |> AST.go_to_node(node)
+    |> Variable.InlineVariable.refactor(node)
+    |> AST.go_to_node(node)
+    |> inline_statements_before_node(statements)
+    |> Z.remove()
+  end
+
+  defp extract_then_inline_statements(%{node: node} = zipper, statements) do
+    {statements, [last_statement]} = Enum.split(statements, -1)
+
+    zipper
+    |> Variable.ExtractVariable.refactor(node)
+    |> AST.go_to_node(node)
+    |> Z.up()
+    |> Z.update(fn {:=, _, [v, _]} -> {:=, [], [v, last_statement]} end)
+    |> inline_statements_before_node(statements)
+    |> AST.go_to_node(last_statement)
+    |> Variable.InlineVariable.refactor(last_statement)
+  end
+
+  defp inline_statements_before_node(zipper, statements),
+    do: Enum.reduce(statements, zipper, &Z.insert_left(&2, &1))
+
+  defp replaced_statements(%{node: {_, _, call_values}} = zipper) do
+    case Function.find_definitions(zipper) do
+      [{_, _, [{:when, _, _}, _]} = guarded_definition] ->
+        merge_definitions_as_case_statement([guarded_definition], call_values)
+
+      [definition] ->
+        if are_args_just_variables?(definition) do
+          [
+            function_args(definition),
+            call_values
+          ]
+          |> Enum.zip()
+          |> Enum.reduce(
+            function_statements(definition),
+            fn {{arg_name, _, _}, call_value}, statements ->
+              Variable.replace_usages_by_value(statements, arg_name, call_value)
+            end
+          )
+        else
+          [
+            {:=, [],
+             [
+               {:{}, [], function_args(definition)},
+               {:{}, [], call_values}
+             ]}
+            | function_statements(definition)
+          ]
+        end
+
+      definitions ->
+        merge_definitions_as_case_statement(definitions, call_values)
+    end
+  end
+
+  defp function_args({_, _, [{:when, _, [{_, _, args}, _]}, _]}), do: args
+  defp function_args({_, _, [{_, _, args}, _]}), do: args
+
+  defp are_args_just_variables?(definition),
+    do: Enum.all?(function_args(definition), &match?({_, _, nil}, &1))
+
+  defp function_statements(definition) do
+    case definition do
+      {_, _, [_, [{_, {:__block__, _, statements}}]]} -> statements
+      {_, _, [_, [{_, statement}]]} -> [statement]
+    end
+  end
+
+  defp merge_definitions_as_case_statement(definitions, call_values) do
+    [
+      {:case, [do: [], end: []],
+       [
+         {:{}, [], call_values},
+         [
+           {{:__block__, [], [:do]},
+            Enum.map(
+              definitions,
+              fn
+                {_, _, [{:when, _, [{_, _, args}, guard]}, [{_, body}]]} ->
+                  {:->, [], [[{:when, [], [{:{}, [], args}, guard]}], body]}
+
+                {_, _, [{_, _, args}, [{_, body}]]} ->
+                  {:->, [], [[{:{}, [], args}], body]}
+              end
+            )}
+         ]
+       ]}
+    ]
+  end
+
+  defp invalid_parent?(%{node: {:|>, _, _}}), do: true
+  defp invalid_parent?(%{node: {:&, _, _}}), do: true
+  defp invalid_parent?(%{node: node}), do: Function.definition?(node)
+end

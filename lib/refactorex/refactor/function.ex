@@ -2,6 +2,8 @@ defmodule Refactorex.Refactor.Function do
   alias Sourceror.Zipper, as: Z
   alias Refactorex.Refactor.Module
 
+  import Sourceror.Identifier
+
   def definition?(node)
   def definition?({:def, _, _}), do: true
   def definition?({:defp, _, _}), do: true
@@ -12,6 +14,9 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?({:&, _, _}), do: true
   def anonymous?({:fn, _, _}), do: true
   def anonymous?(_), do: false
+
+  def call?({_, meta, _} = node), do: !!meta[:closing] and is_call(node)
+  def call?(_), do: false
 
   def find_definitions(%{node: {name, _, args}} = zipper) do
     num_args =
