@@ -23,7 +23,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | ✅ |
 | `function` | [Extract function](#function-extract-function) | selection | ✅ |
 | `function` | Collapse anonymous function | selection | ✅ |
-| `function` | Inline anonymous function | selection |
 | `function` | Inline function | selection | ✅ |
 | `function` | Rename function | selection | ✅ |
 | `function` | [Underscore unused args](#function-underscore-unused-args) | line | ✅ |
