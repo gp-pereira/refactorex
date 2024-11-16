@@ -311,6 +311,116 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
     )
   end
 
+  test "inlines captured function call" do
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(args) do
+        #                 v
+          Enum.map(args, &bar(&1))
+        #                       ^
+        end
+
+        def bar(arg), do: arg
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(args) do
+          Enum.map(args, & &1)
+        end
+
+        def bar(arg), do: arg
+      end
+      """
+    )
+
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(args) do
+        #                       v
+          Enum.map(args, &(25 + bar(&1)))
+        #                             ^
+        end
+
+        def bar(arg), do: arg
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(args) do
+          Enum.map(args, &(25 + &1))
+        end
+
+        def bar(arg), do: arg
+      end
+      """
+    )
+
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(args) do
+        #                v
+          Enum.map(args, &bar(&1))
+        #                       ^
+        end
+
+        def bar(%{arg: arg} = arg), do: arg
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(args) do
+          Enum.map(args, fn arg1 ->
+            {%{arg: arg} = arg} = {arg1}
+            arg
+          end)
+        end
+
+        def bar(%{arg: arg} = arg), do: arg
+      end
+      """
+    )
+
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(args) do
+        #                v
+          Enum.map(args, &bar/1)
+        #                     ^
+        end
+
+        def bar(arg) do
+          c = arg + 10
+          c * arg
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(args) do
+          Enum.map(args, fn arg1 ->
+            c = arg1 + 10
+            c * arg1
+          end)
+        end
+
+        def bar(arg) do
+          c = arg + 10
+          c * arg
+        end
+      end
+      """
+    )
+  end
+
   test "ignores function definition" do
     assert_not_refactored(
       InlineFunction,
@@ -368,53 +478,6 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
       # v
         bar(arg)
       #        ^
-      end
-      """
-    )
-  end
-
-  test "ignores captured function call" do
-    assert_not_refactored(
-      InlineFunction,
-      """
-      defmodule Foo do
-        def foo(args) do
-        #                 v
-          Enum.map(args, &bar(&1))
-        #                       ^
-        end
-
-        def bar(arg), do: arg
-      end
-      """
-    )
-
-    assert_not_refactored(
-      InlineFunction,
-      """
-      defmodule Foo do
-        def foo(args) do
-        #                v
-          Enum.map(args, &bar(&1))
-        #                       ^
-        end
-
-        def bar(arg), do: arg
-      end
-      """
-    )
-
-    assert_not_refactored(
-      InlineFunction,
-      """
-      defmodule Foo do
-        def foo(args) do
-        #                v
-          Enum.map(args, &bar/1)
-        #                     ^
-        end
-
-        def bar(arg), do: arg
       end
       """
     )

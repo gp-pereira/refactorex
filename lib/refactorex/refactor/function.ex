@@ -15,8 +15,13 @@ defmodule Refactorex.Refactor.Function do
   def anonymous?({:fn, _, _}), do: true
   def anonymous?(_), do: false
 
+  def call?(node)
+  def call?({:/, _, [_, {:__block__, _, [_]}]}), do: true
   def call?({_, meta, _} = node), do: !!meta[:closing] and is_call(node)
   def call?(_), do: false
+
+  def find_definitions(%{node: {:/, _, _}} = zipper),
+    do: find_definitions(Z.down(zipper))
 
   def find_definitions(%{node: {name, _, args}} = zipper) do
     num_args =

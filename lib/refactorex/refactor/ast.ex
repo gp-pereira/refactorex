@@ -75,4 +75,13 @@ defmodule Refactorex.Refactor.AST do
   def up(nil, _), do: nil
   def up(zipper, 0), do: zipper
   def up(zipper, times), do: zipper |> Z.up() |> up(times - 1)
+
+  def up_until(zipper, matcher_fn)
+  def up_until(nil, _), do: nil
+
+  def up_until(zipper, matcher_fn) do
+    if matcher_fn.(zipper),
+      do: zipper,
+      else: up_until(Z.up(zipper), matcher_fn)
+  end
 end

@@ -10,6 +10,8 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     Variable
   }
 
+  def can_refactor?(zipper, {:&, _, [body]}), do: can_refactor?(zipper, body)
+
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do
       not AST.equal?(node, selection) ->
@@ -35,32 +37,38 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(zipper, _) do
+    parent = Z.up(zipper)
     statements = statements_to_inline(zipper)
 
-    case Z.up(zipper) do
-      %{node: {:__block__, _, _}} ->
-        inline_statements(zipper, statements)
+    cond do
+      match?(%{node: {:&, _, [{:/, _, _}]}}, parent) ->
+        parent
+        |> Function.ExpandAnonymousFunction.refactor(parent.node)
+        |> then(fn %{node: {:fn, _, [{:->, _, [_, body]}]}} = zipper ->
+          zipper
+          |> AST.go_to_node(body)
+          |> refactor(body)
+        end)
+        |> maybe_collapse_anonymous_function()
 
-      _not_block when length(statements) > 1 ->
-        extract_then_inline_statements(zipper, statements)
+      AST.up_until(zipper, &match?(%{node: {:&, _, _}}, &1)) ->
+        zipper
+        |> ensure_expanded_scope()
+        |> refactor(zipper.node)
+        |> maybe_collapse_anonymous_function()
 
-      _default ->
-        inline_statements(zipper, statements)
+      not match?(%{node: {:__block__, _, _}}, parent) and length(statements) > 1 ->
+        extract_and_reassign_then_inline(zipper, statements)
+
+      true ->
+        zipper
+        |> ensure_expanded_scope()
+        |> inline_statements_before_node(statements)
+        |> Z.remove()
     end
   end
 
-  defp inline_statements(%{node: node} = zipper, statements) do
-    zipper
-    # just ensure enough space
-    |> Variable.ExtractVariable.refactor(node)
-    |> AST.go_to_node(node)
-    |> Variable.InlineVariable.refactor(node)
-    |> AST.go_to_node(node)
-    |> inline_statements_before_node(statements)
-    |> Z.remove()
-  end
-
-  defp extract_then_inline_statements(%{node: node} = zipper, statements) do
+  defp extract_and_reassign_then_inline(%{node: node} = zipper, statements) do
     {statements, [last_statement]} = Enum.split(statements, -1)
 
     zipper
@@ -129,6 +137,21 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
   end
 
   defp invalid_parent?(%{node: {:|>, _, _}}), do: true
-  defp invalid_parent?(%{node: {:&, _, _}}), do: true
   defp invalid_parent?(%{node: node}), do: Function.definition?(node)
+
+  defp ensure_expanded_scope(%{node: node} = zipper) do
+    zipper
+    |> Variable.ExtractVariable.refactor(node)
+    |> Variable.InlineVariable.refactor(node)
+  end
+
+  defp maybe_collapse_anonymous_function(zipper) do
+    zipper
+    |> AST.up_until(&match?(%{node: {:fn, _, _}}, &1))
+    |> then(
+      &if Function.CollapseAnonymousFunction.can_refactor?(&1, &1.node),
+        do: Function.CollapseAnonymousFunction.refactor(&1, &1.node),
+        else: zipper
+    )
+  end
 end
