@@ -311,6 +311,120 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
     )
   end
 
+  test "inlines function call inside pipeline" do
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(arg) do
+          arg
+        #    v
+          |> bar()
+        #        ^
+          |> qez()
+        end
+
+        def bar(arg), do: arg + 10
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(arg) do
+          arg
+          |> then(&(&1 + 10))
+          |> qez()
+        end
+
+        def bar(arg), do: arg + 10
+      end
+      """
+    )
+
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(arg, other) do
+          arg
+        #    v
+          |> bar(other)
+        #             ^
+          |> qez()
+        end
+
+        def bar(arg, other) do
+          c = arg + 10
+          c + other
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(arg, other) do
+          arg
+          |> then(fn arg1 ->
+            c = arg1 + 10
+            c + other
+          end)
+          |> qez()
+        end
+
+        def bar(arg, other) do
+          c = arg + 10
+          c + other
+        end
+      end
+      """
+    )
+
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo(arg, other) do
+          arg
+        #    v
+          |> bar(other)
+        #             ^
+          |> qez()
+        end
+
+        def bar(20, _), do: 35
+
+        def bar(arg, other) do
+          c = arg + 10
+          c + other
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(arg, other) do
+          arg
+          |> then(
+            &case {&1, other} do
+              {20, _} ->
+                35
+
+              {arg, other} ->
+                c = arg + 10
+                c + other
+            end
+          )
+          |> qez()
+        end
+
+        def bar(20, _), do: 35
+
+        def bar(arg, other) do
+          c = arg + 10
+          c + other
+        end
+      end
+      """
+    )
+  end
+
   test "inlines captured function call" do
     assert_refactored(
       InlineFunction,
@@ -448,23 +562,6 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
           bar(arg)
         #        ^
         end
-      end
-      """
-    )
-  end
-
-  test "ignores function call inside pipeline" do
-    assert_not_refactored(
-      InlineFunction,
-      """
-      defmodule Foo do
-        def foo(arg) do
-        #        v
-          arg |> bar()
-        #            ^
-        end
-
-        def bar(arg), do: arg + 10
       end
       """
     )

@@ -23,7 +23,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
       not Function.call?(node) ->
         false
 
-      invalid_parent?(Z.up(zipper)) ->
+      Function.definition?(zipper |> Z.up() |> Z.node()) ->
         false
 
       Enum.empty?(Function.find_definitions(zipper)) ->
@@ -36,25 +36,33 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(zipper, _) do
+  def refactor(%{node: {name, _, call_values} = node} = zipper, _) do
     parent = Z.up(zipper)
     statements = statements_to_inline(zipper)
 
     cond do
+      match?(%{node: {:|>, _, [_, ^node]}}, parent) ->
+        rebuilt_call = {name, [], [{:&, [], [1]} | call_values]}
+
+        zipper
+        |> Z.replace({:then, [], [{:&, [], [rebuilt_call]}]})
+        |> AST.go_to_node(rebuilt_call)
+        |> refactor(nil)
+
       match?(%{node: {:&, _, [{:/, _, _}]}}, parent) ->
         parent
         |> Function.ExpandAnonymousFunction.refactor(parent.node)
         |> then(fn %{node: {:fn, _, [{:->, _, [_, body]}]}} = zipper ->
           zipper
           |> AST.go_to_node(body)
-          |> refactor(body)
+          |> refactor(nil)
         end)
         |> maybe_collapse_anonymous_function()
 
       AST.up_until(zipper, &match?(%{node: {:&, _, _}}, &1)) ->
         zipper
         |> ensure_expanded_scope()
-        |> refactor(zipper.node)
+        |> refactor(nil)
         |> maybe_collapse_anonymous_function()
 
       not match?(%{node: {:__block__, _, _}}, parent) and length(statements) > 1 ->
@@ -78,7 +86,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     |> Z.update(fn {:=, _, [v, _]} -> {:=, [], [v, last_statement]} end)
     |> inline_statements_before_node(statements)
     |> AST.go_to_node(last_statement)
-    |> Variable.InlineVariable.refactor(last_statement)
+    |> Variable.InlineVariable.refactor(nil)
   end
 
   defp inline_statements_before_node(zipper, statements),
@@ -136,13 +144,10 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     ]
   end
 
-  defp invalid_parent?(%{node: {:|>, _, _}}), do: true
-  defp invalid_parent?(%{node: node}), do: Function.definition?(node)
-
   defp ensure_expanded_scope(%{node: node} = zipper) do
     zipper
     |> Variable.ExtractVariable.refactor(node)
-    |> Variable.InlineVariable.refactor(node)
+    |> Variable.InlineVariable.refactor(nil)
   end
 
   defp maybe_collapse_anonymous_function(zipper) do
@@ -150,7 +155,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     |> AST.up_until(&match?(%{node: {:fn, _, _}}, &1))
     |> then(
       &if Function.CollapseAnonymousFunction.can_refactor?(&1, &1.node),
-        do: Function.CollapseAnonymousFunction.refactor(&1, &1.node),
+        do: Function.CollapseAnonymousFunction.refactor(&1, nil),
         else: zipper
     )
   end
