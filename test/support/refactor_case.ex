@@ -111,6 +111,5 @@ defmodule Refactorex.RefactorCase do
     |> Enum.join("\n")
   end
 
-  def placeholder,
-    do: Refactorex.Refactor.Function.ExpandAnonymousFunction.placeholder()
+  def placeholder, do: Refactorex.Refactor.placeholder()
 end

@@ -6,8 +6,6 @@ defmodule Refactorex.Refactor do
   @callback can_refactor?(Zipper.t(), selection_or_line) :: :skip | true | false
   @callback refactor(Zipper.t(), selection_or_line) :: Zipper.t()
 
-  @placeholder :name_being_refactored_31_08_2003
-
   defmacro __using__(attrs) do
     works_on = Keyword.fetch!(attrs, :works_on)
 
@@ -67,7 +65,7 @@ defmodule Refactorex.Refactor do
         }
       end
 
-      def placeholder, do: unquote(@placeholder)
+      defdelegate placeholder, to: Refactorex.Refactor
     end
   end
 
@@ -136,7 +134,9 @@ defmodule Refactorex.Refactor do
 
     zipper
     |> module.execute(selection)
-    |> String.replace("#{@placeholder}", new_name)
+    |> String.replace("#{placeholder()}", new_name)
     |> module.refactoring()
   end
+
+  def placeholder(), do: :name_being_refactored_31_08_2003
 end
