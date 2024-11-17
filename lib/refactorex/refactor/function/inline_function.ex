@@ -59,7 +59,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
         end)
         |> maybe_collapse_anonymous_function()
 
-      AST.up_until(zipper, &match?(%{node: {:&, _, _}}, &1)) ->
+      AST.inside?(zipper, &match?({:&, _, _}, &1)) ->
         zipper
         |> ensure_expanded_scope()
         |> refactor(nil)
@@ -152,7 +152,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
 
   defp maybe_collapse_anonymous_function(zipper) do
     zipper
-    |> AST.up_until(&match?(%{node: {:fn, _, _}}, &1))
+    |> AST.up_until(&match?({:fn, _, _}, &1))
     |> then(
       &if Function.CollapseAnonymousFunction.can_refactor?(&1, &1.node),
         do: Function.CollapseAnonymousFunction.refactor(&1, nil),

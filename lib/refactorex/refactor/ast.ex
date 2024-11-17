@@ -79,9 +79,11 @@ defmodule Refactorex.Refactor.AST do
   def up_until(zipper, matcher_fn)
   def up_until(nil, _), do: nil
 
-  def up_until(zipper, matcher_fn) do
-    if matcher_fn.(zipper),
+  def up_until(%{node: node} = zipper, matcher_fn) do
+    if matcher_fn.(node),
       do: zipper,
       else: up_until(Z.up(zipper), matcher_fn)
   end
+
+  def inside?(zipper, matcher_fn), do: !!up_until(zipper, matcher_fn)
 end
