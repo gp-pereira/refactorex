@@ -33,7 +33,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
 
   def can_refactor?(_, _), do: false
 
-  def refactor(%{node: {_, _meta, _aliases}} = zipper, {_, _, selected_aliases}) do
+  def refactor(zipper, {_, _, selected_aliases}) do
     refactored = extract_alias(zipper, selected_aliases)
 
     case Alias.find_declaration(refactored) do
@@ -41,10 +41,11 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
         refactored
 
       nil ->
-        Module.update_scope(refactored, fn module_scope ->
-          {before, rest} = where_to_place_alias(module_scope)
-          before ++ [{:alias, [], [{:__aliases__, [], selected_aliases}]} | rest]
-        end)
+        Module.place_node(
+          refactored,
+          {:alias, [], [{:__aliases__, [], selected_aliases}]},
+          &after_other_aliases/1
+        )
     end
   end
 
@@ -63,15 +64,14 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
 
   defp drop_beginning(aliases, _), do: aliases
 
-  defp where_to_place_alias(module_scope) do
-    module_scope
+  defp after_other_aliases(nodes) do
+    nodes
     |> Stream.with_index()
     |> Stream.map(fn
       {{id, _, _}, i} when id in ~w(use alias)a -> i + 1
       _ -> 0
     end)
     |> Enum.max()
-    |> then(&Enum.split(module_scope, &1))
   end
 
   defp name_conflict?(zipper, selected_aliases) do

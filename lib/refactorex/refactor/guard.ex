@@ -38,15 +38,13 @@ defmodule Refactorex.Refactor.Guard do
   def new_private_guard(zipper, name, args, body) do
     private_guard = {:defguardp, [], [{:when, [], [{name, [], args}, body]}]}
 
-    Module.update_scope(zipper, fn module_scope ->
-      {before, rest} = where_to_place_guard(module_scope)
-      before ++ [private_guard | rest]
-    end)
+    Module.place_node(
+      zipper,
+      private_guard,
+      &before_any_function_or_guard/1
+    )
   end
 
-  defp where_to_place_guard(module_scope) do
-    module_scope
-    |> Enum.find_index(&(Function.definition?(&1) or definition?(&1)))
-    |> then(&Enum.split(module_scope, &1 || 0))
-  end
+  defp before_any_function_or_guard(nodes),
+    do: Enum.find_index(nodes, &(Function.definition?(&1) or definition?(&1)))
 end

@@ -1,7 +1,18 @@
 defmodule Refactorex.Refactor.Module do
   alias Sourceror.Zipper, as: Z
+  alias Refactorex.Refactor.AST
 
   def inside_one?(zipper), do: !!go_to_definition(zipper)
+
+  def place_node(zipper, node, placer_fn) do
+    zipper
+    |> go_to_scope()
+    |> Z.update(fn {:__block__, meta, scope} ->
+      {before, after_} = Enum.split(scope, placer_fn.(scope) || 0)
+
+      {:__block__, meta, before ++ [node | after_]}
+    end)
+  end
 
   def find_in_scope(zipper, filter_fn) do
     zipper
@@ -9,14 +20,6 @@ defmodule Refactorex.Refactor.Module do
     |> Z.node()
     |> Z.children()
     |> Enum.filter(filter_fn)
-  end
-
-  def update_scope(zipper, updater_fn) do
-    zipper
-    |> go_to_scope()
-    |> Z.update(fn {_, _, scope} ->
-      {:__block__, [], updater_fn.(scope)}
-    end)
   end
 
   def next_available_name(zipper, base_name, filter_fn, node_namer_fn) do
@@ -57,7 +60,6 @@ defmodule Refactorex.Refactor.Module do
     end)
   end
 
-  defp go_to_definition(nil), do: nil
-  defp go_to_definition(%{node: {:defmodule, _, _}} = zipper), do: zipper
-  defp go_to_definition(zipper), do: zipper |> Z.up() |> go_to_definition()
+  defp go_to_definition(zipper),
+    do: AST.up_until(zipper, &match?({:defmodule, _, _}, &1))
 end

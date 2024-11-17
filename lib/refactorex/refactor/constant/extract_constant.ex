@@ -31,17 +31,13 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
     end
   end
 
-  def refactor(%{node: to_be_constant} = zipper, _) do
+  def refactor(%{node: node} = zipper, _) do
     name = next_available_constant_name(zipper)
+    constant = {:@, [], [{name, [], [node]}]}
 
     zipper
     |> Z.update(fn _ -> {:@, [], [{name, [], nil}]} end)
-    |> Module.update_scope(fn module_scope ->
-      position = where_to_place_constant(module_scope, to_be_constant)
-      {before, rest} = Enum.split(module_scope, position)
-
-      before ++ [{:@, [], [{name, [], [to_be_constant]}]} | rest]
-    end)
+    |> Module.place_node(constant, &after_used_constants(&1, node))
   end
 
   def next_available_constant_name(zipper) do
@@ -53,10 +49,10 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
     )
   end
 
-  defp where_to_place_constant(module_scope, to_be_constant) do
-    constants_used = find_constants_used(to_be_constant)
+  defp after_used_constants(nodes, node) do
+    constants_used = find_constants_used(node)
 
-    module_scope
+    nodes
     |> Stream.with_index()
     |> Stream.map(fn
       {{id, _, _}, i} when id in ~w(use alias import require)a ->

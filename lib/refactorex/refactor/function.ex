@@ -66,7 +66,7 @@ defmodule Refactorex.Refactor.Function do
          [{{:__block__, [], [:do]}, body}]
        ]}
 
-    Module.update_scope(zipper, &(&1 ++ [private_function]))
+    Module.place_node(zipper, private_function, &length/1)
   end
 
   def next_available_function_name(zipper, base_name) do
