@@ -10,14 +10,11 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
   }
 
   def can_refactor?(
-        %{node: {:__aliases__, _, aliases} = node} = zipper,
+        %{node: {:__aliases__, _, _}} = zipper,
         {:__aliases__, _, [_, _ | _] = selected_aliases} = selection
       ) do
     cond do
-      not AST.starts_at?(node, AST.get_start_line(selection)) ->
-        false
-
-      not same_beginning?(aliases, selected_aliases) ->
+      not Alias.contains_selection?(zipper, selection) ->
         false
 
       not Module.inside_one?(zipper) ->
@@ -76,13 +73,6 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
     |> Enum.max()
     |> then(&Enum.split(module_scope, &1))
   end
-
-  defp same_beginning?(_aliases, []), do: true
-
-  defp same_beginning?([a | aliases], [a | selected_aliases]),
-    do: same_beginning?(aliases, selected_aliases)
-
-  defp same_beginning?(_aliases, _selected_aliases), do: false
 
   defp name_conflict?(zipper, selected_aliases) do
     zipper

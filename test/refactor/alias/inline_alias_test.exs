@@ -145,7 +145,33 @@ defmodule Refactorex.Refactor.Alias.InlineAliasTest do
         def foo() do
         # v
           Bar.Qez.bar()
-        #       ^
+        #  #    ^
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        alias __MODULE__.Bar
+
+        def foo() do
+          __MODULE__.Bar.Qez.bar()
+        end
+      end
+      """
+    )
+  end
+
+  test "inlines partially selected alias" do
+    assert_refactored(
+      InlineAlias,
+      """
+      defmodule Foo do
+        alias __MODULE__.Bar
+
+        def foo() do
+        # v
+          Bar.Qez.bar()
+        #   ^
         end
       end
       """,
