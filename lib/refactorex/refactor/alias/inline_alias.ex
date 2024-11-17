@@ -4,7 +4,7 @@ defmodule Refactorex.Refactor.Alias.InlineAlias do
     kind: "refactor.inline",
     works_on: :selection
 
-  def can_refactor?(%{node: node} = zipper, selection) do
+  def can_refactor?(%{node: {:__aliases__, _, _} = node} = zipper, selection) do
     cond do
       not AST.equal?(node, selection) ->
         false
