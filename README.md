@@ -11,7 +11,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | :-: | - | :-: | :-: |
 | `alias` | Extract alias | selection | |
 | `alias` | Expand aliases | selection | |
-| `alias` | Inline alias | selection | |
+| `alias` | Inline alias | selection | ✅ |
 | `alias` | Merge aliases | selection | |
 | `alias` | Sort nested aliases | line | ✅ |
 | | | |
