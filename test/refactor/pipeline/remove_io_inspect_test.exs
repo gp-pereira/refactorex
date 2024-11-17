@@ -75,7 +75,6 @@ defmodule Refactorex.Refactor.Pipeline.RemoveIOInspectTest do
     )
   end
 
-  @tag :only
   test "removes piped IO.inspect function call in the middle of pipeline with opts" do
     assert_refactored(
       RemoveIOInspect,
