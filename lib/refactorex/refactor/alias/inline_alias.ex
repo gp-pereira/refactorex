@@ -11,7 +11,7 @@ defmodule Refactorex.Refactor.Alias.InlineAlias do
       not Alias.contains_selection?(zipper, selection) ->
         false
 
-      AST.inside?(zipper, &match?({:alias, _, _}, &1)) ->
+      Alias.inside_declaration?(zipper) ->
         false
 
       is_nil(Alias.find_declaration(zipper)) ->

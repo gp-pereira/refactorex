@@ -1,23 +1,41 @@
 defmodule Refactorex.Refactor.Alias do
+  @doc """
+  alias Foo.Bar <- declaration
+  Bar.bar()     <- usage
+  """
+
   alias Sourceror.Zipper, as: Z
   alias Refactorex.Refactor.AST
+
+  alias Refactorex.Refactor.Module
+
+  def inside_declaration?(zipper), do: AST.inside?(zipper, &match?({:alias, _, _}, &1))
 
   def contains_selection?(
         %{node: {:__aliases__, _, aliases} = node},
         {:__aliases__, _, selected_aliases} = selection
       ) do
     AST.starts_at?(node, AST.get_start_line(selection)) and
-      same_beginning?(aliases, selected_aliases)
+      List.starts_with?(aliases, selected_aliases)
   end
 
   def contains_selection?(_, _), do: false
 
-  defp same_beginning?(_aliases, []), do: true
-
-  defp same_beginning?([a | aliases], [a | selected_aliases]),
-    do: same_beginning?(aliases, selected_aliases)
-
-  defp same_beginning?(_aliases, _selected_aliases), do: false
+  def new_declaration(refactored, alias_) do
+    Module.place_node(
+      refactored,
+      alias_,
+      fn nodes ->
+        nodes
+        |> Stream.with_index()
+        |> Stream.map(fn
+          {{id, _, _}, i} when id in ~w(use alias)a -> i + 1
+          _ -> 0
+        end)
+        |> Enum.max()
+      end
+    )
+  end
 
   def find_declaration(%{node: {_, _, [used_alias | _]}} = zipper) do
     zipper
@@ -34,22 +52,7 @@ defmodule Refactorex.Refactor.Alias do
     |> elem(1)
   end
 
-  defp go_to_declaration(node, used_alias) do
-    node
-    |> Z.zip()
-    |> Z.find(fn
-      {:alias, _, [_, opts]} ->
-        Enum.any?(opts, &match?({{_, _, [:as]}, {_, _, [^used_alias]}}, &1))
-
-      {:__aliases__, _, aliases} ->
-        List.last(aliases) == used_alias
-
-      _ ->
-        false
-    end)
-  end
-
-  defp expand_declaration(zipper, path \\ []) do
+  def expand_declaration(zipper, path \\ []) do
     case zipper do
       %{node: {:__aliases__, _, aliases}} ->
         expand_declaration(Z.up(zipper), aliases ++ path)
@@ -63,5 +66,20 @@ defmodule Refactorex.Refactor.Alias do
       _ ->
         path
     end
+  end
+
+  defp go_to_declaration(node, used_alias) do
+    node
+    |> Z.zip()
+    |> Z.find(fn
+      {:alias, _, [_, opts]} ->
+        Enum.any?(opts, &match?({{_, _, [:as]}, {_, _, [^used_alias]}}, &1))
+
+      {:__aliases__, _, aliases} ->
+        List.last(aliases) == used_alias
+
+      _ ->
+        false
+    end)
   end
 end

@@ -20,7 +20,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
       not Module.inside_one?(zipper) ->
         false
 
-      AST.inside?(zipper, &match?({:alias, _, _}, &1)) ->
+      Alias.inside_declaration?(zipper) ->
         false
 
       name_conflict?(zipper, selected_aliases) ->
@@ -41,37 +41,15 @@ defmodule Refactorex.Refactor.Alias.ExtractAlias do
         refactored
 
       nil ->
-        Module.place_node(
-          refactored,
-          {:alias, [], [{:__aliases__, [], selected_aliases}]},
-          &after_other_aliases/1
-        )
+        alias_ = {:alias, [], [{:__aliases__, [], selected_aliases}]}
+        Alias.new_declaration(refactored, alias_)
     end
   end
 
   defp extract_alias(zipper, selected_aliases) do
     Z.update(zipper, fn {:__aliases__, meta, aliases} ->
-      {:__aliases__, meta, drop_beginning(aliases, selected_aliases)}
+      {:__aliases__, meta, Enum.drop(aliases, length(selected_aliases) - 1)}
     end)
-  end
-
-  defp drop_beginning([], _selected_aliases), do: []
-  defp drop_beginning(aliases, []), do: aliases
-  defp drop_beginning(aliases, [_last]), do: aliases
-
-  defp drop_beginning([a | aliases], [a | selected_aliases]),
-    do: drop_beginning(aliases, selected_aliases)
-
-  defp drop_beginning(aliases, _), do: aliases
-
-  defp after_other_aliases(nodes) do
-    nodes
-    |> Stream.with_index()
-    |> Stream.map(fn
-      {{id, _, _}, i} when id in ~w(use alias)a -> i + 1
-      _ -> 0
-    end)
-    |> Enum.max()
   end
 
   defp name_conflict?(zipper, selected_aliases) do
