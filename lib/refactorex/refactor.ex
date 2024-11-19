@@ -70,6 +70,7 @@ defmodule Refactorex.Refactor do
   end
 
   @refactors [
+    __MODULE__.Alias.ExpandAliases,
     __MODULE__.Alias.ExtractAlias,
     __MODULE__.Alias.InlineAlias,
     __MODULE__.Alias.SortNestedAliases,
