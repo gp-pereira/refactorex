@@ -7,10 +7,12 @@ defmodule Refactorex.Refactor.Module do
   def place_node(zipper, node, placer_fn) do
     zipper
     |> go_to_scope()
-    |> Z.update(fn {:__block__, meta, scope} ->
-      {before, after_} = Enum.split(scope, placer_fn.(scope) || 0)
+    |> Z.update(fn
+      {:__block__, meta, []} ->
+        {:__block__, meta, [node]}
 
-      {:__block__, meta, before ++ [node | after_]}
+      {:__block__, meta, scope} ->
+        {:__block__, meta, List.insert_at(scope, placer_fn.(scope) || 0, node)}
     end)
   end
 
@@ -49,15 +51,22 @@ defmodule Refactorex.Refactor.Module do
     |> Z.down()
     |> Z.right()
     |> Z.down()
+    # normalize module scope
+    |> Z.update(fn
+      # multiple statements
+      {{:__block__, _, [:do]} = do_block, {:__block__, _, _} = block} ->
+        {do_block, block}
+
+      # single statement
+      {{:__block__, _, [:do]} = do_block, scope} ->
+        {do_block, {:__block__, [], [scope]}}
+
+      # no statement
+      {:{}, [], [{:__block__, _, [:do]} = do_block]} ->
+        {do_block, {:__block__, [], []}}
+    end)
     |> Z.down()
     |> Z.right()
-    |> Z.update(fn
-      {:__block__, meta, scope} ->
-        {:__block__, meta, scope}
-
-      scope ->
-        {:__block__, [], [scope]}
-    end)
   end
 
   defp go_to_definition(zipper),
