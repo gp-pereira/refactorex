@@ -73,6 +73,7 @@ defmodule Refactorex.Refactor do
     __MODULE__.Alias.ExpandAliases,
     __MODULE__.Alias.ExtractAlias,
     __MODULE__.Alias.InlineAlias,
+    __MODULE__.Alias.MergeAliases,
     __MODULE__.Alias.SortNestedAliases,
     __MODULE__.Constant.ExtractConstant,
     __MODULE__.Constant.InlineConstant,
