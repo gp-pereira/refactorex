@@ -61,12 +61,10 @@ defmodule Refactorex.Refactor.AST do
   def go_to_node(zipper, node) do
     zipper
     |> Z.top()
-    |> Z.traverse_while(nil, fn
-      %{node: ^node} = zipper, nil ->
-        {:halt, zipper, zipper}
-
-      zipper, nil ->
-        {:cont, zipper, nil}
+    |> Z.traverse_while(nil, fn zipper, nil ->
+      if equal?(zipper.node, node),
+        do: {:halt, zipper, zipper},
+        else: {:cont, zipper, nil}
     end)
     |> elem(1)
   end
