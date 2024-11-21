@@ -46,16 +46,8 @@ defmodule Refactorex.ParserTest do
       range = range_from_markers(original)
       original = remove_markers(original)
 
-      assert """
-
-
-
-                             fn filename ->
-                   file = File.read!("\#{filename}.\#{ext}")
-                   String.split(file, "\\n")
-                 end
-
-             """ == Parser.erase_outside_range(original, range)
+      assert "\n\n\n                fn filename ->\n      file = File.read!(\"\#{filename}.\#{ext}\")\n      String.split(file, \"\\n\")\n    end\n\n" ==
+               Parser.erase_outside_range(original, range)
     end
   end
 end
