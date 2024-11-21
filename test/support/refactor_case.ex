@@ -103,6 +103,7 @@ defmodule Refactorex.RefactorCase do
 
   def text_to_zipper(text) do
     text
+    |> String.replace("\r", "")
     |> Sourceror.parse_string!()
     |> Sourceror.Zipper.zip()
   end
