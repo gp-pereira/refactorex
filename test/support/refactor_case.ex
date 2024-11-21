@@ -58,6 +58,7 @@ defmodule Refactorex.RefactorCase do
 
   def range_from_markers(text) do
     text
+    |> String.replace("\r", "")
     |> String.split("\n")
     |> Enum.with_index()
     |> Enum.filter(fn {text, _} -> String.match?(text, @marker_regex) end)
@@ -82,7 +83,7 @@ defmodule Refactorex.RefactorCase do
           },
           end: %{
             line: end_line - 1,
-            character: String.length(end_text) - if(windows?(), do: 1, else: 0)
+            character: String.length(end_text)
           }
         }
     end)
