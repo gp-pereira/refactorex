@@ -82,11 +82,13 @@ defmodule Refactorex.RefactorCase do
           },
           end: %{
             line: end_line - 1,
-            character: String.length(end_text)
+            character: String.length(end_text) - if(windows?(), do: 1, else: 0)
           }
         }
     end)
   end
+
+  def windows?(), do: match?({:win32, _}, :os.type())
 
   def print_tree(text) do
     IO.puts("")
