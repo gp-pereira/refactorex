@@ -57,6 +57,7 @@ defmodule Refactorex.Parser do
 
   def erase_outside_range(text, range) do
     text
+    |> String.replace("\r", "")
     |> replace_newline_with_placeholder()
     |> String.split("\n")
     |> Stream.with_index(1)
