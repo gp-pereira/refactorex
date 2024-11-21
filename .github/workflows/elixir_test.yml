@@ -8,41 +8,7 @@ on:
     #   - '**'
       
 jobs:
-  deps:
-    name: Dependencies
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        elixir: [1.13.4]
-        otp: [24.3.4]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Setup
-        uses: erlef/setup-elixir@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-
-      - name: Retrieve Cached Dependencies
-        uses: actions/cache@v2
-        id: mix-cache
-        with:
-          path: deps
-          key: ${{ hashFiles('mix.lock') }}
-
-      - name: Install Dependencies
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
-
   test:
-    needs: deps
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -93,12 +59,8 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
 
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v2
-        id: mix-cache
-        with:
-          path: deps
-          key: ${{ hashFiles('mix.lock') }}
+      - name: Install dependencies
+        run: mix deps.get
 
       - name: Run tests
         run: mix test
