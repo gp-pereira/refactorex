@@ -3,8 +3,8 @@ defmodule Refactorex.Diff do
     do: %{refactoring | diffs: find_diffs(original, refactored)}
 
   def find_diffs(original, refactored) do
-    original = original |> String.trim() |> String.split("\n")
-    refactored = refactored |> String.trim() |> String.split("\n")
+    original = original |> String.trim() |> String.split(newline())
+    refactored = refactored |> String.trim() |> String.split(newline())
 
     original
     |> List.myers_difference(refactored)
@@ -83,5 +83,12 @@ defmodule Refactorex.Diff do
       ],
       line + length(del)
     )
+  end
+
+  defp newline() do
+    case :os.type() do
+      {:win32, _} -> "\r\n"
+      {:unix, _} -> "\n"
+    end
   end
 end

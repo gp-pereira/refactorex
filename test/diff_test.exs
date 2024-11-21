@@ -7,22 +7,22 @@ defmodule Refactorex.DiffTest do
     assert Diff.find_diffs(
              """
              defmodule Foo do
-              def bar(arg) do
-                arg
-              end
+               def bar(arg) do
+                 arg
+               end
              end
              """,
              """
              defmodule Foo do
-              def bar(arg), do: arg
+               def bar(arg), do: arg
              end
              """
            ) == [
              %{
-               text: " def bar(arg), do: arg",
+               text: "  def bar(arg), do: arg",
                range: %{
                  start: %{line: 1, character: 0},
-                 end: %{line: 3, character: 4}
+                 end: %{line: 3, character: 5}
                }
              }
            ]
