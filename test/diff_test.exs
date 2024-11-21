@@ -12,11 +12,7 @@ defmodule Refactorex.DiffTest do
                end
              end
              """,
-             """
-             defmodule Foo do
-               def bar(arg), do: arg
-             end
-             """
+             "defmodule Foo do\n  def bar(arg), do: arg\nend\n"
            ) == [
              %{
                text: "  def bar(arg), do: arg",
@@ -36,16 +32,7 @@ defmodule Refactorex.DiffTest do
               end
              end
              """,
-             """
-             defmodule Foo do
-              def bar do
-              end
-
-              def baz(arg) do
-                arg + 10
-              end
-             end
-             """
+             "defmodule Foo do\n def bar do\n end\n\n def baz(arg) do\n   arg + 10\n end\nend"
            ) == [
              %{
                text: "\n def baz(arg) do\n   arg + 10\n end\n",
@@ -69,12 +56,7 @@ defmodule Refactorex.DiffTest do
               end
              end
              """,
-             """
-             defmodule Foo do
-              def bar do
-              end
-             end
-             """
+             "defmodule Foo do\n def bar do\n end\nend\n"
            ) == [
              %{
                text: "",
@@ -95,13 +77,7 @@ defmodule Refactorex.DiffTest do
               end
              end
              """,
-             """
-             defmodule Foo do
-              def bar(arg) do
-                arg
-              end
-             end
-             """
+             "defmodule Foo do\n def bar(arg) do\n   arg\n end\nend\n"
            ) == []
   end
 end
