@@ -20,7 +20,7 @@ defmodule Refactorex.RefactorCase do
       module = unquote(module)
       opts = unquote(opts)
 
-      original = unquote(original) |> String.trim() |> String.replace("\r", "")
+      original = unquote(original) |> String.trim()
       expected = unquote(expected) |> String.trim() |> String.replace("\r", "")
 
       range = range_from_markers(original)
@@ -44,7 +44,7 @@ defmodule Refactorex.RefactorCase do
   defmacro assert_not_refactored(module, original, _opts \\ []) do
     quote do
       module = unquote(module)
-      original = unquote(original) |> String.trim() |> String.replace("\r", "")
+      original = unquote(original)
 
       range = range_from_markers(original)
       original = remove_markers(original)
@@ -109,7 +109,6 @@ defmodule Refactorex.RefactorCase do
 
   def remove_markers(text) do
     text
-    |> String.replace("\r", "")
     |> String.split("\n")
     |> Enum.reject(&String.match?(&1, @marker_regex))
     |> Enum.join("\n")
