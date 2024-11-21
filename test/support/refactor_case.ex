@@ -20,8 +20,8 @@ defmodule Refactorex.RefactorCase do
       module = unquote(module)
       opts = unquote(opts)
 
-      original = String.trim(unquote(original))
-      expected = String.trim(unquote(expected))
+      original = unquote(original) |> String.trim()
+      expected = unquote(expected) |> String.trim() |> String.replace("\r", "")
 
       range = range_from_markers(original)
       original = remove_markers(original)
@@ -36,7 +36,7 @@ defmodule Refactorex.RefactorCase do
       if opts[:raw] do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
       else
-        assert String.split(expected, "\n") == String.split(refactored, "\n")
+        expected = assert String.split(expected, "\n") == String.split(refactored, "\n")
       end
     end
   end
