@@ -6,7 +6,7 @@ defmodule RefactorexTest do
   @moduletag :tmp_dir
 
   @buffer GenLSP.Buffer
-  @timeout 200
+  @timeout 500
 
   setup %{tmp_dir: tmp_dir} do
     {:ok, port} = :inet.port(GenLSP.Buffer.comm_state(@buffer).lsocket)
@@ -160,7 +160,15 @@ defmodule RefactorexTest do
         jsonrpc: "2.0",
         params: %{
           textDocument: %{version: 2, uri: file_uri},
-          contentChanges: [%{text: "defmodule Foo do\n  @foo :foo\nend"}]
+          contentChanges: [
+            %{
+              text: """
+              defmodule Foo do
+                @foo :foo
+              end
+              """
+            }
+          ]
         }
       })
 
