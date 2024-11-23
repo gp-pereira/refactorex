@@ -11,43 +11,14 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        include:
-          # - otp: "25.0"
-          #   elixir: "1.17"
-
-          - os: ubuntu-20.04
-            otp: "24.0"
-            elixir: "1.16"
-
-          - os: ubuntu-20.04
-            otp: "24.0"
-            elixir: "1.15"
-
-          - os: ubuntu-20.04
-            otp: "23.0"
-            elixir: "1.14"
-
-          - os: ubuntu-20.04
-            otp: "22.0"
-            elixir: "1.13"
-
-          - os: windows-latest
-            otp: "24.0"
-            elixir: "1.16"
-
-          - os: windows-latest
-            otp: "24.0"
-            elixir: "1.15"
-
-          - os: windows-latest
-            otp: "23.0"
-            elixir: "1.14"
-
-          - os: windows-latest
-            otp: "22.0"
-            elixir: "1.13"
+        os: [ubuntu-20.04, windows-latest]
+        elixir_otp:
+          - { elixir: 1.13, otp: 22 }
+          - { elixir: 1.14, otp: 23 }
+          - { elixir: 1.15, otp: 24 }
+          - { elixir: 1.16, otp: 24 }
 
     steps:
       - name: Checkout
@@ -56,8 +27,8 @@ jobs:
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir_otp.elixir }}
+          otp-version: ${{ matrix.elixir_otp.otp }}
 
       - name: Install dependencies
         run: mix deps.get
