@@ -13,14 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup elixir
-        uses: erlef/setup-elixir@v1
-        with:
-          elixir-version: 1.13.4
-          otp-version: 24.3.4
+      # - name: Setup elixir
+      #   uses: erlef/setup-elixir@v1
+      #   with:
+      #     elixir-version: 1.13.4
+      #     otp-version: 24.3.4
 
-      - name: Install elixir deps
-        run: mix deps.get
+      # - name: Install elixir deps
+      #   run: mix deps.get
 
       - name: Move necessary files
         run: |
