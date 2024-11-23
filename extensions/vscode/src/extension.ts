@@ -49,11 +49,11 @@ export function deactivate(): Thenable<void> | undefined {
 
 function ensureServerCompiled(serverPath: string): Promise<void> {
 	const compilationPath = path.join(serverPath, "_build", "prod");
-	const compileCommand = `cd ${serverPath} && mix deps.get && mix compile`;
+	const compileCommand = `cd ${serverPath} && mix local.hex --force && mix deps.get && mix compile`;
 
 	const command =
 		process.platform === "win32"
-			? `if not exist ${compilationPath} (set MIX_ENV=prod && ${compileCommand})`
+			? `if not exist ${compilationPath} (set MIX_ENV=prod&& ${compileCommand})`
 			: `[ ! -d "${compilationPath}" ] && (export MIX_ENV=prod && ${compileCommand}) || true`;
 
 	return new Promise((resolve, reject) => {
