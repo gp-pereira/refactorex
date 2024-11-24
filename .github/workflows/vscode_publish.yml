@@ -25,7 +25,7 @@ jobs:
       - name: Move necessary files
         run: |
           mkdir extensions/vscode/refactorex
-          cp -r lib bin mix.exs mix.lock extensions/vscode/refactorex
+          cp -r lib mix.exs mix.lock extensions/vscode/refactorex
           cp README.md LICENSE.md extensions/vscode
 
       - name: Install node deps
