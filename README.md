@@ -52,11 +52,11 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | |
 |-|-|
 | Description | Expand nested aliases to their full names |
-| Target | Selection of single nested alias, block of nested aliases or whole alias |
+| Target | Selection of single nested alias, group of nested aliases or whole alias |
 | Inverse of | [Merge aliases](#alias-merge-aliases) |
 | Notes | - |
 
-![Example](assets/examples/alias/expand_aliases.gif)
+![Example](assets/examples/alias/expand_aliases.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
@@ -71,7 +71,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Inverse of | [Inline alias](#alias-inline-alias) |
 | Notes | - |
 
-![Example](assets/examples/alias/extract_alias.gif)
+![Example](assets/examples/alias/extract_alias.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
@@ -86,7 +86,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Inverse of | [Extract alias](#alias-extract-alias) |
 | Notes | Alias must be declared on the same module |
 
-![Example](assets/examples/alias/inline_alias.gif)
+![Example](assets/examples/alias/inline_alias.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
@@ -101,7 +101,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Inverse of | [Expand aliases](#alias-expand-aliases) |
 | Notes | - |
 
-![Example](assets/examples/alias/merge_aliases.gif)
+![Example](assets/examples/alias/merge_aliases.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
@@ -116,7 +116,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Inverse of | - |
 | Notes | - |
 
-![Example](assets/examples/alias/sort_nested_aliases.gif)
+![Example](assets/examples/alias/sort_nested_aliases.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
