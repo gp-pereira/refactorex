@@ -73,6 +73,9 @@ function ensureServerCompiled(serverPath: string): Promise<void> {
 function startServer(serverPath: string, port: number): ChildProcess {
 	return exec(
 		[
+			process.platform === "win32"
+				? "set MIX_ENV=prod&&"
+				: "export MIX_ENV=prod &&",
 			`cd ${serverPath} &&`,
 			`elixir --sname undefined -S`,
 			`mix run --no-halt -e`,
@@ -80,7 +83,7 @@ function startServer(serverPath: string, port: number): ChildProcess {
 			`-- --port ${port}`,
 		].join(" "),
 		(error, stdout, stderr) => {
-			if (error || stderr) client.error(`Server not started\n ${error}`);
+			if (error || stderr) client.error(`Server not started: ${error}`);
 		}
 	);
 }
