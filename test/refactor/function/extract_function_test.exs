@@ -260,4 +260,17 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
       """
     )
   end
+
+  test "ignores alias" do
+    assert_not_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+      # v
+        alias Foo.Bar
+      #             ^
+      end
+      """
+    )
+  end
 end

@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Function.ExtractFunction do
   use Refactorex.Refactor,
-    title: "Extract private function",
+    title: "Extract function",
     kind: "refactor.extract",
     works_on: :selection
 
@@ -13,7 +13,9 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
 
   @function_name "extracted_function"
 
-  def can_refactor?(_, {id, _, _}) when id in ~w(@ & <-)a, do: :skip
+  def can_refactor?(%{node: {id, _, _}}, _)
+      when id in ~w(@ & <- alias __aliases__)a,
+      do: :skip
 
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do

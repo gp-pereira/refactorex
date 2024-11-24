@@ -58,4 +58,17 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
       """
     )
   end
+
+  test "ignores alias" do
+    assert_not_refactored(
+      IntroduceIOInspect,
+      """
+      defmodule Foo do
+      # v
+        alias Foo.Bar
+      #             ^
+      end
+      """
+    )
+  end
 end

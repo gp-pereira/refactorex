@@ -6,7 +6,9 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspect do
 
   alias Refactorex.Refactor.Variable
 
-  def can_refactor?(_, {id, _, _}) when id in ~w(<- &)a, do: :skip
+  def can_refactor?(_, {id, _, _})
+      when id in ~w(<- & alias __aliases__)a,
+      do: :skip
 
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do

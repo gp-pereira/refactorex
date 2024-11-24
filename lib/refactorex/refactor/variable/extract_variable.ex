@@ -12,6 +12,10 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
 
   @variable_name "extracted_variable"
 
+  def can_refactor?(%{node: {id, _, _}}, _)
+      when id in ~w(alias __aliases__)a,
+      do: false
+
   def can_refactor?(%{node: node} = zipper, selection) do
     cond do
       not AST.equal?(node, selection) ->

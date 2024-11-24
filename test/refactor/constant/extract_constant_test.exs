@@ -215,4 +215,17 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
       """
     )
   end
+
+  test "ignores alias" do
+    assert_not_refactored(
+      ExtractConstant,
+      """
+      defmodule Foo do
+      # v
+        alias Foo.Bar
+      #             ^
+      end
+      """
+    )
+  end
 end

@@ -298,4 +298,30 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
       """
     )
   end
+
+  test "ignores alias" do
+    assert_not_refactored(
+      ExtractVariable,
+      """
+      defmodule Foo do
+      # v
+        alias Foo.Bar
+      #             ^
+      end
+      """
+    )
+
+    assert_not_refactored(
+      ExtractVariable,
+      """
+      defmodule Foo do
+        def foo() do
+      #   v
+          Foo.Bar
+      #         ^
+        end
+      end
+      """
+    )
+  end
 end
