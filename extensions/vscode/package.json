@@ -2,7 +2,7 @@
 	"name": "refatorex",
 	"publisher": "gp-pereira",
 	"displayName": "Refactorex",
-	"version": "0.0.8",
+	"version": "0.2.0",
 	"author": {
 		"name": "gp-pereira",
 		"url": "https://www.github.com/gp-pereira"
@@ -30,6 +30,19 @@
 		"code actions",
 		"keybindings"
 	],
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "Refactorex",
+			"properties": {
+				"refactorex.devPort": {
+					"type": "string",
+					"description": "Port number for a local RefactorEx server",
+					"default": ""
+				}
+			}
+		}
+	},
 	"icon": "icon.png",
 	"main": "./out/extension.js",
 	"scripts": {

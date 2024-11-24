@@ -14,15 +14,23 @@ export async function activate(context: ExtensionContext) {
 		"refactorex",
 		"Refactorex",
 		async () => {
-			await ensureServerCompiled(serverPath);
+			let port = workspace
+				.getConfiguration("refactorex")
+				.get<number>("devPort");
 
-			const port = await findAvailablePort();
-			server = startServer(serverPath, port);
+			if (!port) {
+				await ensureServerCompiled(serverPath);
 
-			// giving the server some time to start
-			await new Promise((r) => setTimeout(r, 1000));
+				port = await findAvailablePort();
+				server = startServer(serverPath, port);
 
-			client.info(`Server started on port ${port}`);
+				// giving the server some time to start
+				await new Promise((r) => setTimeout(r, 1000));
+
+				client.info(`Server started on port ${port}`);
+			} else {
+				client.info(`Server expected on port ${port}`);
+			}
 
 			const socket = await connect(port);
 			return { writer: socket, reader: socket };
