@@ -9,11 +9,11 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | Scope | Refactoring | Target | Published? |
 | :-: | - | :-: | :-: |
-| `alias` | Expand aliases | selection | ✅ |
-| `alias` | Extract alias | selection | ✅ |
-| `alias` | Inline alias | selection | ✅ |
-| `alias` | Merge aliases | selection | ✅ |
-| `alias` | Sort nested aliases | line | ✅ |
+| `alias` | [Expand aliases](#alias-expand-aliases) | selection | ✅ |
+| `alias` | [Extract alias](#alias-extract-alias) | selection | ✅ |
+| `alias` | [Inline alias](#alias-inline-alias) | selection | ✅ |
+| `alias` | [Merge aliases](#alias-merge-aliases) | selection | ✅ |
+| `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line | ✅ |
 | | | |
 | `constant` | [Extract constant](#variable-extract-constant) | selection | ✅ |
 | `constant` | Inline constant | selection | ✅ |
@@ -46,6 +46,81 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `variable` | Rename variable | selection | ✅ |
 
 ## How to use each refactoring
+
+### Alias: expand aliases
+
+| | |
+|-|-|
+| Description | Expand nested aliases to their full names |
+| Target | Selection of single nested alias, block of nested aliases or whole alias |
+| Inverse of | [Merge aliases](#alias-merge-aliases) |
+| Notes | - |
+
+![Example](assets/examples/alias/expand_aliases.gif)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Alias: extract alias
+
+| | |
+|-|-|
+| Description | Extract the module full name to an alias and use it |
+| Target | Selection of module full name |
+| Inverse of | [Inline alias](#alias-inline-alias) |
+| Notes | - |
+
+![Example](assets/examples/alias/extract_alias.gif)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Alias: inline alias
+
+| | |
+|-|-|
+| Description | Replace the aliased name by its full name |
+| Target | Selection of aliased name |
+| Inverse of | [Extract alias](#alias-extract-alias) |
+| Notes | Alias must be declared on the same module |
+
+![Example](assets/examples/alias/inline_alias.gif)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Alias: merge aliases
+
+| | |
+|-|-|
+| Description | Merge a group of aliases into a nested alias |
+| Target | Selection of two or more aliases |
+| Inverse of | [Expand aliases](#alias-expand-aliases) |
+| Notes | - |
+
+![Example](assets/examples/alias/merge_aliases.gif)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Alias: sort nested aliases
+
+| | |
+|-|-|
+| Description | Sort all aliases inside a nested alias |
+| Target | Line of an unsorted nested alias |
+| Inverse of | - |
+| Notes | - |
+
+![Example](assets/examples/alias/sort_nested_aliases.gif)
+
+[▲ top](#available-refactorings)
+
+<br>
 
 ### Function: expand anonymous function
 

@@ -44,3 +44,5 @@ jobs:
           packagePath: extensions/vscode
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
+          baseContentUrl: https://github.com/gp-pereira/refactorex/blob/main/
+          baseImagesUrl: https://github.com/gp-pereira/refactorex/blob/main/
