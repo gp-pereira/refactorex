@@ -16,9 +16,11 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
       """
       defmodule Foo do
         @extracted_constant "PAID"
+
         @foo %{status: @extracted_constant}
       end
-      """
+      """,
+      raw: true
     )
   end
 
@@ -37,6 +39,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
       """
       defmodule Foo do
         @extracted_constant bar()
+
         def foo(arg) do
           @extracted_constant
         end
@@ -62,6 +65,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
         @skipped_constant :skipped
         @first_constant 10
         @extracted_constant %{start: @first_constant, end: 14}
+
         @second_constant %{range: @extracted_constant}
       end
       """
@@ -83,6 +87,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
       """
       defmodule Foo do
         @extracted_constant2 "PAID"
+
         @extracted_constant "REFUNDED"
         @extracted_constant1 "AUTHORIZED"
         @foo %{status: @extracted_constant2}
@@ -110,6 +115,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
         @extracted_constant :foo
                             |> bar()
                             |> baz()
+
         def foo do
           @extracted_constant
         end
@@ -147,6 +153,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
         @behaviour Baz
 
         @extracted_constant bar()
+
         def foo(arg) do
           @extracted_constant
         end

@@ -33,7 +33,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
 
   def refactor(%{node: node} = zipper, _) do
     name = next_available_constant_name(zipper)
-    constant = {:@, [], [{name, [], [node]}]}
+    constant = {:@, [end_of_expression: [newlines: 2]], [{name, [], [node]}]}
 
     zipper
     |> Z.update(fn _ -> {:@, [], [{name, [], nil}]} end)
