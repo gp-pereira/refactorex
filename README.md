@@ -33,8 +33,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `guard` | Inline guard | selection | ✅ |
 | `guard` | Rename guard | selection | ✅ |
 | | | |
-| `if else` | Use keyword syntax | line | ✅ |
-| `if else` | Use regular syntax | line | ✅ |
+| `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line | ✅ |
+| `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | ✅ |
 | | | |
 | `pipeline` | Introduce IO.inspect | selection | ✅ |
 | `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✅ |
@@ -55,8 +55,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Target | Selection of single nested alias, group of nested aliases or whole alias |
 | Inverse of | [Merge aliases](#alias-merge-aliases) |
 | Notes | - |
-
-![Example](assets/examples/alias/expand_aliases.gif?raw=true)
+| Example | ![Example](assets/examples/alias/expand_aliases.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -66,7 +65,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Extract the module full name to an alias and use it |
+| Description | Extract the module full name into an alias and use it |
 | Target | Selection of module full name |
 | Inverse of | [Inline alias](#alias-inline-alias) |
 | Notes | - |
@@ -82,7 +81,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | |
 |-|-|
 | Description | Replace the aliased name by its full name |
-| Target | Selection of aliased name |
+| Target | Selection of an aliased name |
 | Inverse of | [Extract alias](#alias-extract-alias) |
 | Notes | Alias must be declared on the same module |
 
@@ -96,8 +95,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Merge a group of aliases into a nested alias |
-| Target | Selection of two or more aliases |
+| Description | Merge the group of aliases into a nested alias |
+| Target | Selection of two or more mergeable aliases |
 | Inverse of | [Expand aliases](#alias-expand-aliases) |
 | Notes | - |
 
@@ -111,12 +110,43 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Sort all aliases inside a nested alias |
-| Target | Line of an unsorted nested alias |
+| Description | Sort all nested aliases alphabetically |
+| Target | Line of alias with unsorted nested aliases |
 | Inverse of | - |
 | Notes | - |
 
 ![Example](assets/examples/alias/sort_nested_aliases.gif?raw=true)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### If else: use keyword syntax
+
+| | |
+|-|-|
+| Description | Rewrite the `if else` using keyword syntax |
+| Target | Line of `if` using regular syntax |
+| Inverse of | [Use regular syntax](#if-else-use-regular-syntax) |
+| Notes | Clauses must have a single statement |
+
+![Example](assets/examples/if_else/use_keyword_syntax.gif?raw=true)
+
+[▲ top](#available-refactorings)
+
+<br>
+
+
+### If else: use regular syntax
+
+| | |
+|-|-|
+| Description | Rewrite the `if else` using regular syntax |
+| Target | Line of `if` using keyword syntax |
+| Inverse of | [Use keyword syntax](#if-else-use-keyword-syntax) |
+| Notes | - |
+
+![Example](assets/examples/if_else/use_regular_syntax.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
