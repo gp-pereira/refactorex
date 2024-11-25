@@ -69,8 +69,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Target | Selection of module full name |
 | Inverse of | [Inline alias](#alias-inline-alias) |
 | Notes | - |
-
-![Example](assets/examples/alias/extract_alias.gif?raw=true)
+| Example | ![Example](assets/examples/alias/extract_alias.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
