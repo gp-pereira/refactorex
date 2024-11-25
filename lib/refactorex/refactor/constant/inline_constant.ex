@@ -2,11 +2,11 @@ defmodule Refactorex.Refactor.Constant.InlineConstant do
   use Refactorex.Refactor,
     title: "Inline constant",
     kind: "refactor.inline",
-    works_on: :line
+    works_on: :selection
 
-  def can_refactor?(%{node: {:@, _, [{_, _, nil}]} = node} = zipper, line) do
+  def can_refactor?(%{node: {:@, _, [{_, _, nil}]} = node} = zipper, selection) do
     cond do
-      not AST.starts_at?(node, line) ->
+      not AST.equal?(node, selection) ->
         false
 
       is_nil(find_definition(zipper)) ->
@@ -22,23 +22,16 @@ defmodule Refactorex.Refactor.Constant.InlineConstant do
   def refactor(zipper, _) do
     {:@, _, [{_, _, [block]}]} = def = find_definition(zipper)
 
-    if count_usages(zipper) > 1 do
-      Z.replace(zipper, block)
-    else
-      zipper
-      |> Z.replace(block)
-      |> Z.top()
-      |> Z.traverse(fn
-        %{node: ^def} = zipper ->
-          Z.remove(zipper)
-
-        zipper ->
-          zipper
-      end)
-    end
+    zipper
+    |> Z.replace(block)
+    |> then(
+      &if count_usages(zipper) == 1,
+        do: &1 |> AST.go_to_node(def) |> Z.remove(),
+        else: &1
+    )
   end
 
-  def find_definition(%{node: {:@, _, [{id, _, _}]}} = zipper) do
+  defp find_definition(%{node: {:@, _, [{id, _, _}]}} = zipper) do
     zipper
     |> AST.find(&match?({:@, _, [{^id, _, u}]} when not is_nil(u), &1))
     |> List.first()

@@ -11,8 +11,9 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
         @foo 42
 
         def foo(bar \\\\ @foo) do
-        #   v
+        # v
           @foo + bar
+        #    ^
         end
       end
       """,
@@ -36,8 +37,9 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
         @foo %{test: 1}
 
         def foo(bar) do
-      #   v
+        #   v
           %{@foo | test: bar}
+        #      ^
         end
       end
       """,
@@ -56,8 +58,9 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
       InlineConstant,
       """
       defmodule Foo do
-        #  v
+      # v
         @foo 42
+      #    ^
 
         def foo(bar \\\\ @foo) do
           @foo + bar
@@ -75,6 +78,7 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
         def foo(bar \\\\ @foo) do
         #  v
           @foo + bar
+        #    ^
         end
       end
       """
