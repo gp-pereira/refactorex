@@ -36,14 +36,14 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line | ✅ |
 | `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | ✅ |
 | | | |
-| `pipeline` | Introduce IO.inspect | selection | ✅ |
+| `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection | ✅ |
 | `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✅ |
-| `pipeline` | Remove IO.inspect | line | ✅ |
+| `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line | ✅ |
 | `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✅ |
 | | | |
-| `variable` | Extract variable | selection | ✅ |
-| `variable` | Inline variable | selection | ✅ |
-| `variable` | Rename variable | selection | ✅ |
+| `variable` | [Extract variable](#variable-extract-variable) | selection | ✅ |
+| `variable` | [Inline variable](#variable-inline-variable) | selection | ✅ |
+| `variable` | [Rename variable](#variable-rename-variable) | selection | ✅ |
 
 ## How to use each refactoring
 
@@ -51,10 +51,9 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Expand nested aliases to their full names |
-| Target | Selection of single nested alias, group of nested aliases or whole alias |
+| Description | Expand nested `aliases` to their full names |
+| Target | Selection of nested `alias`, group of nested `aliases` or `alias` with nesting |
 | Inverse of | [Merge aliases](#alias-merge-aliases) |
-| Notes | - |
 | Example | ![Example](assets/examples/alias/expand_aliases.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -65,10 +64,9 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Extract the module full name into an alias and use it |
+| Description | Extract the module full name into an `alias` and use it |
 | Target | Selection of module full name |
 | Inverse of | [Inline alias](#alias-inline-alias) |
-| Notes | - |
 | Example | ![Example](assets/examples/alias/extract_alias.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -79,8 +77,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Replace the aliased name by its full name |
-| Target | Selection of an aliased name |
+| Description | Replace the `alias` usage by the module full name |
+| Target | Selection of `alias` usage |
 | Inverse of | [Extract alias](#alias-extract-alias) |
 | Notes | Alias must be declared on the same module |
 | Example | ![Example](assets/examples/alias/inline_alias.gif?raw=true) |
@@ -93,10 +91,9 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Merge the group of aliases into a nested alias |
-| Target | Selection of two or more mergeable aliases |
+| Description | Merge the group of `aliases` into a nested alias |
+| Target | Selection of two or more mergeable `aliases` |
 | Inverse of | [Expand aliases](#alias-expand-aliases) |
-| Notes | - |
 | Example | ![Example](assets/examples/alias/merge_aliases.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -107,10 +104,8 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Sort all nested aliases alphabetically |
-| Target | Line of alias with unsorted nested aliases |
-| Inverse of | - |
-| Notes | - |
+| Description | Sort all nested `aliases` alphabetically |
+| Target | Line of `alias` with unsorted nested `aliases` |
 | Example | ![Example](assets/examples/alias/sort_nested_aliases.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -124,7 +119,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Extract a piece of code into a `constant` |
 | Target | Selection of any code without `variables` |
 | Inverse of | [Inline constant](#constant-inline-constant) |
-| Notes | - |
 | Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -138,7 +132,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace a `constant` usage by its value |
 | Target | Selection of `constant` |
 | Inverse of | [Extract constant](#constant-extract-constant) |
-| Notes | - |
 | Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -150,9 +143,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | |
 |-|-|
 | Description | Replace the name of `constant` in all its usages |
-| Target | Selection of `constant` / Cursor over `constant` |
-| Inverse of | - |
-| Notes | - |
+| Target | Selection of (or cursor over) `constant` |
 | Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -181,12 +172,81 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Rewrite the `if else` using regular syntax |
 | Target | Line of `if` using keyword syntax |
 | Inverse of | [Use keyword syntax](#if-else-use-keyword-syntax) |
-| Notes | - |
 | Example | ![Example](assets/examples/if_else/use_regular_syntax.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
 <br>
+
+### Pipeline: introduce IO.inspect
+
+| | |
+|-|-|
+| Description | Pipe a piece of code into an `IO.inspect` |
+| Target | Selection of any code |
+| Inverse of | [Remove IO.inspect](#pipeline-remove-ioinspect) |
+| Example | ![Example](assets/examples/pipeline/introduce_io_inspect.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Pipeline: remove IO.inspect
+
+| | |
+|-|-|
+| Description | Remove `IO.inspect` call |
+| Target | Line of `IO.inspect` call |
+| Inverse of | [Introduce IO.inspect](#pipeline-introduce-ioinspect) |
+| Example | ![Example](assets/examples/pipeline/remove_io_inspect.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Variable: extract variable
+
+| | |
+|-|-|
+| Description | Extract a piece of code into a `variable` |
+| Target | Selection of any code |
+| Inverse of | [Inline variable](#variable-inline-variable) |
+| Example | ![Example](assets/examples/variable/extract_variable.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Variable: inline variable
+
+| | |
+|-|-|
+| Description | Replace all usages of `variable` by its value |
+| Target | Selection of `variable` before assignment (`=`) |
+| Inverse of | [Extract variable](#variable-extract-variable) |
+| Example | ![Example](assets/examples/variable/inline_variable.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Variable: rename variable
+
+| | |
+|-|-|
+| Description | Replace the name of `variable` in all its usages  |
+| Target | Selection of (or cursor over) `variable` before assignment (`=`) |
+| Example | ![Example](assets/examples/variable/rename_variable.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+
+
+
+
+
 
 ### Function: expand anonymous function
 
