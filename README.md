@@ -15,9 +15,9 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `alias` | [Merge aliases](#alias-merge-aliases) | selection | ✅ |
 | `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line | ✅ |
 | | | |
-| `constant` | [Extract constant](#variable-extract-constant) | selection | ✅ |
-| `constant` | Inline constant | selection | ✅ |
-| `constant` | Rename constant | selection | ✅ |
+| `constant` | [Extract constant](#constant-extract-constant) | selection | ✅ |
+| `constant` | [Inline constant](#constant-inline-constant) | selection | ✅ |
+| `constant` | [Rename constant](#constant-rename-constant) | selection | ✅ |
 | | | |
 | `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection | ✅ |
 | `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | ✅ |
@@ -112,6 +112,48 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Inverse of | - |
 | Notes | - |
 | Example | ![Example](assets/examples/alias/sort_nested_aliases.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Constant: extract constant
+
+| | |
+|-|-|
+| Description | Extract a piece of code into a `constant` |
+| Target | Selection of any code without `variables` |
+| Inverse of | [Inline constant](#constant-inline-constant) |
+| Notes | - |
+| Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Constant: inline constant
+
+| | |
+|-|-|
+| Description | Replace a `constant` usage by its value |
+| Target | Selection of `constant` |
+| Inverse of | [Extract constant](#constant-extract-constant) |
+| Notes | - |
+| Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Constant: rename constant
+
+| | |
+|-|-|
+| Description | Replace the name of `constant` in all its usages |
+| Target | Selection of `constant` / Cursor over `constant` |
+| Inverse of | - |
+| Notes | - |
+| Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -231,17 +273,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 * __Works on__: pipe line
 
 ![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/pipeline/remove_pipe.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Variable: extract constant
-
-* __Description__: extract the selection into a module constant
-* __Works on__: selection
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/variable/extract_constant.gif?raw=true)
 
 [▲ top](#available-refactorings)
 
