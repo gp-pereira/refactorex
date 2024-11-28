@@ -12,7 +12,7 @@ defmodule Refactorex.Refactor.Pipeline.RemovePipe do
   def refactor(zipper, _) do
     zipper
     |> Z.update(fn {:|>, _, [arg, {id, meta, rest}]} ->
-      {id, meta, [arg |> IO.inspect() | rest]}
+      {id, meta, [arg | rest]}
     end)
   end
 end
