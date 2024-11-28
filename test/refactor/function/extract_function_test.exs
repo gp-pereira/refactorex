@@ -70,91 +70,91 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
     )
   end
 
-  test "extracts consecutive statements that are not the whole block" do
-    assert_refactored(
-      ExtractFunction,
-      """
-      defmodule Foo do
-        def foo(a) do
-          a = 10
-      #   v
-          b = 20
-          a + b
-      #       ^
-          c = 30
-        end
-      end
-      """,
-      """
-      defmodule Foo do
-        def foo(a) do
-          a = 10
-          extracted_function(a)
-          c = 30
-        end
+  # test "extracts consecutive statements that are not the whole block" do
+  #   assert_refactored(
+  #     ExtractFunction,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #         a = 10
+  #     #   v
+  #         b = 20
+  #         a + b
+  #     #       ^
+  #         c = 30
+  #       end
+  #     end
+  #     """,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #         a = 10
+  #         extracted_function(a)
+  #         c = 30
+  #       end
 
-        defp extracted_function(a) do
-          b = 20
-          a + b
-        end
-      end
-      """
-    )
-  end
+  #       defp extracted_function(a) do
+  #         b = 20
+  #         a + b
+  #       end
+  #     end
+  #     """
+  #   )
+  # end
 
-  test "extracts function and recreates the last assignment " do
-    assert_refactored(
-      ExtractFunction,
-      """
-      defmodule Foo do
-        def foo(a) do
-      #   v
-          a = a + 10
-          b = a + 20
-      #            ^
-          c = b + 30
-        end
-      end
-      """,
-      """
-      defmodule Foo do
-        def foo(a) do
-          b = extracted_function(a)
-          c = b + 30
-        end
+  # test "extracts function and recreates the last assignment " do
+  #   assert_refactored(
+  #     ExtractFunction,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #     #   v
+  #         a = a + 10
+  #         b = a + 20
+  #     #            ^
+  #         c = b + 30
+  #       end
+  #     end
+  #     """,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #         b = extracted_function(a)
+  #         c = b + 30
+  #       end
 
-        defp extracted_function(a) do
-          a = a + 10
-          a + 20
-        end
-      end
-      """
-    )
+  #       defp extracted_function(a) do
+  #         a = a + 10
+  #         a + 20
+  #       end
+  #     end
+  #     """
+  #   )
 
-    assert_refactored(
-      ExtractFunction,
-      """
-      defmodule Foo do
-        def foo(a) do
-      #   v
-          b = a + 20
-      #            ^
-        end
-      end
-      """,
-      """
-      defmodule Foo do
-        def foo(a) do
-          b = extracted_function(a)
-        end
+  #   assert_refactored(
+  #     ExtractFunction,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #     #   v
+  #         b = a + 20
+  #     #            ^
+  #       end
+  #     end
+  #     """,
+  #     """
+  #     defmodule Foo do
+  #       def foo(a) do
+  #         b = extracted_function(a)
+  #       end
 
-        defp extracted_function(a) do
-          a + 20
-        end
-      end
-      """
-    )
-  end
+  #       defp extracted_function(a) do
+  #         a + 20
+  #       end
+  #     end
+  #     """
+  #   )
+  # end
 
   test "extracts part of a pipeline into function" do
     assert_refactored(

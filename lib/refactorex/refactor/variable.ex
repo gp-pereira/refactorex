@@ -4,7 +4,7 @@ defmodule Refactorex.Refactor.Variable do
 
   def at_one?(%{node: {name, _, nil}} = zipper) do
     cond do
-      not is_atom(name) or name in ~w(binary)a ->
+      not is_atom(name) or name in ~w(binary _)a ->
         false
 
       match?(%{node: {:@, _, _}}, Z.up(zipper)) ->
