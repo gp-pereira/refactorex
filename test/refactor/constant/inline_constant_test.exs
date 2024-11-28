@@ -29,7 +29,7 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
     )
   end
 
-  test "inlines the single usage and remove the definition" do
+  test "inlines the single usage" do
     assert_refactored(
       InlineConstant,
       """
@@ -45,6 +45,8 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
       """,
       """
       defmodule Foo do
+        @foo %{test: 1}
+
         def foo(bar) do
           %{%{test: 1} | test: bar}
         end
