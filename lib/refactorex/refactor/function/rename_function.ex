@@ -28,26 +28,9 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {name, _, _}} = zipper, _) do
-    case Function.find_definitions(zipper) do
-      [{:def, _, [header, _]} = first_definition | _] = definitions ->
-        definitions
-        |> Enum.reduce(zipper, fn
-          ^first_definition, zipper ->
-            zipper
-            |> copy_as_private_function(first_definition)
-            |> redirect_to_private_function(first_definition)
+    [{_, _, [header, _]} | _] = Function.find_definitions(zipper)
 
-          definition, zipper ->
-            zipper
-            |> copy_as_private_function(definition)
-            |> AST.go_to_node(definition)
-            |> Z.remove()
-        end)
-        |> rename_references(name, header)
-
-      [{:defp, _, [header, _]} | _] ->
-        rename_references(zipper, name, header)
-    end
+    rename_references(zipper, name, header)
   end
 
   defp rename_references(zipper, name, {:when, _, [header, _]}),
@@ -57,10 +40,6 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
     zipper
     |> Z.top()
     |> Z.traverse_while(fn
-      %{node: {:def, _, [{^name, _, args} | _]}} = zipper
-      when length(function_args) == length(args) ->
-        {:skip, zipper}
-
       %{node: {:|>, _, [_, {^name, meta, args} = function]}} = zipper
       when length(function_args) == length(args) + 1 ->
         {:cont,
@@ -84,40 +63,5 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
       zipper ->
         {:cont, zipper}
     end)
-  end
-
-  defp copy_as_private_function(zipper, definition) do
-    case definition do
-      {_, _, [{:when, _, _} = args, [{_, body}]]} ->
-        Function.new_private_function(zipper, placeholder(), args, body)
-
-      {_, _, [{_, _, args}, [{_, body}]]} ->
-        Function.new_private_function(zipper, placeholder(), args, body)
-    end
-  end
-
-  defp redirect_to_private_function(zipper, definition) do
-    case definition do
-      {:def, _, [{:when, _, [{_, _, args} = header, _]} = guard, [{_, body}]]} ->
-        zipper
-        |> AST.go_to_node(guard)
-        |> Z.replace(header)
-        |> replace_body_by_redirect(body, args)
-
-      {:def, _, [{_, _, args}, [{_, body}]]} ->
-        replace_body_by_redirect(zipper, body, args)
-    end
-  end
-
-  defp replace_body_by_redirect(zipper, body, args) do
-    args_without_defaults =
-      Enum.map(args, fn
-        {:\\, _, [arg, _]} -> arg
-        arg -> arg
-      end)
-
-    zipper
-    |> AST.go_to_node(body)
-    |> Z.replace({placeholder(), [], args_without_defaults})
   end
 end

@@ -31,7 +31,7 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
     )
   end
 
-  test "renames the selected public function usages and redirect definition" do
+  test "renames the selected public function definition and usages" do
     assert_refactored(
       RenameFunction,
       """
@@ -47,11 +47,7 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
       defmodule Foo do
         def foo(arg), do: #{placeholder()}(arg)
 
-        def bar(arg), do: #{placeholder()}(arg)
-
-        defp #{placeholder()}(arg) do
-          arg + 10
-        end
+        def #{placeholder()}(arg), do: arg + 10
       end
       """
     )
@@ -75,16 +71,9 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
       defmodule Foo do
         def foo(arg), do: #{placeholder()}(arg)
 
-        def bar(arg)
-        def bar(arg), do: #{placeholder()}(arg)
-
-        defp #{placeholder()}(arg) when is_number(arg) do
-          arg + 10
-        end
-
-        defp #{placeholder()}(%{value: value}) do
-          value + 10
-        end
+        def #{placeholder()}(arg)
+        def #{placeholder()}(arg) when is_number(arg), do: arg + 10
+        def #{placeholder()}(%{value: value}), do: value + 10
       end
       """
     )
@@ -106,11 +95,7 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
       defmodule Foo do
         def foo(arg), do: #{placeholder()}(arg, arg)
 
-        def bar(arg1 \\\\ 4, arg2 \\\\ nil), do: #{placeholder()}(arg1, arg2)
-
-        defp #{placeholder()}(arg1 \\\\ 4, arg2 \\\\ nil) do
-          arg1 + arg2
-        end
+        def #{placeholder()}(arg1 \\\\ 4, arg2 \\\\ nil), do: arg1 + arg2
       end
       """
     )
