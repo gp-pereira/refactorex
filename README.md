@@ -29,9 +29,9 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `function` | [Use keyword syntax](#function-use-keyword-syntax) | line | ✅ |
 | `function` | [Use regular syntax](#function-use-regular-syntax) | line | ✅ |
 | | | |
-| `guard` | Extract guard | selection | ✅ |
-| `guard` | Inline guard | selection | ✅ |
-| `guard` | Rename guard | selection | ✅ |
+| `guard` | [Extract guard](#guard-extract-guard) | selection | ✅ |
+| `guard` | [Inline guard](#guard-inline-guard) | selection | ✅ |
+| `guard` | [Rename guard](#guard--guard) | selection | ✅ |
 | | | |
 | `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line | ✅ |
 | `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | ✅ |
@@ -132,7 +132,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace a `constant` usage by its value |
 | Target | Selection of `constant` |
 | Inverse of | [Extract constant](#constant-extract-constant) |
-| Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
+| Example | ![Example](assets/examples/constant/inline_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -145,6 +145,72 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace the name of `constant` in all its usages |
 | Target | Selection of (or cursor over) `constant` |
 | Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: use keyword syntax
+
+| | |
+|-|-|
+| Description | Rewrite the `function` using keyword syntax |
+| Target | Line of `function` definition using regular syntax |
+| Inverse of | [Use regular syntax](#function-use-regular-syntax) |
+| Notes | `function` body must have a single statement |
+| Example | ![Example](assets/examples/function/use_keyword_syntax.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: use regular syntax
+
+| | |
+|-|-|
+| Description | Rewrite the `function` using regular syntax |
+| Target | Line of `function` definition using keyword syntax |
+| Inverse of | [Use keyword syntax](#function-use-keyword-syntax) |
+| Example | ![Example](assets/examples/function/use_regular_syntax.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Guard: extract guard
+
+| | |
+|-|-|
+| Description | Extract a `when` statement into a `guard` |
+| Target | Selection of `when` statement or part of one |
+| Inverse of | [Inline guard](#guard-inline-guard) |
+| Example | ![Example](assets/examples/guard/extract_guard.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Guard: inline guard
+
+| | |
+|-|-|
+| Description | Replace a `guard` call by its `when` statement |
+| Target | Selection of `guard` call |
+| Inverse of | [Extract guard](#guard-extract-guard) |
+| Notes | Guard must be defined on the same module |
+| Example | ![Example](assets/examples/guard/inline_guard.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Guard: rename guard
+
+| | |
+|-|-|
+| Description | Replace the name of `guard` in all its calls |
+| Target | Selection of (or cursor over) `guard` name |
+| Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -163,7 +229,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 [▲ top](#available-refactorings)
 
 <br>
-
 
 ### If else: use regular syntax
 
@@ -222,7 +287,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | |
 |-|-|
 | Description | Replace all usages of `variable` by its value |
-| Target | Selection of `variable` before assignment (`=`) |
+| Target | Selection of `variable` declaration or assignment |
 | Inverse of | [Extract variable](#variable-extract-variable) |
 | Example | ![Example](assets/examples/variable/inline_variable.gif?raw=true) |
 
@@ -235,16 +300,12 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | | |
 |-|-|
 | Description | Replace the name of `variable` in all its usages  |
-| Target | Selection of (or cursor over) `variable` before assignment (`=`) |
+| Target | Selection of (or cursor over) `variable` declaration or assignment |
 | Example | ![Example](assets/examples/variable/rename_variable.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
 <br>
-
-
-
-
 
 
 
