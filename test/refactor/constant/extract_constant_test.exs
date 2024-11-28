@@ -19,8 +19,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
 
         @foo %{status: @extracted_constant}
       end
-      """,
-      raw: true
+      """
     )
   end
 
@@ -206,6 +205,21 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
         # v
           bar(arg)
         #        ^
+        end
+      end
+      """
+    )
+  end
+
+  test "ignores pipe function calls" do
+    assert_not_refactored(
+      ExtractConstant,
+      """
+      defmodule Foo do
+        def foo(arg) do
+        #         v
+          args |> bar()
+        #             ^
         end
       end
       """

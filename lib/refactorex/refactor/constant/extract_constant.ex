@@ -26,6 +26,9 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
       Enum.any?(Variable.list_variables(node)) ->
         :skip
 
+      match?(%{node: {:|>, _, [_, ^node]}}, Z.up(zipper)) ->
+        false
+
       true ->
         true
     end
