@@ -37,7 +37,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | ✅ |
 | | | |
 | `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection | ✅ |
-| `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✅ |
+| `pipeline` | [Introduce pipe](#pipeline-introduce-pipe) | line |  ✅ |
 | `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line | ✅ |
 | `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✅ |
 | | | |
@@ -256,6 +256,19 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 <br>
 
+### Pipeline: introduce pipe
+
+| | |
+|-|-|
+| Description | Pipe the first arg into `function` call or `case` condition |
+| Target | Line of `function` call or `case` condition |
+| Inverse of | [Remove pipe](#pipeline-remove-pipe) |
+| Example | ![Example](assets/examples/pipeline/introduce_pipe.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
 ### Pipeline: remove IO.inspect
 
 | | |
@@ -264,6 +277,21 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Target | Line of `IO.inspect` call |
 | Inverse of | [Introduce IO.inspect](#pipeline-introduce-ioinspect) |
 | Example | ![Example](assets/examples/pipeline/remove_io_inspect.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+
+
+### Pipeline: remove pipe
+
+| | |
+|-|-|
+| Description | Remove `\|>` from `function` call or `case` condition |
+| Target | Line of pipe (`\|>`)  |
+| Inverse of | [Introduce pipe](#pipeline-introduce-pipe) |
+| Example | ![Example](assets/examples/pipeline/remove_pipe.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -377,24 +405,3 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 <br>
 
-### Pipeline: pipe first arg
-
-* __Description__: pipe the first arg into call
-* __Works on__: line
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/pipeline/pipe_first_arg.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Pipeline: remove pipe
-
-* __Description__: remove the pipe operator and put first arg inside call
-* __Works on__: pipe line
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/pipeline/remove_pipe.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
