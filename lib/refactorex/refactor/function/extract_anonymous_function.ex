@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
   use Refactorex.Refactor,
-    title: "Extract anonymous function into private function",
+    title: "Extract anonymous function",
     kind: "refactor.extract",
     works_on: :selection
 
