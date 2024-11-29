@@ -1,18 +1,18 @@
 {
 	"name": "refatorex",
 	"publisher": "gp-pereira",
-	"displayName": "Refactorex",
-	"version": "0.2.0",
+	"displayName": "RefactorEx",
+	"version": "0.0.1",
 	"author": {
 		"name": "gp-pereira",
 		"url": "https://www.github.com/gp-pereira"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/gp-pereira/refactorex-vscode"
+		"url": "https://github.com/gp-pereira/refactorex"
 	},
 	"bugs": {
-		"url": "https://github.com/gp-pereira/refactorex-vscode/issues"
+		"url": "https://github.com/gp-pereira/refactorex/issues"
 	},
 	"engines": {
 		"vscode": "^1.73.0"
@@ -28,7 +28,8 @@
 		"elixir",
 		"refactor",
 		"code actions",
-		"keybindings"
+		"keybindings",
+		"language server"
 	],
 	"contributes": {
 		"configuration": {

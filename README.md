@@ -1,49 +1,50 @@
-# Refactorex for VS Code
+# RefactorEx
 
-Uses the [Refactorex](https://github.com/gp-pereira/refactorex) language server to 
-enhance VS Code with code actions to quickly refactor Elixir. 
+RefactorEx is a powerful Visual Studio Code extension that simplifies and accelerates code refactoring for Elixir projects. It introduces intuitive code actions to help you refactor Elixir code efficiently and confidently.
 
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/readme.gif?raw=true)
+With RefactorEx, you can perform common refactorings like extracting functions, renaming variables, and more — all within a few clicks.
+
+![Example](assets/examples/demo.gif?raw=true)
 
 ## Available refactorings
 
-| Scope | Refactoring | Target | Published? |
-| :-: | - | :-: | :-: |
-| `alias` | [Expand aliases](#alias-expand-aliases) | selection | ✅ |
-| `alias` | [Extract alias](#alias-extract-alias) | selection | ✅ |
-| `alias` | [Inline alias](#alias-inline-alias) | selection | ✅ |
-| `alias` | [Merge aliases](#alias-merge-aliases) | selection | ✅ |
-| `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line | ✅ |
+| Scope | Refactoring | Target |
+| :-: | - | :-: | 
+| `alias` | [Expand aliases](#alias-expand-aliases) | selection |
+| `alias` | [Extract alias](#alias-extract-alias) | selection |
+| `alias` | [Inline alias](#alias-inline-alias) | selection |
+| `alias` | [Merge aliases](#alias-merge-aliases) | selection |
+| `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line |
 | | | |
-| `constant` | [Extract constant](#constant-extract-constant) | selection | ✅ |
-| `constant` | [Inline constant](#constant-inline-constant) | selection | ✅ |
-| `constant` | [Rename constant](#constant-rename-constant) | selection | ✅ |
+| `constant` | [Extract constant](#constant-extract-constant) | selection |
+| `constant` | [Inline constant](#constant-inline-constant) | selection |
+| `constant` | [Rename constant](#constant-rename-constant) | selection |
 | | | |
-| `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection | ✅ |
-| `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | ✅ |
-| `function` | [Extract function](#function-extract-function) | selection | ✅ |
-| `function` | Collapse anonymous function | selection | ✅ |
-| `function` | Inline function | selection | ✅ |
-| `function` | Rename function | selection | ✅ |
-| `function` | [Underscore unused args](#function-underscore-unused-args) | line | ✅ |
-| `function` | [Use keyword syntax](#function-use-keyword-syntax) | line | ✅ |
-| `function` | [Use regular syntax](#function-use-regular-syntax) | line | ✅ |
+| `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection |
+| `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection |
+| `function` | [Extract function](#function-extract-function) | selection |
+| `function` | [Collapse anonymous function](#function-collapse-anonymous-function) | selection |
+| `function` | [Inline function](#function-inline-function) | selection |
+| `function` | [Rename function](#function-rename-function) | selection |
+| `function` | [Underscore unused args](#function-underscore-unused-args) | line |
+| `function` | [Use keyword syntax](#function-use-keyword-syntax) | line |
+| `function` | [Use regular syntax](#function-use-regular-syntax) | line |
 | | | |
-| `guard` | [Extract guard](#guard-extract-guard) | selection | ✅ |
-| `guard` | [Inline guard](#guard-inline-guard) | selection | ✅ |
-| `guard` | [Rename guard](#guard--guard) | selection | ✅ |
+| `guard` | [Extract guard](#guard-extract-guard) | selection |
+| `guard` | [Inline guard](#guard-inline-guard) | selection |
+| `guard` | [Rename guard](#guard--guard) | selection |
 | | | |
-| `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line | ✅ |
-| `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | ✅ |
+| `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line |
+| `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line |
 | | | |
-| `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection | ✅ |
-| `pipeline` | [Introduce pipe](#pipeline-introduce-pipe) | line |  ✅ |
-| `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line | ✅ |
-| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✅ |
+| `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection |
+| `pipeline` | [Introduce pipe](#pipeline-introduce-pipe) | line | 
+| `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line |
+| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line |
 | | | |
-| `variable` | [Extract variable](#variable-extract-variable) | selection | ✅ |
-| `variable` | [Inline variable](#variable-inline-variable) | selection | ✅ |
-| `variable` | [Rename variable](#variable-rename-variable) | selection | ✅ |
+| `variable` | [Extract variable](#variable-extract-variable) | selection |
+| `variable` | [Inline variable](#variable-inline-variable) | selection |
+| `variable` | [Rename variable](#variable-rename-variable) | selection |
 
 ## How to use each refactoring
 
@@ -80,7 +81,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace the `alias` usage by the module full name |
 | Target | Selection of `alias` usage |
 | Inverse of | [Extract alias](#alias-extract-alias) |
-| Notes | Alias must be declared on the same module |
+| Notes | 1. `alias` must be declared on the same module <br> 2. `alias` declaration will not be removed |
 | Example | ![Example](assets/examples/alias/inline_alias.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -132,6 +133,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace a `constant` usage by its value |
 | Target | Selection of `constant` |
 | Inverse of | [Extract constant](#constant-extract-constant) |
+| Notes | 1. `constant` must be declared on the same module <br> 2. `constant` declaration will not be removed |
 | Example | ![Example](assets/examples/constant/inline_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -145,6 +147,97 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace the name of `constant` in all its usages |
 | Target | Selection of (or cursor over) `constant` |
 | Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: collapse anonymous function
+
+| | |
+|-|-|
+| Description | Collapse a `fn` function into a `&` function |
+| Target | Selection of `fn` function |
+| Inverse of | [Expand anonymous function](#function-expand-anonymous-function) |
+| Example | ![Example](assets/examples/function/collapse_anonymous_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: extract anonymous function
+
+| | |
+|-|-|
+| Description | Extract a `&` or `fn` function into a `function` |
+| Target | Selection of `&` or `fn` function |
+| Inverse of | [Inline function](#function-inline-function) |
+| Example | ![Example](assets/examples/function/extract_anonymous_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: expand anonymous function
+
+| | |
+|-|-|
+| Description | Expand a `&` function into a `fn` function |
+| Target | Selection of `&` function |
+| Inverse of | [Collapse anonymous function](#function-collapse-anonymous-function) |
+| Example | ![Example](assets/examples/function/expand_anonymous_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: extract function
+
+| | |
+|-|-|
+| Description | Extract a piece of code into a `function` |
+| Target | Selection of any code |
+| Inverse of | [Inline function](#function-inline-function) |
+| Example | ![Example](assets/examples/function/extract_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: inline function
+
+| | |
+|-|-|
+| Description | Replace a `function` call by its body |
+| Target | Selection of `function` call |
+| Inverse of | [Extract anonymous function](#function-extract-anonymous-function), [Extract function](#function-extract-function) |
+| Notes | 1. `function` must be defined on the same module <br> 2. `function` definition will not be removed |
+| Example | ![Example](assets/examples/function/inline_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: rename function
+
+| | |
+|-|-|
+| Description | Replace the name of `function` in all its calls |
+| Target | Selection of (or cursor over) `function` name |
+| Notes | Renaming a public `function` only affects the current file |
+| Example | ![Example](assets/examples/function/rename_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Function: underscore unused args
+
+| | |
+|-|-|
+| Description | Places a `_` in front of args not used |
+| Target | Line of `function` definition with unused args |
+| Example | ![Example](assets/examples/function/underscore_unused_args.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
@@ -197,7 +290,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 | Description | Replace a `guard` call by its `when` statement |
 | Target | Selection of `guard` call |
 | Inverse of | [Extract guard](#guard-extract-guard) |
-| Notes | Guard must be defined on the same module |
+| Notes | 1. `guard` must be defined on the same module <br> 2. `guard` definition will not be removed |
 | Example | ![Example](assets/examples/guard/inline_guard.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -210,6 +303,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 |-|-|
 | Description | Replace the name of `guard` in all its calls |
 | Target | Selection of (or cursor over) `guard` name |
+| Notes | Renaming a public `guard` only affects the current file |
 | Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -282,8 +376,6 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 <br>
 
-
-
 ### Pipeline: remove pipe
 
 | | |
@@ -314,7 +406,7 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 | | |
 |-|-|
-| Description | Replace all usages of `variable` by its value |
+| Description | Replace __all__ usages of `variable` by its value |
 | Target | Selection of `variable` declaration or assignment |
 | Inverse of | [Extract variable](#variable-extract-variable) |
 | Example | ![Example](assets/examples/variable/inline_variable.gif?raw=true) |
@@ -335,73 +427,4 @@ enhance VS Code with code actions to quickly refactor Elixir.
 
 <br>
 
-
-
-### Function: expand anonymous function
-
-* __Description__: expand an anonymous function from & to fn -> end syntax
-* __Works on__: anonymous function selection
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/expand_anonymous_function.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Function: extract anonymous function
-
-* __Description__: extract the anonymous function into a private function
-* __Works on__: anonymous function selection
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/extract_anonymous_function.gif?raw=true)
-
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Function: extract function
-
-* __Description__: extract the selection into a private function
-* __Works on__: selection
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/extract_function.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-
-### Variable: underscore unused args
-
-* __Description__: places an underscore in front of function args not used.
-* __Works on__: function definition line or function clause line
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/underscore_unused_args.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Function: use keyword syntax
-
-* __Description__: rewrite the regular function (do end) using keyword syntax (, do:)
-* __Works on__: function definition line
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/use_keyword_syntax.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Function: use regular syntax
-
-* __Description__: rewrite the keyword function (, do:) using regular syntax (do end)
-* __Works on__: function definition line
-
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/function/use_regular_syntax.gif?raw=true)
-
-[▲ top](#available-refactorings)
-
-<br>
 
