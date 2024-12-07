@@ -55,6 +55,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Expand nested `aliases` to their full names |
 | Target | Selection of nested `alias`, group of nested `aliases` or `alias` with nesting |
 | Inverse of | [Merge aliases](#alias-merge-aliases) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#alias-expansion) |
 | Example | ![Example](assets/examples/alias/expand_aliases.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -120,6 +121,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Extract a piece of code into a `constant` |
 | Target | Selection of any code without `variables` |
 | Inverse of | [Inline constant](#constant-inline-constant) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#extract-constant) |
 | Example | ![Example](assets/examples/constant/extract_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -146,6 +148,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 |-|-|
 | Description | Replace the name of `constant` in all its usages |
 | Target | Selection of (or cursor over) `constant` |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -172,6 +175,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Extract a `&` or `fn` function into a `function` |
 | Target | Selection of `&` or `fn` function |
 | Inverse of | [Inline function](#function-inline-function) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#turning-anonymous-into-local-functions) |
 | Example | ![Example](assets/examples/function/extract_anonymous_function.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -198,6 +202,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Extract a piece of code into a `function` |
 | Target | Selection of any code |
 | Inverse of | [Inline function](#function-inline-function) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#extract-function) |
 | Example | ![Example](assets/examples/function/extract_function.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -211,6 +216,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Replace a `function` call by its body |
 | Target | Selection of `function` call |
 | Inverse of | [Extract anonymous function](#function-extract-anonymous-function), [Extract function](#function-extract-function) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#inline-function) |
 | Notes | 1. `function` must be defined on the same module <br> 2. `function` definition will not be removed |
 | Example | ![Example](assets/examples/function/inline_function.gif?raw=true) |
 
@@ -224,6 +230,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 |-|-|
 | Description | Replace the name of `function` in all its calls |
 | Target | Selection of (or cursor over) `function` name |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Notes | <span style="color: lightyellow;"> ⚠️ Renaming a public `function` only affects the current file </span> |
 | Example | ![Example](assets/examples/function/rename_function.gif?raw=true) |
 
@@ -303,6 +310,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 |-|-|
 | Description | Replace the name of `guard` in all its calls |
 | Target | Selection of (or cursor over) `guard` name |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Notes | <span style="color: lightyellow;"> ⚠️ Renaming a public `guard` only affects the current file </span> |
 | Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
 
@@ -383,6 +391,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Remove `\|>` from `function` call or `case` condition |
 | Target | Line of pipe (`\|>`)  |
 | Inverse of | [Introduce pipe](#pipeline-introduce-pipe) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#remove-single-pipe) |
 | Example | ![Example](assets/examples/pipeline/remove_pipe.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -396,6 +405,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Extract a piece of code into a `variable` |
 | Target | Selection of any code |
 | Inverse of | [Inline variable](#variable-inline-variable) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#extract-expressions) |
 | Example | ![Example](assets/examples/variable/extract_variable.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -409,6 +419,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Replace __all__ usages of `variable` by its value |
 | Target | Selection of `variable` declaration or assignment |
 | Inverse of | [Extract variable](#variable-extract-variable) |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#temporary-variable-elimination) |
 | Example | ![Example](assets/examples/variable/inline_variable.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -420,7 +431,8 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | | |
 |-|-|
 | Description | Replace the name of `variable` in all its usages  |
-| Target | Selection of (or cursor over) `variable` declaration or assignment |
+| Target | Selection of (or cursor over) `variable` assignment |
+| Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Example | ![Example](assets/examples/variable/rename_variable.gif?raw=true) |
 
 [▲ top](#available-refactorings)
