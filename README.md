@@ -224,7 +224,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 |-|-|
 | Description | Replace the name of `function` in all its calls |
 | Target | Selection of (or cursor over) `function` name |
-| Notes | Renaming a public `function` only affects the current file |
+| Notes | <span style="color: lightyellow;"> ⚠️ Renaming a public `function` only affects the current file </span> |
 | Example | ![Example](assets/examples/function/rename_function.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -303,7 +303,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 |-|-|
 | Description | Replace the name of `guard` in all its calls |
 | Target | Selection of (or cursor over) `guard` name |
-| Notes | Renaming a public `guard` only affects the current file |
+| Notes | <span style="color: lightyellow;"> ⚠️ Renaming a public `guard` only affects the current file </span> |
 | Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
 
 [▲ top](#available-refactorings)
