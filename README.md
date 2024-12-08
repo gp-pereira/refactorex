@@ -32,7 +32,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | | | |
 | `guard` | [Extract guard](#guard-extract-guard) | selection |
 | `guard` | [Inline guard](#guard-inline-guard) | selection |
-| `guard` | [Rename guard](#guard--guard) | selection |
+| `guard` | [Rename guard](#guard-rename-guard) | selection |
 | | | |
 | `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line |
 | `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line |
