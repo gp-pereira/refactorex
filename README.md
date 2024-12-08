@@ -231,7 +231,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Replace the name of `function` in all its calls |
 | Target | Selection of (or cursor over) `function` name |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
-| Notes | $${\color{yellow} ⚠️ Renaming a public `function` only affects the current file}$$ |
+| Notes | [!WARNING] Renaming a public `function` only affects the current file |
 | Example | ![Example](assets/examples/function/rename_function.gif?raw=true) |
 
 [▲ top](#available-refactorings)
@@ -311,7 +311,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 | Description | Replace the name of `guard` in all its calls |
 | Target | Selection of (or cursor over) `guard` name |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
-| Notes | $${\color{yellow} ⚠️ Renaming a public `guard` only affects the current file}$$ |
+| Notes | > [!WARNING] > Renaming a public `guard` only affects the current file}$$ |
 | Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
 
 [▲ top](#available-refactorings)
