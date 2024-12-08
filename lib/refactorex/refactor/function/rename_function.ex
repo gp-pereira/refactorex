@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Function.RenameFunction do
   use Refactorex.Refactor,
-    title: "Rename function",
+    title: "Rename function (current module only)",
     kind: "source",
     works_on: :selection
 
@@ -38,21 +38,22 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
 
   defp rename_references(zipper, name, {_, _, function_args}) do
     zipper
-    |> Z.top()
+    |> Module.go_to_scope()
     |> Z.traverse_while(fn
-      %{node: {:|>, _, [_, {^name, meta, args} = function]}} = zipper
+      %{node: {:|>, _, [_, {^name, meta, args}]}} = zipper
       when length(function_args) == length(args) + 1 ->
         {:cont,
          zipper
-         |> AST.go_to_node(function)
+         |> Z.down()
+         |> Z.right()
          |> Z.replace({placeholder(), meta, args})
          |> Z.up()}
 
-      %{node: {:/, _, [{^name, meta, nil} = function, {:__block__, _, [num_args]}]}}
+      %{node: {:/, _, [{^name, meta, nil}, {:__block__, _, [num_args]}]}} = zipper
       when length(function_args) == num_args ->
         {:cont,
          zipper
-         |> AST.go_to_node(function)
+         |> Z.down()
          |> Z.replace({placeholder(), meta, nil})
          |> Z.up()}
 

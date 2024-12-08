@@ -128,6 +128,64 @@ defmodule Refactorex.Refactor.Guard.RenameGuardTest do
     )
   end
 
+  test "renames only affects the current file" do
+    assert_refactored(
+      RenameGuard,
+      """
+      defmodule Before do
+        defguardp some_guard(arg) when arg.valid? == true
+
+        def foo(arg) when some_guard(arg) do
+          arg
+        end
+      end
+
+      defmodule Foo do
+        defguardp some_guard(arg) when arg.valid? == true
+
+        #                 v
+        def foo(arg) when some_guard(arg) do
+        #                          ^
+          arg
+        end
+      end
+
+      defmodule After do
+        defguardp some_guard(arg) when arg.valid? == true
+
+        def foo(arg) when some_guard(arg) do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule Before do
+        defguardp some_guard(arg) when arg.valid? == true
+
+        def foo(arg) when some_guard(arg) do
+          arg
+        end
+      end
+
+      defmodule Foo do
+        defguardp #{placeholder()}(arg) when arg.valid? == true
+
+        def foo(arg) when #{placeholder()}(arg) do
+          arg
+        end
+      end
+
+      defmodule After do
+        defguardp some_guard(arg) when arg.valid? == true
+
+        def foo(arg) when some_guard(arg) do
+          arg
+        end
+      end
+      """
+    )
+  end
+
   test "ignores selection outside module" do
     assert_not_refactored(
       RenameGuard,

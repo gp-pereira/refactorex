@@ -153,6 +153,64 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
     )
   end
 
+  test "renames only affect the current module" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Before do
+        def foo(args) do
+          Enum.map(args, &bar/1)
+        end
+
+        defp bar(arg), do: arg + 10
+      end
+
+      defmodule Foo do
+        def foo(args) do
+        #                 v
+          Enum.map(args, &bar/1)
+        #                   ^
+        end
+
+        defp bar(arg), do: arg + 10
+      end
+
+      defmodule After do
+        def foo(args) do
+          Enum.map(args, &bar/1)
+        end
+
+        defp bar(arg), do: arg + 10
+      end
+      """,
+      """
+      defmodule Before do
+        def foo(args) do
+          Enum.map(args, &bar/1)
+        end
+
+        defp bar(arg), do: arg + 10
+      end
+
+      defmodule Foo do
+        def foo(args) do
+          Enum.map(args, &#{placeholder()}/1)
+        end
+
+        defp #{placeholder()}(arg), do: arg + 10
+      end
+
+      defmodule After do
+        def foo(args) do
+          Enum.map(args, &bar/1)
+        end
+
+        defp bar(arg), do: arg + 10
+      end
+      """
+    )
+  end
+
   test "ignores function when the definition cannot be found" do
     assert_not_refactored(
       RenameFunction,

@@ -45,7 +45,7 @@ defmodule Refactorex.Refactor.Module do
     |> String.to_atom()
   end
 
-  defp go_to_scope(zipper) do
+  def go_to_scope(zipper) do
     zipper
     |> go_to_definition()
     |> Z.down()

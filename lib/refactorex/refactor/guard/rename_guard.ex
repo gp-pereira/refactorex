@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Guard.RenameGuard do
   use Refactorex.Refactor,
-    title: "Rename guard",
+    title: "Rename guard (current module only)",
     kind: "source",
     works_on: :selection
 
@@ -45,7 +45,7 @@ defmodule Refactorex.Refactor.Guard.RenameGuard do
 
   defp rename_references(zipper, name, args) do
     zipper
-    |> Z.top()
+    |> Module.go_to_scope()
     |> Z.traverse_while(fn
       %{node: {:defguard, _, [{:when, _, [{^name, _, guard_args}, _]}]}} = zipper
       when length(args) == length(guard_args) ->
