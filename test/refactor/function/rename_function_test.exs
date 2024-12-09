@@ -212,7 +212,7 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
   end
 
   test "ignores function when the definition cannot be found" do
-    assert_not_refactored(
+    assert_ignored(
       RenameFunction,
       """
       defmodule Foo do
@@ -227,7 +227,7 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
   end
 
   test "ignores selection outside module" do
-    assert_not_refactored(
+    assert_ignored(
       RenameFunction,
       """
       def foo(arg) do

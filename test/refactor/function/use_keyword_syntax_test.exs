@@ -142,7 +142,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
   end
 
   test "ignores multiple statements functions " do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       defmodule Foo do
@@ -158,7 +158,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
   end
 
   test "ignores keyword functions" do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       defmodule Foo do
@@ -170,7 +170,7 @@ defmodule Refactorex.Refactor.Function.UseKeywordSyntaxTest do
   end
 
   test "ignores functions outside range" do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       #      v

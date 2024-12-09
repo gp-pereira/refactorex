@@ -61,7 +61,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
   end
 
   test "ignores regular functions" do
-    assert_not_refactored(
+    assert_ignored(
       UseRegularSyntax,
       """
       defmodule Foo do
@@ -75,7 +75,7 @@ defmodule Refactorex.Refactor.Function.UseRegularSyntaxTest do
   end
 
   test "ignores functions outside range" do
-    assert_not_refactored(
+    assert_ignored(
       UseRegularSyntax,
       """
       defmodule Foo do

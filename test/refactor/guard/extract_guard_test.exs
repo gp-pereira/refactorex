@@ -119,7 +119,7 @@ defmodule Refactorex.Refactor.Guard.ExtractGuardTest do
   end
 
   test "ignores statements outside modules" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractGuard,
       """
       #                 v
@@ -132,7 +132,7 @@ defmodule Refactorex.Refactor.Guard.ExtractGuardTest do
   end
 
   test "ignores statements outside WHEN" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractGuard,
       """
       defmodule Foo do
@@ -147,7 +147,7 @@ defmodule Refactorex.Refactor.Guard.ExtractGuardTest do
   end
 
   test "ignores incomplete statements" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractGuard,
       """
       defmodule Foo do

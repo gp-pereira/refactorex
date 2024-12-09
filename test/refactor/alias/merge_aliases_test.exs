@@ -229,7 +229,7 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
   end
 
   test "ignores single alias" do
-    assert_not_refactored(
+    assert_ignored(
       MergeAliases,
       """
       defmodule Foo do
@@ -242,7 +242,7 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
   end
 
   test "ignores unmergeable aliases" do
-    assert_not_refactored(
+    assert_ignored(
       MergeAliases,
       """
       defmodule Foo do
@@ -256,7 +256,7 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
   end
 
   test "ignores outside alias" do
-    assert_not_refactored(
+    assert_ignored(
       MergeAliases,
       """
       defmodule Foo do
@@ -271,7 +271,7 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
   end
 
   test "ignores partially selected alias" do
-    assert_not_refactored(
+    assert_ignored(
       MergeAliases,
       """
       defmodule Foo do

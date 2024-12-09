@@ -88,7 +88,7 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
   end
 
   test "ignores guard call outside module" do
-    assert_not_refactored(
+    assert_ignored(
       InlineGuard,
       """
       #                 v
@@ -101,7 +101,7 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
   end
 
   test "ignores guard call when the definition is not found" do
-    assert_not_refactored(
+    assert_ignored(
       InlineGuard,
       """
        defmodule Foo do
@@ -118,7 +118,7 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
   end
 
   test "ignores other guards statements" do
-    assert_not_refactored(
+    assert_ignored(
       InlineGuard,
       """
        defmodule Foo do
@@ -135,7 +135,7 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
   end
 
   test "ignores function call with the same name" do
-    assert_not_refactored(
+    assert_ignored(
       InlineGuard,
       """
        defmodule Foo do

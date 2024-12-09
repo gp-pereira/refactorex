@@ -15,10 +15,9 @@ defmodule Refactorex.RefactorCase do
     end
   end
 
-  defmacro assert_refactored(module, original, expected, opts \\ []) do
+  defmacro assert_refactored(module, raw? \\ false, original, expected) do
     quote do
       module = unquote(module)
-      opts = unquote(opts)
 
       original = unquote(original) |> String.trim()
       expected = unquote(expected) |> String.trim() |> String.replace("\r", "")
@@ -33,15 +32,15 @@ defmodule Refactorex.RefactorCase do
 
       refactored = module.execute(zipper, selection_or_line)
 
-      if opts[:raw] do
-        assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
+      if unquote(raw?) do
+        assert String.split(expected, "\n") == String.split(refactored, "\n")
       else
-        expected = assert String.split(expected, "\n") == String.split(refactored, "\n")
+        assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
       end
     end
   end
 
-  defmacro assert_not_refactored(module, original, _opts \\ []) do
+  defmacro assert_ignored(module, original) do
     quote do
       module = unquote(module)
       original = unquote(original)

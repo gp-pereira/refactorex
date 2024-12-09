@@ -271,7 +271,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
   end
 
   test "ignores variable declarations" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractVariable,
       """
       quote do
@@ -285,7 +285,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
   end
 
   test "ignores part of pipeline" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractVariable,
       """
       quote do
@@ -300,7 +300,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
   end
 
   test "ignores alias" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractVariable,
       """
       defmodule Foo do
@@ -311,7 +311,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
       """
     )
 
-    assert_not_refactored(
+    assert_ignored(
       ExtractVariable,
       """
       defmodule Foo do

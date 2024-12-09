@@ -77,7 +77,7 @@ defmodule Refactorex.Refactor.Pipeline.RemovePipeTest do
   end
 
   test "ignores range without pipes" do
-    assert_not_refactored(
+    assert_ignored(
       RemovePipe,
       """
       def foo(arg1) do
@@ -89,7 +89,7 @@ defmodule Refactorex.Refactor.Pipeline.RemovePipeTest do
   end
 
   test "ignores range outside pipe usage" do
-    assert_not_refactored(
+    assert_ignored(
       RemovePipe,
       """
       # v

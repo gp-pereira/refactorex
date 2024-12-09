@@ -188,7 +188,7 @@ defmodule Refactorex.Refactor.Alias.InlineAliasTest do
   end
 
   test "ignores alias declaration" do
-    assert_not_refactored(
+    assert_ignored(
       InlineAlias,
       """
       defmodule Foo do
@@ -205,7 +205,7 @@ defmodule Refactorex.Refactor.Alias.InlineAliasTest do
   end
 
   test "ignores aliases without same module declaration" do
-    assert_not_refactored(
+    assert_ignored(
       InlineAlias,
       """
       defmodule Foo do

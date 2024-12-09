@@ -38,7 +38,7 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntaxTest do
   end
 
   test "ignores if statement with multiple inner statements" do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       # v
@@ -51,7 +51,7 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntaxTest do
   end
 
   test "ignores if else statement with multiple inner statements" do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       # v
@@ -66,7 +66,7 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntaxTest do
   end
 
   test "ignores if else statement already with keyword syntax" do
-    assert_not_refactored(
+    assert_ignored(
       UseKeywordSyntax,
       """
       # v

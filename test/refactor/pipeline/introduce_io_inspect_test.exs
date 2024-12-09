@@ -22,7 +22,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
   end
 
   test "ignores variable declarations" do
-    assert_not_refactored(
+    assert_ignored(
       IntroduceIOInspect,
       """
       #                  v
@@ -35,7 +35,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
   end
 
   test "ignores the whole anonymous function" do
-    assert_not_refactored(
+    assert_ignored(
       IntroduceIOInspect,
       """
       foo
@@ -47,7 +47,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
   end
 
   test "ignores a whole with clause" do
-    assert_not_refactored(
+    assert_ignored(
       IntroduceIOInspect,
       """
       #    v
@@ -60,7 +60,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
   end
 
   test "ignores alias" do
-    assert_not_refactored(
+    assert_ignored(
       IntroduceIOInspect,
       """
       defmodule Foo do

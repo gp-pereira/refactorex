@@ -185,7 +185,7 @@ defmodule Refactorex.Refactor.Guard.RenameGuardTest do
   end
 
   test "ignores selection outside module" do
-    assert_not_refactored(
+    assert_ignored(
       RenameGuard,
       """
       #         v

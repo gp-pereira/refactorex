@@ -55,7 +55,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores repeated args used for pattern matching" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       #       v
@@ -67,7 +67,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores functions with no args" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       #       v
@@ -77,7 +77,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores anonymous functions with no args" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       #       v
@@ -87,7 +87,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores already underlined args" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       #       v
@@ -99,7 +99,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores pinned args" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       def foo(bar) do
@@ -111,7 +111,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
   end
 
   test "ignores args used on guards" do
-    assert_not_refactored(
+    assert_ignored(
       UnderscoreUnusedArgs,
       """
       #       v

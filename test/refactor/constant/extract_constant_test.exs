@@ -162,7 +162,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores constants" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       defmodule Foo do
@@ -180,7 +180,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores anonymous function" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       defmodule Foo do
@@ -197,7 +197,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores selection ranges with variables" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       defmodule Foo do
@@ -212,7 +212,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores pipe function calls" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       defmodule Foo do
@@ -227,7 +227,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores selection ranges outside modules" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       #               v
@@ -238,7 +238,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstantTest do
   end
 
   test "ignores alias" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractConstant,
       """
       defmodule Foo do

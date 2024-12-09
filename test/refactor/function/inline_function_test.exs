@@ -536,7 +536,7 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
   end
 
   test "ignores function definition" do
-    assert_not_refactored(
+    assert_ignored(
       InlineFunction,
       """
       defmodule Foo do
@@ -553,7 +553,7 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
   end
 
   test "ignores function call without same module definition" do
-    assert_not_refactored(
+    assert_ignored(
       InlineFunction,
       """
       defmodule Foo do
@@ -568,7 +568,7 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
   end
 
   test "ignores function call outside module" do
-    assert_not_refactored(
+    assert_ignored(
       InlineFunction,
       """
       def foo(arg) do

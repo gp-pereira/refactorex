@@ -212,7 +212,7 @@ defmodule Refactorex.Refactor.Variable.InlineVariableTest do
   end
 
   test "ignore assignment inside other assignment" do
-    assert_not_refactored(
+    assert_ignored(
       InlineVariable,
       """
       defmodule Foo do
@@ -228,7 +228,7 @@ defmodule Refactorex.Refactor.Variable.InlineVariableTest do
   end
 
   test "ignores function args" do
-    assert_not_refactored(
+    assert_ignored(
       InlineVariable,
       """
        defmodule Foo do
@@ -243,7 +243,7 @@ defmodule Refactorex.Refactor.Variable.InlineVariableTest do
   end
 
   test "ignores variable declaration" do
-    assert_not_refactored(
+    assert_ignored(
       InlineVariable,
       """
        defmodule Foo do

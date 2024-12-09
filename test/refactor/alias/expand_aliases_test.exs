@@ -117,7 +117,7 @@ defmodule Refactorex.Refactor.Alias.ExpandAliasesTest do
   end
 
   test "ignores outside module" do
-    assert_not_refactored(
+    assert_ignored(
       ExpandAliases,
       """
       #          v
@@ -128,7 +128,7 @@ defmodule Refactorex.Refactor.Alias.ExpandAliasesTest do
   end
 
   test "ignores outside alias" do
-    assert_not_refactored(
+    assert_ignored(
       ExpandAliases,
       """
       defmodule Foo do

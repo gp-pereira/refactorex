@@ -45,7 +45,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with pattern matching" do
-    assert_not_refactored(
+    assert_ignored(
       CollapseAnonymousFunction,
       """
       #                   v
@@ -56,7 +56,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with multiples statements" do
-    assert_not_refactored(
+    assert_ignored(
       CollapseAnonymousFunction,
       """
       #                   v
@@ -70,7 +70,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with multiples clauses" do
-    assert_not_refactored(
+    assert_ignored(
       CollapseAnonymousFunction,
       """
       #                   v
@@ -84,7 +84,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with zero args" do
-    assert_not_refactored(
+    assert_ignored(
       CollapseAnonymousFunction,
       """
       def foo do
@@ -97,7 +97,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with unused args" do
-    assert_not_refactored(
+    assert_ignored(
       CollapseAnonymousFunction,
       """
       def foo do

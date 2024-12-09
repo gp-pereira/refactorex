@@ -114,7 +114,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAliasTest do
   end
 
   test "ignores alias declaration" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAlias,
       """
       defmodule Foo do
@@ -127,7 +127,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAliasTest do
   end
 
   test "ignores single alias" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAlias,
       """
       defmodule Foo do
@@ -142,7 +142,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAliasTest do
   end
 
   test "ignores if there would be a name conflict" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAlias,
       """
       defmodule Foo do
@@ -159,7 +159,7 @@ defmodule Refactorex.Refactor.Alias.ExtractAliasTest do
   end
 
   test "ignores outside module" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAlias,
       """
       def foo() do

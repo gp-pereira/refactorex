@@ -62,7 +62,7 @@ defmodule Refactorex.Refactor.Alias.SortNestedAliasesTest do
   end
 
   test "ignores alias without nesting" do
-    assert_not_refactored(
+    assert_ignored(
       SortNestedAliases,
       """
       #   v
@@ -72,7 +72,7 @@ defmodule Refactorex.Refactor.Alias.SortNestedAliasesTest do
   end
 
   test "ignores already sorted alias" do
-    assert_not_refactored(
+    assert_ignored(
       SortNestedAliases,
       """
       #   v

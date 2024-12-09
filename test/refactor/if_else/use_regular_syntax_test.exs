@@ -38,7 +38,7 @@ defmodule Refactorex.Refactor.IfElse.UseRegularSyntaxTest do
   end
 
   test "ignores if else statement already with regular syntax" do
-    assert_not_refactored(
+    assert_ignored(
       UseRegularSyntax,
       """
       # v

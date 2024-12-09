@@ -56,7 +56,7 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
   end
 
   test "ignores the constant definition" do
-    assert_not_refactored(
+    assert_ignored(
       InlineConstant,
       """
       defmodule Foo do
@@ -73,7 +73,7 @@ defmodule Refactorex.Refactor.Constant.InlineConstantTest do
   end
 
   test "ignores constant without a previous definition" do
-    assert_not_refactored(
+    assert_ignored(
       InlineConstant,
       """
       defmodule Foo do

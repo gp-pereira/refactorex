@@ -194,7 +194,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
   end
 
   test "ignore with clauses" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractFunction,
       """
       defmodule Foo do
@@ -211,7 +211,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
   end
 
   test "ignore module constants" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractFunction,
       """
       defmodule Foo do
@@ -228,7 +228,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
   end
 
   test "ignore anonymous functions" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractFunction,
       """
       defmodule Foo do
@@ -245,7 +245,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
   end
 
   test "ignore variable declaration functions" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractFunction,
       """
       defmodule Foo do
@@ -262,7 +262,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
   end
 
   test "ignores alias" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractFunction,
       """
       defmodule Foo do

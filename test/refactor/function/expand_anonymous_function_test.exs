@@ -70,7 +70,7 @@ defmodule Refactorex.Refactor.Function.ExpandAnonymousFunctionTest do
   end
 
   test "ignores capture variables" do
-    assert_not_refactored(
+    assert_ignored(
       ExpandAnonymousFunction,
       """
       def foo(modules) do

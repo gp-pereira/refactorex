@@ -252,7 +252,7 @@ defmodule Refactorex.Refactor.Variable.RenameVariableTest do
   end
 
   test "ignores function call values" do
-    assert_not_refactored(
+    assert_ignored(
       RenameVariable,
       """
       defp was_variable_reassigned?(node, name) do
@@ -265,7 +265,7 @@ defmodule Refactorex.Refactor.Variable.RenameVariableTest do
   end
 
   test "ignores pinned variables" do
-    assert_not_refactored(
+    assert_ignored(
       RenameVariable,
       """
       defp was_variable_reassigned?(node, name) do

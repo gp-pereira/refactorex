@@ -188,7 +188,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores already piped functions" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #        v
@@ -198,7 +198,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores access operations" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -208,7 +208,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores functions without at least one argument" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       def bar do
@@ -220,7 +220,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   # test "ignores functions outside range" do
-  #   assert_not_refactored(
+  #   assert_ignored(
   #     IntroducePipe,
   #     """
   #     def some_function do
@@ -230,7 +230,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   #     """
   #   )
 
-  #   assert_not_refactored(
+  #   assert_ignored(
   #     IntroducePipe,
   #     """
   #     def some_function do
@@ -242,7 +242,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   # end
 
   test "ignores anonymous functions" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       list
@@ -253,7 +253,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores alias" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #        v
@@ -263,7 +263,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores function declarations" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -275,7 +275,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores function declaration with when clause" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -287,7 +287,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores every thing that is not a function call" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -295,7 +295,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
       """
     )
 
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -303,7 +303,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
       """
     )
 
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -311,7 +311,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
       """
     )
 
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       #    v
@@ -321,7 +321,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroducePipeTest do
   end
 
   test "ignores range if it's not empty" do
-    assert_not_refactored(
+    assert_ignored(
       IntroducePipe,
       """
       def some_function(arg1, arg2) do

@@ -450,7 +450,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
   end
 
   test "ignores anonymous function that is not inside a module" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAnonymousFunction,
       """
       def power_sum(numbers, power) do
@@ -463,7 +463,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
   end
 
   test "ignores anonymous function with zero arguments" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAnonymousFunction,
       """
       defmodule Middleware do
@@ -478,7 +478,7 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunctionTest do
   end
 
   test "ignores already extracted function" do
-    assert_not_refactored(
+    assert_ignored(
       ExtractAnonymousFunction,
       """
       defmodule Foo do
