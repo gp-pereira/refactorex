@@ -52,8 +52,7 @@ defmodule Refactorex.Refactor.Guard.RenameGuardTest do
 
         defguardp supported?(socket) when true
 
-        def update(%{payment: payment} = assigns, socket)
-            when #{placeholder()}(payment) do
+        def update(%{payment: payment} = assigns, socket) when #{placeholder()}(payment) do
           reply_ok(socket, assigns)
         end
       end
@@ -89,8 +88,7 @@ defmodule Refactorex.Refactor.Guard.RenameGuardTest do
         defguardp my_guard(arg) when arg == true
         defguardp other_guard(arg1, arg2) when arg1 == true
 
-        def foo(arg)
-            when (#{placeholder()}(arg, arg) and my_guard(arg)) or other_guard(arg, arg) do
+        def foo(arg) when (#{placeholder()}(arg, arg) and my_guard(arg)) or other_guard(arg, arg) do
           my_guard(arg, arg + 5)
         end
 

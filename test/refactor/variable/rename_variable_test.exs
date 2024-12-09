@@ -55,6 +55,24 @@ defmodule Refactorex.Refactor.Variable.RenameVariableTest do
     )
   end
 
+  test "renames but do not modify the code structure" do
+    assert_refactored(
+      RenameVariable,
+      """
+      def bar(args) do
+        #                   v
+        args |> Enum.map(fn a -> a + 10 end) |> Enum.sum()
+        #                   ^
+      end
+      """,
+      """
+      def bar(args) do
+        args |> Enum.map(fn #{placeholder()} -> #{placeholder()} + 10 end) |> Enum.sum()
+      end
+      """
+    )
+  end
+
   test "renames the all usages until a new assignment" do
     assert_refactored(
       RenameVariable,

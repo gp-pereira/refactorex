@@ -142,5 +142,5 @@ defmodule Refactorex.Refactor do
     |> module.refactoring()
   end
 
-  def placeholder(), do: :name_being_refactored_31_08_2003
+  def placeholder(), do: :__y__
 end
