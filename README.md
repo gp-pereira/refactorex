@@ -4,6 +4,8 @@ RefactorEx is a powerful Visual Studio Code extension that simplifies and accele
 
 With RefactorEx, you can perform common refactorings like extracting functions, renaming variables, and more — all within a few clicks.
 
+RefactorEx integrates with VSCode's built in `Refactor...`, `Quick Fix`, and `Rename symbol` commands. You can use those commands or their keyboard shortcuts to access all of RefactorEx's features.
+
 ![Example](assets/examples/demo.gif?raw=true)
 
 ## Available refactorings
