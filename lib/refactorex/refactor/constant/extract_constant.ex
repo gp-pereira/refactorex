@@ -4,6 +4,8 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
     kind: "refactor.extract",
     works_on: :selection
 
+  alias Refactorex.NameCache
+
   alias Refactorex.Refactor.{
     Module,
     Variable
@@ -44,12 +46,14 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
   end
 
   def next_available_constant_name(zipper) do
-    Module.next_available_name(
-      zipper,
-      @constant_name,
-      &match?({:@, _, _}, &1),
-      fn {_, _, [{name, _, _}]} -> name end
-    )
+    NameCache.consume_name_or(fn ->
+      Module.next_available_name(
+        zipper,
+        @constant_name,
+        &match?({:@, _, _}, &1),
+        fn {_, _, [{name, _, _}]} -> name end
+      )
+    end)
   end
 
   defp after_used_constants(nodes, node) do

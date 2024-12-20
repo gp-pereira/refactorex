@@ -12,6 +12,7 @@ defmodule Refactorex.Application do
           [communication: {GenLSP.Communication.TCP, [port: port()]}]
         },
         {Refactorex.Logger, []},
+        {Refactorex.NameCache, []},
         {Refactorex, []}
       ],
       strategy: :one_for_one,

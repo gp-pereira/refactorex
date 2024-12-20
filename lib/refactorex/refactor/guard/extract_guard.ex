@@ -4,6 +4,8 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
     kind: "refactor.extract",
     works_on: :selection
 
+  alias Refactorex.NameCache
+
   alias Refactorex.Refactor.{
     Guard,
     Module,
@@ -38,11 +40,13 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
   end
 
   defp next_available_guard_name(zipper) do
-    Module.next_available_name(
-      zipper,
-      @guard_name,
-      &Guard.definition?/1,
-      fn {_, _, [{:when, _, [{name, _, _} | _]}]} -> name end
-    )
+    NameCache.consume_name_or(fn ->
+      Module.next_available_name(
+        zipper,
+        @guard_name,
+        &Guard.definition?/1,
+        fn {_, _, [{:when, _, [{name, _, _} | _]}]} -> name end
+      )
+    end)
   end
 end

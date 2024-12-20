@@ -4,6 +4,8 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
     kind: "refactor.extract",
     works_on: :selection
 
+  alias Refactorex.NameCache
+
   alias Refactorex.Refactor.{
     Function,
     IfElse,
@@ -103,31 +105,33 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
   end
 
   defp next_available_name(zipper) do
-    zipper
-    |> Z.top()
-    |> Z.traverse([0], fn
-      %{node: {id, _, nil}} = zipper, used_numbers when is_atom(id) ->
-        {
-          zipper,
-          case Regex.run(~r/#{@variable_name}(\d*)/, Atom.to_string(id)) do
-            [_, ""] ->
-              [1 | used_numbers]
+    NameCache.consume_name_or(fn ->
+      zipper
+      |> Z.top()
+      |> Z.traverse([0], fn
+        %{node: {id, _, nil}} = zipper, used_numbers when is_atom(id) ->
+          {
+            zipper,
+            case Regex.run(~r/#{@variable_name}(\d*)/, Atom.to_string(id)) do
+              [_, ""] ->
+                [1 | used_numbers]
 
-            [_, i] ->
-              [String.to_integer(i) | used_numbers]
+              [_, i] ->
+                [String.to_integer(i) | used_numbers]
 
-            _ ->
-              used_numbers
-          end
-        }
+              _ ->
+                used_numbers
+            end
+          }
 
-      zipper, used_numbers ->
-        {zipper, used_numbers}
+        zipper, used_numbers ->
+          {zipper, used_numbers}
+      end)
+      |> elem(1)
+      |> Enum.max()
+      |> then(&"#{@variable_name}#{if &1 == 0, do: "", else: &1 + 1}")
+      |> String.to_atom()
     end)
-    |> elem(1)
-    |> Enum.max()
-    |> then(&"#{@variable_name}#{if &1 == 0, do: "", else: &1 + 1}")
-    |> String.to_atom()
   end
 
   defp replace_selection_by_variable(statement, selection, variable) do

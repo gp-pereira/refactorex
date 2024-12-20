@@ -131,6 +131,51 @@ defmodule RefactorexTest do
     )
   end
 
+  test "allows some Extract CodeActions to name the new resource", %{
+    client: client,
+    file_uri: file_uri
+  } do
+    :ok =
+      request_code_actions(client, file_uri, %{
+        # selecting arg usage
+        start: %{line: 2, character: 4},
+        end: %{line: 2, character: 7}
+      })
+
+    assert_result(2, code_actions, @timeout)
+
+    assert extract_variable = Enum.find(code_actions, &(&1["title"] == "Extract variable"))
+
+    :ok =
+      request(client, %{
+        method: "codeAction/resolve",
+        id: 3,
+        jsonrpc: "2.0",
+        params: put_in(extract_variable, ~w(data new_name), "foo")
+      })
+
+    assert_result(
+      3,
+      %{
+        "title" => "Extract variable",
+        "edit" => %{
+          "changes" => %{
+            ^file_uri => [
+              %{
+                "newText" => "    foo = arg\n    foo",
+                "range" => %{
+                  "start" => %{"line" => 2, "character" => 0},
+                  "end" => %{"line" => 2, "character" => 7}
+                }
+              }
+            ]
+          }
+        }
+      },
+      @timeout
+    )
+  end
+
   test "responds no CodeActions for syntactically broken file", %{
     client: client,
     file_uri: file_uri
@@ -223,17 +268,21 @@ defmodule RefactorexTest do
     )
   end
 
-  defp request_code_actions(client, file_uri) do
+  defp request_code_actions(
+         client,
+         file_uri,
+         range \\ %{
+           start: %{line: 1, character: 4},
+           end: %{line: 1, character: 4}
+         }
+       ) do
     request(client, %{
       method: "textDocument/codeAction",
       id: 2,
       jsonrpc: "2.0",
       params: %{
         textDocument: %{uri: file_uri},
-        range: %{
-          start: %{line: 1, character: 4},
-          end: %{line: 1, character: 4}
-        },
+        range: range,
         context: %{
           diagnostics: [],
           triggerKind: 1

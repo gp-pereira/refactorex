@@ -1,5 +1,10 @@
-import { LanguageClient } from "vscode-languageclient/node";
-import { workspace, ExtensionContext } from "vscode";
+import {
+	CancellationToken,
+	LanguageClient,
+	ResolveCodeActionSignature,
+} from "vscode-languageclient/node";
+import { ExtensionContext, CodeAction, window, workspace } from "vscode";
+
 import { ChildProcess, exec } from "child_process";
 import * as path from "path";
 import * as net from "net";
@@ -40,6 +45,7 @@ export async function activate(context: ExtensionContext) {
 			synchronize: {
 				fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
 			},
+			middleware: { resolveCodeAction },
 		}
 	);
 
@@ -141,4 +147,37 @@ function connect(
 
 		doConnect();
 	});
+}
+
+async function resolveCodeAction(
+	item: CodeAction,
+	token: CancellationToken,
+	next: ResolveCodeActionSignature
+) {
+	if (willNameNewResource(item)) {
+		const resource = item.title.split(" ").pop();
+
+		const newName = await window.showInputBox({
+			title: item.title,
+			prompt: `Choose a name for new ${resource}`,
+		});
+
+		// user canceled the input box, so we
+		// are also canceling the code action
+		if (!newName) return undefined;
+
+		(item as any).data.new_name = newName;
+	}
+
+	return next(item, token);
+}
+
+function willNameNewResource(item: CodeAction) {
+	return [
+		"Extract anonymous function",
+		"Extract constant",
+		"Extract guard",
+		"Extract function",
+		"Extract variable",
+	].includes(item.title);
 }

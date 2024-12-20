@@ -1,5 +1,6 @@
 defmodule Refactorex.Refactor.Function do
   alias Sourceror.Zipper, as: Z
+  alias Refactorex.NameCache
   alias Refactorex.Refactor.Module
 
   import Sourceror.Identifier
@@ -70,12 +71,14 @@ defmodule Refactorex.Refactor.Function do
   end
 
   def next_available_function_name(zipper, base_name) do
-    Module.next_available_name(
-      zipper,
-      base_name,
-      &definition?/1,
-      fn {_, _, [{name, _, _}, _]} -> name end
-    )
+    NameCache.consume_name_or(fn ->
+      Module.next_available_name(
+        zipper,
+        base_name,
+        &definition?/1,
+        fn {_, _, [{name, _, _}, _]} -> name end
+      )
+    end)
   end
 
   def go_to_block(zipper) do

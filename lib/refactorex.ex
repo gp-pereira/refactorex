@@ -20,6 +20,7 @@ defmodule Refactorex do
   alias __MODULE__.{
     Diff,
     Logger,
+    NameCache,
     Parser,
     Refactor,
     Response
@@ -118,9 +119,10 @@ defmodule Refactorex do
   end
 
   def do_handle_request(%CodeActionResolve{params: %{data: data}}, lsp) do
-    %{module: module, uri: uri, range: range} = Parser.parse_metadata(data)
+    %{module: module, uri: uri, range: range} = metadata = Parser.parse_metadata(data)
 
     original = lsp.assigns.documents[uri]
+    NameCache.store_name(metadata[:new_name])
 
     with {:ok, zipper, selection_or_line} <- Parser.parse_inputs(original, range) do
       {
