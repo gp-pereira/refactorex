@@ -202,6 +202,19 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
     )
   end
 
+  test "ignore already merged aliases" do
+    assert_ignored(
+      MergeAliases,
+      """
+      defmodule Foo do
+      #           v
+        alias Qez.{Delta, K}
+      #                    ^
+      end
+      """
+    )
+  end
+
   test "merges selected alias with multiple newlines" do
     assert_refactored(
       MergeAliases,

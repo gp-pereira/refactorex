@@ -116,6 +116,25 @@ defmodule Refactorex.Refactor.Alias.ExpandAliasesTest do
     )
   end
 
+  test "expand two merged alias selecting on the tuple" do
+    assert_refactored(
+      ExpandAliases,
+      """
+      defmodule Foo do
+        #         v
+        alias Foo.{Bar, Qez}
+        #                  ^
+      end
+      """,
+      """
+      defmodule Foo do
+        alias Foo.Bar
+        alias Foo.Qez
+      end
+      """
+    )
+  end
+
   test "ignores outside module" do
     assert_ignored(
       ExpandAliases,

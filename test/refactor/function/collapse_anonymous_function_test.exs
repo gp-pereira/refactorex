@@ -108,4 +108,17 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunctionTest do
       """
     )
   end
+
+  test "ignores anything other than anonymous function" do
+    assert_ignored(
+      CollapseAnonymousFunction,
+      """
+      def foo do
+      #              v
+        fn _, foo -> foo end
+      #                ^
+      end
+      """
+    )
+  end
 end

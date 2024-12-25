@@ -84,4 +84,18 @@ defmodule Refactorex.Refactor.Alias.SortNestedAliasesTest do
       """
     )
   end
+
+  test "ignores selection on other line" do
+    assert_ignored(
+      SortNestedAliases,
+      """
+      alias Foo.{
+      # v
+        A,
+        B,
+        C
+      }
+      """
+    )
+  end
 end

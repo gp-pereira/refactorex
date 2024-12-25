@@ -273,4 +273,17 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
       """
     )
   end
+
+  test "ignores selection outside module" do
+    assert_ignored(
+      ExtractFunction,
+      """
+      def foo() do
+      # v
+        :outside
+      #        ^
+      end
+      """
+    )
+  end
 end

@@ -74,4 +74,15 @@ defmodule Refactorex.Refactor.IfElse.UseKeywordSyntaxTest do
       """
     )
   end
+
+  test "ignores the line below the if statement" do
+    assert_ignored(
+      UseKeywordSyntax,
+      """
+      if true,
+      # v
+        do: bar
+      """
+    )
+  end
 end
