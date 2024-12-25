@@ -34,8 +34,6 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     end
   end
 
-  def can_refactor?(_, _), do: false
-
   def refactor(%{node: {name, _, call_values} = node} = zipper, _) do
     parent = Z.up(zipper)
     statements = statements_to_inline(zipper)

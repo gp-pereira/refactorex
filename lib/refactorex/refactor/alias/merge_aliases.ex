@@ -6,9 +6,6 @@ defmodule Refactorex.Refactor.Alias.MergeAliases do
 
   alias Refactorex.Refactor.Alias
 
-  def can_refactor?(zipper, {:__block__, meta, [{s1, s2}]}),
-    do: can_refactor?(zipper, {:__block__, meta, [s1, s2]})
-
   def can_refactor?(zipper, {:__block__, _, selected_aliases}) do
     cond do
       group_mergeable_aliases(selected_aliases) == [] ->
@@ -23,9 +20,6 @@ defmodule Refactorex.Refactor.Alias.MergeAliases do
   end
 
   def can_refactor?(_, _), do: :skip
-
-  def refactor(zipper, {:__block__, meta, [{s1, s2}]}),
-    do: refactor(zipper, {:__block__, meta, [s1, s2]})
 
   def refactor(zipper, {_, _, aliases}) do
     aliases
