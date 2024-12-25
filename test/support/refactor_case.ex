@@ -33,9 +33,9 @@ defmodule Refactorex.RefactorCase do
       refactored = module.execute(zipper, selection_or_line)
 
       if unquote(raw?) do
-        assert String.split(expected, "\n") == String.split(refactored, "\n")
-      else
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
+      else
+        assert String.split(expected, "\n") == String.split(refactored, "\n")
       end
     end
   end
