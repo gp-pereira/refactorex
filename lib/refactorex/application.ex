@@ -9,7 +9,7 @@ defmodule Refactorex.Application do
       [
         {
           GenLSP.Buffer,
-          [communication: {GenLSP.Communication.TCP, [port: port()]}]
+          [communication: communication_config()]
         },
         {Refactorex.Logger, []},
         {Refactorex.NameCache, []},
@@ -20,10 +20,24 @@ defmodule Refactorex.Application do
     )
   end
 
-  defp port do
+  defp parse_opts do
     System.argv()
-    |> OptionParser.parse(strict: [port: :integer])
+    |> OptionParser.parse(strict: [port: :integer, stdio: :boolean])
     |> elem(0)
+  end
+
+  defp port do
+    parse_opts()
     |> Keyword.get(:port, @default_port)
+  end
+
+  defp communication_config do
+    opts = parse_opts()
+
+    if Keyword.get(opts, :stdio, false) do
+      {GenLSP.Communication.Stdio, []}
+    else
+      {GenLSP.Communication.TCP, [port: port()]}
+    end
   end
 end
