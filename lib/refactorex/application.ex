@@ -3,7 +3,6 @@ defmodule Refactorex.Application do
 
   @default_port 6890
 
-  @impl true
   def start(_, _) do
     Supervisor.start_link(
       [
@@ -20,24 +19,16 @@ defmodule Refactorex.Application do
     )
   end
 
-  defp parse_opts do
-    System.argv()
-    |> OptionParser.parse(strict: [port: :integer, stdio: :boolean])
-    |> elem(0)
-  end
-
-  defp port do
-    parse_opts()
-    |> Keyword.get(:port, @default_port)
-  end
-
   defp communication_config do
-    opts = parse_opts()
+    opts =
+      System.argv()
+      |> OptionParser.parse(strict: [port: :integer, stdio: :boolean])
+      |> elem(0)
 
     if Keyword.get(opts, :stdio, false) do
       {GenLSP.Communication.Stdio, []}
     else
-      {GenLSP.Communication.TCP, [port: port()]}
+      {GenLSP.Communication.TCP, [port: Keyword.get(opts, :port, @default_port)]}
     end
   end
 end
