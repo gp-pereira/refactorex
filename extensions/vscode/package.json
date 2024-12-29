@@ -2,6 +2,7 @@
 	"name": "refatorex",
 	"publisher": "gp-pereira",
 	"displayName": "RefactorEx",
+	"description": "Fast and reliable Elixir refactoring",
 	"version": "0.0.1",
 	"author": {
 		"name": "gp-pereira",
