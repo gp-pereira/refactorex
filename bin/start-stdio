@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-# used for mason.nvim
-
-cd "$(dirname "$0")"/.. || exit 1
-
-./bin/start --stdio "$0"
