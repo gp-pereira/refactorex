@@ -74,7 +74,7 @@ defmodule Refactorex do
       end
     rescue
       e ->
-        Logger.error(Exception.format(:error, e, __STACKTRACE__))
+        Logger.error({e, __STACKTRACE__})
         {:reply, Response.error(:internal_error), lsp}
     end
   end

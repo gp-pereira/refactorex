@@ -12,7 +12,8 @@ defmodule Refactorex.Application do
         },
         {Refactorex.Logger, []},
         {Refactorex.NameCache, []},
-        {Refactorex, []}
+        {Refactorex, []},
+        {Task.Supervisor, [name: Refactorex.Refactor]}
       ],
       strategy: :one_for_one,
       name: Refactorex.Supervisor

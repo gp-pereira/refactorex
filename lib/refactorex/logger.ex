@@ -15,7 +15,8 @@ defmodule Refactorex.Logger do
     end
   end
 
-  def error(message) do
+  def error(reason) do
+    message = Exception.format_exit(reason)
     Logger.error(message)
 
     if Mix.env() != :test do

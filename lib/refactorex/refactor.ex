@@ -105,21 +105,23 @@ defmodule Refactorex.Refactor do
   ]
 
   def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
-    modules
-    |> Task.async_stream(fn module ->
-      # if a refactor crashes, it must not impact the others
-      try do
-        if module.available?(zipper, selection_or_line),
-          do: module.refactoring(),
-          else: nil
-      rescue
-        e ->
-          Refactorex.Logger.error(Exception.format(:error, e, __STACKTRACE__))
-          nil
-      end
+    __MODULE__
+    |> Task.Supervisor.async_stream_nolink(modules, fn module ->
+      if module.available?(zipper, selection_or_line),
+        do: module.refactoring(),
+        else: nil
     end)
-    |> Stream.reject(&(match?({:ok, nil}, &1) or match?({:error, _}, &1)))
-    |> Enum.map(fn {:ok, refactoring} -> refactoring end)
+    |> Enum.reduce([], fn
+      {:ok, nil}, refactorings ->
+        refactorings
+
+      {:ok, refactoring}, refactorings ->
+        [refactoring | refactorings]
+
+      {:exit, reason}, refactorings ->
+        Refactorex.Logger.error(reason)
+        refactorings
+    end)
   end
 
   def refactor(zipper, selection_or_line, module) do
