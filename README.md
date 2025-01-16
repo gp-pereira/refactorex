@@ -23,43 +23,43 @@ We are currently working on getting the plugin added to the mason registry. Foll
 
 ## Available refactorings
 
-| Scope | Refactoring | Target |
-| :-: | - | :-: |
-| `alias` | [Expand aliases](#alias-expand-aliases) | selection |
-| `alias` | [Extract alias](#alias-extract-alias) | selection |
-| `alias` | [Inline alias](#alias-inline-alias) | selection |
-| `alias` | [Merge aliases](#alias-merge-aliases) | selection |
-| `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line |
+| Scope | Refactoring | Target | Command |
+| :-: | - | - | - |
+| `alias` | [Expand aliases](#alias-expand-aliases) | selection | refactor (`ctrl`+`.`)|
+| `alias` | [Extract alias](#alias-extract-alias) | selection | refactor (`ctrl`+`.`) |
+| `alias` | [Inline alias](#alias-inline-alias) | selection | refactor (`ctrl`+`.`) |
+| `alias` | [Merge aliases](#alias-merge-aliases) | selection | refactor (`ctrl`+`.`) |
+| `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line | refactor (`ctrl`+`.`) |
 | | | |
-| `constant` | [Extract constant](#constant-extract-constant) | selection |
-| `constant` | [Inline constant](#constant-inline-constant) | selection |
-| `constant` | [Rename constant](#constant-rename-constant) | selection |
+| `constant` | [Extract constant](#constant-extract-constant) | selection | refactor (`ctrl`+`.`) |
+| `constant` | [Inline constant](#constant-inline-constant) | selection | refactor (`ctrl`+`.`) |
+| `constant` | [Rename constant](#constant-rename-constant) | at symbol | rename (`F2`) |
 | | | |
-| `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection |
-| `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection |
-| `function` | [Extract function](#function-extract-function) | selection |
-| `function` | [Collapse anonymous function](#function-collapse-anonymous-function) | selection |
-| `function` | [Inline function](#function-inline-function) | selection |
-| `function` | [Rename function](#function-rename-function) | selection |
-| `function` | [Underscore unused args](#function-underscore-unused-args) | line |
-| `function` | [Use keyword syntax](#function-use-keyword-syntax) | line |
-| `function` | [Use regular syntax](#function-use-regular-syntax) | line |
+| `function` | [Expand anonymous function](#function-expand-anonymous-function) | selection | refactor (`ctrl`+`.`) |
+| `function` | [Extract anonymous function](#function-extract-anonymous-function) | selection | refactor (`ctrl`+`.`) |
+| `function` | [Extract function](#function-extract-function) | selection | refactor (`ctrl`+`.`) |
+| `function` | [Collapse anonymous function](#function-collapse-anonymous-function) | selection | refactor (`ctrl`+`.`) |
+| `function` | [Inline function](#function-inline-function) | selection | refactor (`ctrl`+`.`) |
+| `function` | [Rename function](#function-rename-function) | at symbol | rename (`F2`) |
+| `function` | [Underscore unused args](#function-underscore-unused-args) | line | refactor (`ctrl`+`.`) |
+| `function` | [Use keyword syntax](#function-use-keyword-syntax) | line | refactor (`ctrl`+`.`) |
+| `function` | [Use regular syntax](#function-use-regular-syntax) | line | refactor (`ctrl`+`.`) |
 | | | |
-| `guard` | [Extract guard](#guard-extract-guard) | selection |
-| `guard` | [Inline guard](#guard-inline-guard) | selection |
-| `guard` | [Rename guard](#guard-rename-guard) | selection |
+| `guard` | [Extract guard](#guard-extract-guard) | selection | refactor (`ctrl`+`.`) |
+| `guard` | [Inline guard](#guard-inline-guard) | selection | refactor (`ctrl`+`.`) |
+| `guard` | [Rename guard](#guard-rename-guard) | at symbol | rename (`F2`) |
 | | | |
-| `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line |
-| `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line |
+| `if else` | [Use keyword syntax](#if-else-use-keyword-syntax) | line | refactor (`ctrl`+`.`) |
+| `if else` | [Use regular syntax](#if-else-use-regular-syntax) | line | refactor (`ctrl`+`.`) |
 | | | |
-| `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection |
-| `pipeline` | [Introduce pipe](#pipeline-introduce-pipe) | line |
-| `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line |
-| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line |
+| `pipeline` | [Introduce IO.inspect](#pipeline-introduce-ioinspect) | selection | refactor (`ctrl`+`.`) |
+| `pipeline` | [Introduce pipe](#pipeline-introduce-pipe) | line | refactor (`ctrl`+`.`) | 
+| `pipeline` | [Remove IO.inspect](#pipeline-remove-ioinspect) | line | refactor (`ctrl`+`.`) |
+| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | refactor (`ctrl`+`.`) |
 | | | |
-| `variable` | [Extract variable](#variable-extract-variable) | selection |
-| `variable` | [Inline variable](#variable-inline-variable) | selection |
-| `variable` | [Rename variable](#variable-rename-variable) | selection |
+| `variable` | [Extract variable](#variable-extract-variable) | selection | refactor (`ctrl`+`.`) |
+| `variable` | [Inline variable](#variable-inline-variable) | selection | refactor (`ctrl`+`.`) |
+| `variable` | [Rename variable](#variable-rename-variable) | at symbol | rename (`F2`) |
 
 ## How to use each refactoring
 
@@ -162,7 +162,7 @@ We are currently working on getting the plugin added to the mason registry. Foll
 | | |
 |-|-|
 | Description | Replace the name of `constant` in all its usages |
-| Target | Selection of (or cursor over) `constant` |
+| Target | Cursor at `constant` definition or usage |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Example | ![Example](assets/examples/constant/rename_constant.gif?raw=true) |
 
@@ -244,7 +244,7 @@ We are currently working on getting the plugin added to the mason registry. Foll
 | | |
 |-|-|
 | Description | Replace the name of `function` in all its calls |
-| Target | Selection of (or cursor over) `function` name |
+| Target | Cursor at `function` definition or usage |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Notes | ⚠️ Renaming a public `function` only affects the current file |
 | Example | ![Example](assets/examples/function/rename_function.gif?raw=true) |
@@ -324,7 +324,7 @@ We are currently working on getting the plugin added to the mason registry. Foll
 | | |
 |-|-|
 | Description | Replace the name of `guard` in all its calls |
-| Target | Selection of (or cursor over) `guard` name |
+| Target | Cursor at `guard` definition or usage |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Notes | ⚠️ Renaming a public `guard` only affects the current file |
 | Example | ![Example](assets/examples/guard/rename_guard.gif?raw=true) |
@@ -432,7 +432,7 @@ We are currently working on getting the plugin added to the mason registry. Foll
 | | |
 |-|-|
 | Description | Replace __all__ usages of `variable` by its value |
-| Target | Selection of `variable` declaration or assignment |
+| Target | Selection of `variable` assignment |
 | Inverse of | [Extract variable](#variable-extract-variable) |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#temporary-variable-elimination) |
 | Example | ![Example](assets/examples/variable/inline_variable.gif?raw=true) |
@@ -446,7 +446,7 @@ We are currently working on getting the plugin added to the mason registry. Foll
 | | |
 |-|-|
 | Description | Replace the name of `variable` in all its usages  |
-| Target | Selection of (or cursor over) `variable` assignment |
+| Target | Cursor at `variable` definition |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Example | ![Example](assets/examples/variable/rename_variable.gif?raw=true) |
 
