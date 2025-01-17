@@ -159,7 +159,7 @@ async function resolveCodeAction(
 
 		const newName = await window.showInputBox({
 			title: item.title,
-			prompt: `Choose a name for new ${resource}`,
+			prompt: `Choose a name for the new ${resource}`,
 		});
 
 		// user canceled the input box, so we
