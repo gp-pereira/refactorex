@@ -4,9 +4,9 @@ RefactorEx is a powerful editor plugin extension that simplifies and accelerates
 
 With RefactorEx, you can perform common refactorings like extracting functions, renaming variables, and more — all within a few clicks.
 
-![Example](assets/examples/demo.gif?raw=true)
-
 You can check all supported editors in our [installation guide](INSTALLATION.md).
+
+![Example](assets/examples/demo.gif?raw=true)
 
 ## Available refactorings
 
