@@ -6,20 +6,7 @@ With RefactorEx, you can perform common refactorings like extracting functions, 
 
 ![Example](assets/examples/demo.gif?raw=true)
 
-## Installation Instructions
-
-### Visual Studio Code
-
-You can install directly in VS code by going to the "Code" menu, "Settings", "Extensions" and then search for "RefactorEx".
-Alternatively, you can view the plugin at the [VSCode Market](https://marketplace.visualstudio.com/items?itemName=gp-pereira.refatorex).
-
-### NeoVim
-
-Install the plugin following instructions on the plugin page: [refactorex.nvim](https://github.com/synic/refactorex.nvim/blob/main/README.md).
-
-#### Mason
-
-We are currently working on getting the plugin added to the mason registry. Follow the status [here](https://github.com/mason-org/mason-registry/pull/8368).
+You can check all supported editors in our [installation guide](INSTALLATION.md).
 
 ## Available refactorings
 
