@@ -7,7 +7,7 @@
   "jason": {:hex, :jason, "1.4.1", "af1504e35f629ddcdd6addb3513c3853991f694921b1b9368b0bd32beb9f1b63", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "fbb01ecdfd565b56261302f7e1fcc27c4fb8f32d56eab74db621fc154604a7a1"},
   "nimble_options": {:hex, :nimble_options, "1.1.0", "3b31a57ede9cb1502071fade751ab0c7b8dbe75a9a4c2b5bbb0943a690b63172", [:mix], [], "hexpm", "8bbbb3941af3ca9acc7835f5655ea062111c9c27bcac53e004460dfd19008a99"},
   "schematic": {:hex, :schematic, "0.3.1", "be633c1472959dc0ace22dd0e1f1445b099991fec39f6d6e5273d35ebd217ac4", [:mix], [{:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm", "52c419b5c405286e2d0369b9ca472b00b850c59a8b0bdf0dd69172ad4418d5ea"},
-  "sourceror": {:hex, :sourceror, "1.0.2", "c5e86fdc14881f797749d1fe5df017ca66727a8146e7ee3e736605a3df78f3e6", [:mix], [], "hexpm", "832335e87d0913658f129d58b2a7dc0490ddd4487b02de6d85bca0169ec2bd79"},
+  "sourceror": {:hex, :sourceror, "1.7.1", "599d78f4cc2be7d55c9c4fd0a8d772fd0478e3a50e726697c20d13d02aa056d4", [:mix], [], "hexpm", "cd6f268fe29fa00afbc535e215158680a0662b357dc784646d7dff28ac65a0fc"},
   "telemetry": {:hex, :telemetry, "1.2.1", "68fdfe8d8f05a8428483a97d7aab2f268aaff24b49e0f599faa091f1d4e7f61c", [:rebar3], [], "hexpm", "dad9ce9d8effc621708f99eac538ef1cbe05d6a874dd741de2e689c47feafed5"},
   "typed_struct": {:hex, :typed_struct, "0.3.0", "939789e3c1dca39d7170c87f729127469d1315dcf99fee8e152bb774b17e7ff7", [:mix], [], "hexpm", "c50bd5c3a61fe4e198a8504f939be3d3c85903b382bde4865579bc23111d1b6d"},
 }
