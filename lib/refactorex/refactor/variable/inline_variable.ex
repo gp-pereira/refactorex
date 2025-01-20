@@ -27,33 +27,44 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
   end
 
   def refactor(zipper, _) do
-    %{node: {:=, _, [{name, _, _}, value]} = assignment} = parent = Z.up(zipper)
+    %{node: {:=, _, [declaration, value]} = assignment} = Z.up(zipper)
+    [_ | usages] = Variable.find_all_references(zipper, declaration)
 
-    case outer_scope = Z.up(parent) do
-      %{node: {:->, meta, [args, ^assignment]}} ->
-        Z.replace(outer_scope, {:->, meta, [args, value]})
+    zipper
+    |> Z.top()
+    |> Z.traverse(fn
+      %{node: ^assignment} = zipper ->
+        if replace_assignment_by_value?(zipper),
+          do: Z.replace(zipper, value),
+          else: Z.remove(zipper)
 
-      %{node: {{:__block__, meta, [tag]}, ^assignment}} when tag in ~w(do else)a ->
-        Z.replace(outer_scope, {{:__block__, meta, [tag]}, value})
+      %{node: {_, _, nil} = node} = zipper ->
+        if Enum.member?(usages, node),
+          do: Z.replace(zipper, value),
+          else: zipper
 
-      %{node: {:__block__, meta, statements}} ->
-        {before, [_ | rest]} = Enum.split_while(statements, &(&1 != assignment))
-
-        Z.replace(
-          outer_scope,
-          if List.last(statements) == assignment do
-            {:__block__, meta, before ++ [value]}
-          else
-            {:__block__, meta, before ++ Variable.replace_usages_by_value(rest, name, value)}
-          end
-        )
-
-      %{node: {id, meta, [^assignment, clauses]}} when id in ~w(case if)a ->
-        Z.replace(
-          outer_scope,
-          {id, meta, [value, Variable.replace_usages_by_value(clauses, name, value)]}
-        )
-    end
+      zipper ->
+        zipper
+    end)
     |> AST.go_to_node(value)
+  end
+
+  defp replace_assignment_by_value?(%{node: assignment} = zipper) do
+    case Z.up(zipper) do
+      %{node: {:->, _, [_, ^assignment]}} ->
+        true
+
+      %{node: {id, _, [^assignment, _]}} when id in ~w(case if)a ->
+        true
+
+      %{node: {{:__block__, _, [tag]}, ^assignment}} when tag in ~w(do else)a ->
+        true
+
+      %{node: {:__block__, _, statements}} ->
+        List.last(statements) == assignment
+
+      _ ->
+        false
+    end
   end
 end
