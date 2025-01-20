@@ -1,4 +1,5 @@
 defmodule Refactorex.Refactor.Variable do
+  alias Refactorex.Dataflow
   alias Refactorex.Refactor.AST
   alias Sourceror.Zipper, as: Z
 
@@ -16,6 +17,40 @@ defmodule Refactorex.Refactor.Variable do
   end
 
   def at_one?(_zipper), do: false
+
+  def was_declared?(zipper, variable),
+    do: not Enum.empty?(find_all_references(zipper, variable))
+
+  def update_all_references(zipper, variable, updater_fn) do
+    references = find_all_references(zipper, variable)
+
+    zipper
+    |> Z.top()
+    |> Z.traverse(fn
+      %{node: {_, _, nil} = node} = zipper ->
+        if Enum.member?(references, node),
+          do: Z.replace(zipper, updater_fn.(node)),
+          else: zipper
+
+      zipper ->
+        zipper
+    end)
+  end
+
+  def find_all_references(zipper, {name, _, _} = variable) do
+    zipper
+    |> Z.topmost_root()
+    |> Dataflow.analyze()
+    |> Enum.find(fn
+      {^variable, _} -> true
+      {{^name, _, _}, usages} -> Enum.any?(usages, &AST.equal?(&1, variable))
+      _ -> false
+    end)
+    |> then(fn
+      {declaration, usages} -> [declaration | usages]
+      _ -> []
+    end)
+  end
 
   # remove later ?
   def find_available_variables(%{node: node} = zipper) do

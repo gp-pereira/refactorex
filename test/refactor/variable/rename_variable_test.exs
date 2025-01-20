@@ -131,11 +131,11 @@ defmodule Refactorex.Refactor.Variable.RenameVariableTest do
         def foo(arg) do
           sum = 20
 
-      #        v
           case sum = arg + 10 do
-      #          ^
             sum -> sum + 12
+            #     v
             10 -> sum + 10
+            #       ^
           end
         end
       end
@@ -251,45 +251,56 @@ defmodule Refactorex.Refactor.Variable.RenameVariableTest do
     )
   end
 
-  test "ignores function call values" do
-    assert_ignored(
+  test "renames after selecting pinned variables" do
+    assert_refactored(
       RenameVariable,
       """
-      defp was_variable_reassigned?(node, name) do
-        #                  v
-        was_variable_used?(args, name)
-        #                     ^
-      end
-      """
-    )
-  end
-
-  test "ignores pinned variables" do
-    assert_ignored(
-      RenameVariable,
-      """
-      defp was_variable_reassigned?(node, name) do
+      defp was_variable_reassigned?(args, name) do
         #    v
         fn {^args, _} -> name end
         #       ^
       end
+      """,
+      """
+      defp was_variable_reassigned?(#{placeholder()}, name) do
+        fn {^#{placeholder()}, _} -> name end
+      end
       """
     )
   end
 
-  # test "ignores variable usages inside WHEN clause" do
-  #   assert_refactored(
-  #     RenameVariable,
-  #     """
-  #     #                          v
-  #     defp foo?(node, name) when node > name do
-  #     #                             ^
-  #       node
-  #     end
-  #     """,
-  #     """
-  #     defguardp bar(#{placeholder()}) when #{placeholder()} > 10
-  #     """
-  #   )
-  # end
+  test "renames all usages while preserving comments" do
+    assert_refactored(
+      RenameVariable,
+      """
+      defp foo(args, name) do
+        # comment above
+      # v
+        args
+      #    ^
+        # comment below
+      end
+      """,
+      """
+      defp foo(#{placeholder()}, name) do
+        # comment above
+        #{placeholder()}
+        # comment below
+      end
+      """
+    )
+  end
+
+  test "ignores variables without a declaration" do
+    assert_ignored(
+      RenameVariable,
+      """
+      defp foo?(node, name) when node > name do
+      # v
+        test
+      #    ^
+      end
+      """
+    )
+  end
 end
