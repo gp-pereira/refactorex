@@ -72,12 +72,12 @@ function ensureServerCompiled(serverPath: string): Promise<void> {
 
 	return new Promise((resolve, reject) => {
 		exec(command, (error, stdout, stderr) => {
-			if (!error && !stderr) {
+			if (!error) {
 				client.info(stdout);
 				return resolve();
 			}
 
-			const msg = `Compilation error: ${error || stderr}`;
+			const msg = `Compilation error: ${error}`;
 			client.error(msg);
 			reject(new Error(msg));
 		});
