@@ -1,6 +1,6 @@
 # RefactorEx
 
-RefactorEx is a powerful editor plugin extension that simplifies and accelerates code refactoring for Elixir projects. It introduces intuitive code actions to help you refactor Elixir code efficiently and confidently.
+RefactorEx is a powerful editor extension that simplifies and accelerates code refactoring for Elixir projects. It introduces intuitive code actions to help you refactor Elixir code efficiently and confidently.
 
 With RefactorEx, you can perform common refactorings like extracting functions, renaming variables, and more — all within a few clicks.
 
