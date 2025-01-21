@@ -4,19 +4,66 @@ defmodule Refactorex.ParserTest do
   alias Refactorex.Parser
 
   describe "position_to_range/2" do
-    test "parse the selected node when passed a position" do
+    test "parse the selected node when passed a position in the beginning" do
       original = """
       defmodule Foo do
+        #   v
         def do_bar?(arg) do
         end
       end
       """
 
-      position = %{line: 1, character: 10}
+      %{start: %{line: 2, character: 6} = position} = range_from_markers(original)
 
       assert %{
-               start: %{line: 1, character: 6},
-               end: %{line: 1, character: 13}
+               start: %{line: 2, character: 6},
+               end: %{line: 2, character: 13}
+             } = range = Parser.position_to_range(original, position)
+
+      assert {
+               :ok,
+               %Sourceror.Zipper{},
+               {:do_bar?, _, nil}
+             } = Parser.parse_inputs(original, range)
+    end
+
+    test "parse the selected node when passed a position in the middle" do
+      original = """
+      defmodule Foo do
+        #    v
+        def do_bar?(arg) do
+        end
+      end
+      """
+
+      %{start: %{line: 2, character: 7} = position} = range_from_markers(original)
+
+      assert %{
+               start: %{line: 2, character: 6},
+               end: %{line: 2, character: 13}
+             } = range = Parser.position_to_range(original, position)
+
+      assert {
+               :ok,
+               %Sourceror.Zipper{},
+               {:do_bar?, _, nil}
+             } = Parser.parse_inputs(original, range)
+    end
+
+    test "parse the selected node when passed a position in the end" do
+      original = """
+      defmodule Foo do
+        #          v
+        def do_bar?(arg) do
+        end
+      end
+      """
+
+      %{start: %{line: 2, character: 13} = position} = range_from_markers(original)
+
+      assert %{
+               start: %{line: 2, character: 6},
+               end: %{line: 2, character: 13}
              } = range = Parser.position_to_range(original, position)
 
       assert {

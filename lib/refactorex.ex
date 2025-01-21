@@ -143,9 +143,19 @@ defmodule Refactorex do
 
     case Parser.parse_inputs(original, range) do
       {:ok, zipper, selection} ->
-        if Refactor.rename_available?(zipper, selection),
-          do: {:ok, Response.send_rename_range(range)},
-          else: {:ok, nil}
+        cond do
+          not Refactor.rename_available?(zipper, selection) ->
+            {:ok, nil}
+
+          match?({:@, _, _}, selection) ->
+            # this is done so that the placeholder
+            # for RenameConstant doesn't include the @
+            range = update_in(range.start.character, &(&1 + 1))
+            {:ok, Response.send_rename_range(range)}
+
+          true ->
+            {:ok, Response.send_rename_range(range)}
+        end
 
       {:error, :parse_error} ->
         {:ok, nil}

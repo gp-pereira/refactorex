@@ -224,7 +224,7 @@ defmodule RefactorexTest do
         jsonrpc: "2.0",
         params: %{
           textDocument: %{uri: file_uri},
-          position: %{line: 1, character: 5}
+          position: %{line: 1, character: 2}
         }
       })
 
@@ -245,7 +245,7 @@ defmodule RefactorexTest do
         params: %{
           newName: "bar",
           textDocument: %{uri: file_uri},
-          position: %{line: 1, character: 5}
+          position: %{line: 1, character: 2}
         }
       })
 

@@ -27,16 +27,16 @@ defmodule Refactorex.Parser do
       |> String.split(~r/(?<!\\)\n/)
       |> Enum.at(line)
       |> String.split("")
-      |> Enum.split(character)
+      |> Enum.split(character + 1)
 
     %{
       start: %{
         line: line,
-        character: character - 1 - count_while_name(Enum.reverse(left))
+        character: character - count_while_name(Enum.reverse(left))
       },
       end: %{
         line: line,
-        character: character - 1 + count_while_name(right)
+        character: character + count_while_name(right)
       }
     }
   end
@@ -89,7 +89,7 @@ defmodule Refactorex.Parser do
 
   defp count_while_name(characters) do
     Enum.reduce_while(characters, 0, fn i, count ->
-      if String.match?(i, ~r/^[a-zA-Z0-9_?!]+$/),
+      if String.match?(i, ~r/^[a-zA-Z0-9_?!@]+$/),
         do: {:cont, count + 1},
         else: {:halt, count}
     end)
