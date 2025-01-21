@@ -46,6 +46,19 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
     )
   end
 
+  test "ignores part of constant" do
+    assert_ignored(
+      IntroduceIOInspect,
+      """
+      def foo() do
+      #  v
+        @foo
+      #    ^
+      end
+      """
+    )
+  end
+
   test "ignores a whole with clause" do
     assert_ignored(
       IntroduceIOInspect,

@@ -26,7 +26,7 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
       Variable.inside_declaration?(zipper) ->
         false
 
-      match?(%{node: {:|>, _, [_, ^node]}}, Z.up(zipper)) ->
+      invalid_parent?(zipper) ->
         false
 
       true ->
@@ -144,6 +144,19 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
       |> Z.replace(variable)
       |> Z.top()
       |> Z.node()
+    end
+  end
+
+  defp invalid_parent?(%{node: node} = zipper) do
+    case Z.up(zipper) do
+      %{node: {:|>, _, [_, ^node]}} ->
+        true
+
+      %{node: {:@, _, [^node]}} ->
+        true
+
+      _ ->
+        false
     end
   end
 end

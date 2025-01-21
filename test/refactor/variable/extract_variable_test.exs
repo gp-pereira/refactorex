@@ -299,6 +299,20 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
     )
   end
 
+
+  test "ignores part of constant" do
+    assert_ignored(
+      ExtractVariable,
+      """
+      def foo() do
+      #  v
+        @foo
+      #    ^
+      end
+      """
+    )
+  end
+
   test "ignores alias" do
     assert_ignored(
       ExtractVariable,

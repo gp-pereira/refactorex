@@ -18,6 +18,9 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspect do
       Variable.inside_declaration?(zipper) ->
         false
 
+      match?(%{node: {:@, _, [^node]}}, Z.up(zipper)) ->
+        false
+
       true ->
         true
     end
