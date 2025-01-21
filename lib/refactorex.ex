@@ -148,7 +148,7 @@ defmodule Refactorex do
             {:ok, nil}
 
           match?({:@, _, _}, selection) ->
-            # this is done so that the placeholder
+            # this is done so that the input placeholder
             # for RenameConstant doesn't include the @
             range = update_in(range.start.character, &(&1 + 1))
             {:ok, Response.send_rename_range(range)}
