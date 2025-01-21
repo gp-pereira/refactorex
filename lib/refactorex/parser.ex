@@ -1,8 +1,6 @@
 defmodule Refactorex.Parser do
   alias Sourceror.Zipper, as: Z
 
-  @newline_placeholder "-----placeholder-----"
-
   def parse_metadata(%{} = map) do
     map
     |> Enum.map(fn {k, v} -> {String.to_atom(k), parse_metadata(v)} end)
@@ -24,11 +22,9 @@ defmodule Refactorex.Parser do
   end
 
   def position_to_range(text, %{line: line, character: character}) do
-    text = replace_newline_with_placeholder(text)
-
     {left, right} =
       text
-      |> String.split("\n")
+      |> String.split(~r/(?<!\\)\n/)
       |> Enum.at(line)
       |> String.split("")
       |> Enum.split(character)
@@ -58,8 +54,7 @@ defmodule Refactorex.Parser do
   def erase_outside_range(text, range) do
     text
     |> String.replace("\r", "")
-    |> replace_newline_with_placeholder()
-    |> String.split("\n")
+    |> String.split(~r/(?<!\\)\n/)
     |> Stream.with_index(1)
     |> Stream.map(fn
       {line, i} when i > range.start.line and i < range.end.line ->
@@ -80,28 +75,7 @@ defmodule Refactorex.Parser do
         ""
     end)
     |> Enum.join("\n")
-    |> replace_placeholder_with_newline()
   end
-
-  defp replace_newline_with_placeholder(text) do
-    {:ok, macro} = Sourceror.parse_string(text)
-
-    macro
-    |> Z.zip()
-    |> Z.traverse(fn
-      %{node: {id, meta, [string]}} = zipper when is_bitstring(string) ->
-        string = String.replace(string, "\n", "#{@newline_placeholder}\n")
-        Z.replace(zipper, {id, meta, [string]})
-
-      zipper ->
-        zipper
-    end)
-    |> Z.node()
-    |> Sourceror.to_string()
-  end
-
-  defp replace_placeholder_with_newline(text),
-    do: String.replace(text, @newline_placeholder, "\n")
 
   defp remove_line_start(line, %{start: %{character: character}}) do
     {_, line} = String.split_at(line, character)

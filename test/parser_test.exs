@@ -46,8 +46,48 @@ defmodule Refactorex.ParserTest do
       range = range_from_markers(original)
       original = remove_markers(original)
 
-      assert "\n\n\n                fn filename ->\n      file = File.read!(\"\#{filename}.\#{ext}\")\n      String.split(file, \"\\n\")\n    end\n\n" ==
-               Parser.erase_outside_range(original, range)
+      assert [
+               "",
+               "",
+               "",
+               "                fn filename ->",
+               "      file = File.read!(\"\#{filename}.\#{ext}\")",
+               "      String.split(file, \"\\n\")",
+               "    end",
+               "",
+               "",
+               ""
+             ]
+             |> Enum.join("\n") == Parser.erase_outside_range(original, range)
+    end
+
+    test "keeps the original formatting even if it's not up to the standards" do
+      original = """
+      defmodule Foo do
+        def read_files(filenames, ext) do
+        # v
+          case filenames do
+            variable_name -> really_really_really_really_really_really_really_really_long_function(variable_name)
+          end
+        #   ^
+        end
+      end
+      """
+
+      range = range_from_markers(original)
+      original = remove_markers(original)
+
+      assert [
+               "",
+               "",
+               "    case filenames do",
+               "      variable_name -> really_really_really_really_really_really_really_really_long_function(variable_name)",
+               "    end",
+               "",
+               "",
+               ""
+             ]
+             |> Enum.join("\n") == Parser.erase_outside_range(original, range)
     end
   end
 end
