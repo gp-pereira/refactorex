@@ -41,14 +41,13 @@ defmodule Refactorex.Refactor.Variable do
     zipper
     |> Z.topmost_root()
     |> Dataflow.analyze()
-    |> Enum.find(fn
-      {^variable, _} -> true
-      {{^name, _, _}, usages} -> Enum.any?(usages, &AST.equal?(&1, variable))
-      _ -> false
-    end)
-    |> then(fn
-      {declaration, usages} -> [declaration | usages]
-      _ -> []
+    |> Stream.map(fn {d, u} -> [d | u] end)
+    |> Enum.find([], fn
+      [{^name, _, _} | _] = references ->
+        Enum.any?(references, &AST.equal?(&1, variable))
+
+      _ ->
+        false
     end)
   end
 
