@@ -1,6 +1,6 @@
 defmodule Refactorex.Refactor.Guard.ExtractGuard do
   use Refactorex.Refactor,
-    title: "Extract private guard",
+    title: "Extract guard",
     kind: "refactor.extract",
     works_on: :selection
 
