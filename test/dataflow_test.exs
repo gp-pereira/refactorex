@@ -119,6 +119,33 @@ defmodule Refactorex.DataflowTest do
              )
   end
 
+  test "lists all variables reused by guards" do
+    assert %{
+             variable_at(:arg, 2, 3) => [
+               variable_at(:arg, 10, 17),
+               variable_at(:arg, 7, 16),
+               variable_at(:arg, 6, 17)
+             ]
+           } =
+             Dataflow.analyze(
+               """
+               defp bar() do
+                 arg = 10
+
+                 1..30
+                 |> Enum.map(fn
+                   i when i <= arg -> i
+                   i when i > arg -> i + 10
+                 end)
+
+                with true when arg > 10 <- true do
+                end
+               end
+               """
+               |> Sourceror.parse_string!()
+             )
+  end
+
   test "lists all variables after a reassignment" do
     assert %{
              variable_at(:arg, 1, 9) => [

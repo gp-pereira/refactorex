@@ -71,8 +71,17 @@ defmodule Refactorex.Dataflow do
       {:test, _, scope} ->
         analyze_sealed_scope(dataflow, scope)
 
+      {:->, _, [[{:when, _, [left, guard]}], right]} ->
+        analyze_scope(dataflow, left, [guard, right])
+
       {:->, _, [left, right]} ->
         analyze_scope(dataflow, left, right)
+
+      {:<-, _, [{:when, _, [left, guard]}, right]} ->
+        dataflow
+        |> recursive_analyze(right)
+        |> add_commands(gen_commands(left))
+        |> recursive_analyze(guard)
 
       {id, _, [left, right]} when id in ~w(= <-)a ->
         dataflow
