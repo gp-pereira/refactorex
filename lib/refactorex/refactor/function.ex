@@ -34,20 +34,40 @@ defmodule Refactorex.Refactor.Function do
           length(args) + 1
 
         _ ->
-          length(args)
+          if args, do: length(args), else: 0
       end
 
     zipper
     |> Module.find_in_scope(fn
-      {_, _, [{:when, _, [{^name, _, function_args}, _]}, _]} = node ->
-        definition?(node) and length(function_args) == num_args
+      node ->
+        cond do
+          not definition?(node) ->
+            false
 
-      {_, _, [{^name, _, function_args}, _]} = node ->
-        definition?(node) and length(function_args) == num_args
+          not match?({^name, _, _}, actual_header(node)) ->
+            false
 
-      _ ->
-        false
+          true ->
+            {min, max} = range_of_args(node)
+            min <= num_args and num_args <= max
+        end
     end)
+  end
+
+  def actual_header({_, _, [{:when, _, [header, _]} | _]}), do: header
+  def actual_header({_, _, [header | _]}), do: header
+
+  def range_of_args(definition) do
+    case actual_header(definition) do
+      {_, _, nil} ->
+        {0, 0}
+
+      {_, _, args} ->
+        {
+          Enum.count(args, &(not match?({:\\, _, _}, &1))),
+          length(args)
+        }
+    end
   end
 
   def new_private_function(zipper, name, args, body) do

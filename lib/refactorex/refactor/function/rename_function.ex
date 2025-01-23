@@ -9,6 +9,9 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
     Module
   }
 
+  defguardp inside_range(min_args, max_args, num_args)
+            when min_args <= num_args and num_args <= max_args
+
   def can_refactor?(%{node: {name, meta, _}} = zipper, selection) do
     cond do
       not AST.equal?({name, meta, nil}, selection) ->
@@ -28,20 +31,14 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {name, _, _}} = zipper, _) do
-    [{_, _, [header, _]} | _] = Function.find_definitions(zipper)
+    [definition | _] = _definitions = Function.find_definitions(zipper)
+    {min_args, max_args} = Function.range_of_args(definition)
 
-    rename_references(zipper, name, header)
-  end
-
-  defp rename_references(zipper, name, {:when, _, [header, _]}),
-    do: rename_references(zipper, name, header)
-
-  defp rename_references(zipper, name, {_, _, function_args}) do
     zipper
     |> Module.go_to_scope()
     |> Z.traverse_while(fn
       %{node: {:|>, _, [_, {^name, meta, args}]}} = zipper
-      when length(function_args) == length(args) + 1 ->
+      when inside_range(min_args, max_args, length(args) + 1) ->
         {:cont,
          zipper
          |> Z.down()
@@ -50,15 +47,20 @@ defmodule Refactorex.Refactor.Function.RenameFunction do
          |> Z.up()}
 
       %{node: {:/, _, [{^name, meta, nil}, {:__block__, _, [num_args]}]}} = zipper
-      when length(function_args) == num_args ->
+      when inside_range(min_args, max_args, num_args) ->
         {:cont,
          zipper
          |> Z.down()
          |> Z.replace({placeholder(), meta, nil})
          |> Z.up()}
 
+      # zero arity function
       %{node: {^name, meta, args}} = zipper
-      when length(function_args) == length(args) ->
+      when (is_nil(args) or args == []) and min_args == 0 ->
+        {:cont, Z.replace(zipper, {placeholder(), meta, args})}
+
+      %{node: {^name, meta, args}} = zipper
+      when inside_range(min_args, max_args, length(args)) ->
         {:cont, Z.replace(zipper, {placeholder(), meta, args})}
 
       zipper ->

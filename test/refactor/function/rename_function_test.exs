@@ -53,6 +53,56 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
     )
   end
 
+  test "renames the zero arity function definition and usages" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Foo do
+        def foo(arg), do: bar()
+
+        #   v
+        def bar, do: 10 + 10
+        #     ^
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(arg), do: #{placeholder()}()
+
+        def #{placeholder()}, do: 10 + 10
+      end
+      """
+    )
+  end
+
+  test "renames function with default args" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Foo do
+        def foo(arg) do
+        # v
+          bar()
+        #   ^
+          bar(10)
+        end
+
+        def bar(arg \\\\ 10), do: arg + 10
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(arg) do
+          #{placeholder()}()
+          #{placeholder()}(10)
+        end
+
+        def #{placeholder()}(arg \\\\ 10), do: arg + 10
+      end
+      """
+    )
+  end
+
   test "renames the selected public function with multiple definitions" do
     assert_refactored(
       RenameFunction,
