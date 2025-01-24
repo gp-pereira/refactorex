@@ -32,7 +32,7 @@ defmodule Refactorex.Refactor.AST do
 
   def equal?(_, _), do: false
 
-  defp simpler_meta(node) do
+  def simpler_meta(node) do
     node
     |> Z.zip()
     |> Z.traverse(fn

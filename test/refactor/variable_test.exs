@@ -1,6 +1,7 @@
 defmodule Refactorex.Refactor.VariableTest do
   use Refactorex.RefactorCase
 
+  alias Sourceror.Zipper, as: Z
   alias Refactorex.Refactor.Variable
 
   describe "inside_declaration?/1" do
@@ -142,16 +143,17 @@ defmodule Refactorex.Refactor.VariableTest do
 
       {:ok, selection} = Refactorex.Parser.selection_or_line(original, range)
 
-      original
-      |> text_to_zipper()
-      |> Sourceror.Zipper.traverse_while(nil, fn
-        %{node: ^selection} = zipper, _ ->
-          {:halt, zipper, zipper}
+      {_, %Z{} = zipper} =
+        original
+        |> text_to_zipper()
+        |> Z.traverse_while(nil, fn
+          %{node: node} = zipper, _ ->
+            if Refactorex.Refactor.AST.equal?(node, selection),
+              do: {:halt, zipper, zipper},
+              else: {:cont, zipper, nil}
+        end)
 
-        zipper, _ ->
-          {:cont, zipper, nil}
-      end)
-      |> elem(1)
+      zipper
     end
   end
 end

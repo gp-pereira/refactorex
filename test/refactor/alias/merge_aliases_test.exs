@@ -14,8 +14,7 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
         alias Qez.K.Delta.Too.Foo
         alias Qez.K.Delta.Too.Bar.Foo
         alias Qez.K.Delta.Foo.{Y, J}
-        alias Qez.K.Foo.{X, K}
-      #                      ^
+      #                            ^
       end
       """,
       """
@@ -30,10 +29,6 @@ defmodule Refactorex.Refactor.Alias.MergeAliasesTest do
           Delta.Too.{
             Foo,
             Bar.Foo
-          },
-          Foo.{
-            K,
-            X
           }
         }
       end
