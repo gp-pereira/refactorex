@@ -170,6 +170,19 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 
 <br>
 
+### Function: expand anonymous function
+
+| | |
+|-|-|
+| Description | Expand a `&` function into a `fn` function |
+| Target | Selection of `&` function |
+| Inverse of | [Collapse anonymous function](#function-collapse-anonymous-function) |
+| Example | ![Example](assets/examples/function/expand_anonymous_function.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
 ### Function: extract anonymous function
 
 | | |
@@ -179,19 +192,6 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | Inverse of | [Inline function](#function-inline-function) |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#turning-anonymous-into-local-functions) |
 | Example | ![Example](assets/examples/function/extract_anonymous_function.gif?raw=true) |
-
-[▲ top](#available-refactorings)
-
-<br>
-
-### Function: expand anonymous function
-
-| | |
-|-|-|
-| Description | Expand a `&` function into a `fn` function |
-| Target | Selection of `&` function |
-| Inverse of | [Collapse anonymous function](#function-collapse-anonymous-function) |
-| Example | ![Example](assets/examples/function/expand_anonymous_function.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
