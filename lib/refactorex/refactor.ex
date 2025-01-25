@@ -82,7 +82,6 @@ defmodule Refactorex.Refactor do
     __MODULE__.Function.ExtractAnonymousFunction,
     __MODULE__.Function.ExtractFunction,
     __MODULE__.Function.InlineFunction,
-    __MODULE__.Function.UnderscoreUnusedArgs,
     __MODULE__.Function.UseKeywordSyntax,
     __MODULE__.Function.UseRegularSyntax,
     __MODULE__.Guard.ExtractGuard,
@@ -94,7 +93,8 @@ defmodule Refactorex.Refactor do
     __MODULE__.Pipeline.RemoveIOInspect,
     __MODULE__.Pipeline.RemovePipe,
     __MODULE__.Variable.ExtractVariable,
-    __MODULE__.Variable.InlineVariable
+    __MODULE__.Variable.InlineVariable,
+    __MODULE__.Variable.UnderscoreNotUsed
   ]
 
   @renamers [

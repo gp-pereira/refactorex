@@ -1,11 +1,11 @@
-defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
+defmodule Refactorex.Refactor.Variable.UnderscoreNotUsedTest do
   use Refactorex.RefactorCase
 
-  alias Refactorex.Refactor.Function.UnderscoreUnusedArgs
+  alias Refactorex.Refactor.Variable.UnderscoreNotUsed
 
   test "underlines unused args on function header" do
     assert_refactored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo(bar1, bar2, bar3) do
@@ -22,7 +22,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "underlines unused args on anonymous function" do
     assert_refactored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       fn
       #       v
@@ -39,7 +39,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "underlines unused args inside pattern matching" do
     assert_refactored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo(%{bar1: bar1, bar2: bar2}) do
@@ -56,7 +56,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores repeated args used for pattern matching" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo(bar1, bar2, bar2) do
@@ -68,7 +68,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores functions with no args" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo, do: 25
@@ -78,7 +78,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores anonymous functions with no args" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       fn -> 25 end
@@ -88,7 +88,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores already underlined args" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo(bar1, _bar2) do
@@ -100,7 +100,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores pinned args" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       def foo(bar) do
         #       v
@@ -112,7 +112,7 @@ defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgsTest do
 
   test "ignores args used on guards" do
     assert_ignored(
-      UnderscoreUnusedArgs,
+      UnderscoreNotUsed,
       """
       #       v
       def foo(bar1, bar2) when bar2 == 2 do

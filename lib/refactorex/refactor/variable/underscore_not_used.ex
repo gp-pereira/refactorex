@@ -1,6 +1,6 @@
-defmodule Refactorex.Refactor.Function.UnderscoreUnusedArgs do
+defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
   use Refactorex.Refactor,
-    title: "Underscore arguments not used",
+    title: "Underscore variables not used",
     kind: "quickfix",
     works_on: :line
 
