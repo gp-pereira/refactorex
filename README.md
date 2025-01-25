@@ -28,7 +28,6 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | `function` | [Collapse anonymous function](#function-collapse-anonymous-function) | selection | refactor (`ctrl`+`.`) |
 | `function` | [Inline function](#function-inline-function) | selection | refactor (`ctrl`+`.`) |
 | `function` | [Rename function](#function-rename-function) | at symbol | rename (`F2`) |
-| `function` | [Underscore unused args](#function-underscore-unused-args) | line | refactor (`ctrl`+`.`) |
 | `function` | [Use keyword syntax](#function-use-keyword-syntax) | line | refactor (`ctrl`+`.`) |
 | `function` | [Use regular syntax](#function-use-regular-syntax) | line | refactor (`ctrl`+`.`) |
 | | | |
@@ -47,6 +46,8 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | `variable` | [Extract variable](#variable-extract-variable) | selection | refactor (`ctrl`+`.`) |
 | `variable` | [Inline variable](#variable-inline-variable) | selection | refactor (`ctrl`+`.`) |
 | `variable` | [Rename variable](#variable-rename-variable) | at symbol | rename (`F2`) |
+| `variable` | [Underscore not used](#variable-underscore-not-used) | line | refactor (`ctrl`+`.`) |
+
 
 ## How to use each refactoring
 
@@ -240,18 +241,6 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 
 <br>
 
-### Function: underscore unused args
-
-| | |
-|-|-|
-| Description | Places a `_` in front of args not used |
-| Target | Line of `function` definition with unused args |
-| Example | ![Example](assets/examples/function/underscore_unused_args.gif?raw=true) |
-
-[▲ top](#available-refactorings)
-
-<br>
-
 ### Function: use keyword syntax
 
 | | |
@@ -436,6 +425,18 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | Target | Cursor at `variable` definition |
 | Read more | [Catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings?tab=readme-ov-file#rename-an-identifier) |
 | Example | ![Example](assets/examples/variable/rename_variable.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Variable: underscore not used
+
+| | |
+|-|-|
+| Description | Place a `_` in front of `variables` defined but not used |
+| Target | Line of unused `variable` |
+| Example | ![Example](assets/examples/variable/underscore_not_used.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
