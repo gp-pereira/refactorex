@@ -4,74 +4,35 @@ defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
     kind: "quickfix",
     works_on: :line
 
-  alias Refactorex.Refactor.{
-    Function,
-    Variable
-  }
+  alias Refactorex.Dataflow
 
   def can_refactor?(%{node: node}, line) do
-    cond do
-      not (Function.definition?(node) or match?({:->, _, _}, node)) ->
+    node
+    |> Dataflow.analyze()
+    |> Enum.any?(fn
+      {{name, _, _} = declaration, []} ->
+        AST.starts_at?(declaration, line) and
+          not String.starts_with?("#{name}", "_")
+
+      {_declaration, _usages} ->
         false
-
-      not AST.starts_at?(node, line) ->
-        false
-
-      Enum.empty?(find_unused_args(node)) ->
-        false
-
-      true ->
-        true
-    end
-  end
-
-  def refactor(%{node: node} = zipper, _) do
-    unused_args = find_unused_args(node)
-
-    zipper
-    |> Z.update(fn {id, meta, [header, body]} ->
-      header
-      |> Z.zip()
-      |> Z.traverse(fn %{node: variable} = zipper ->
-        if Variable.member?(unused_args, variable),
-          do: underline_unused_arg(zipper, variable),
-          else: zipper
-      end)
-      |> Z.node()
-      |> then(&{id, meta, [&1, body]})
     end)
   end
 
-  defp find_unused_args({_, _, [{:when, _, [{_, _, args}, guard]}, body]}),
-    do: find_unused_args(args, [body, guard])
-
-  defp find_unused_args({_, _, [{_, _, args}, body]}),
-    do: find_unused_args(args, body)
-
-  defp find_unused_args({:->, _, [args, body]}),
-    do: find_unused_args(args, body)
-
-  defp find_unused_args(args, body) do
-    used_variables = Variable.list_unique_variables(body)
-    unpinned_args = Variable.list_unpinned_variables(args)
-
-    Enum.filter(unpinned_args, fn {arg_id, _, _} = arg ->
-      cond do
-        arg_id |> Atom.to_string() |> String.starts_with?("_") ->
-          false
-
-        Enum.count(unpinned_args, fn {id, _, _} -> id == arg_id end) > 1 ->
-          false
-
-        Variable.member?(used_variables, arg) ->
-          false
-
-        true ->
-          true
-      end
+  def refactor(%{node: node} = zipper, line) do
+    node
+    |> Dataflow.analyze()
+    |> Stream.filter(&same_line_and_no_usages?(&1, line))
+    |> Enum.reduce(zipper, fn
+      {declaration, []}, zipper ->
+        zipper
+        |> AST.go_to_node(declaration)
+        |> Z.update(fn {name, meta, nil} ->
+          {String.to_atom("_#{name}"), meta, nil}
+        end)
     end)
   end
 
-  defp underline_unused_arg(zipper, {id, _, nil}),
-    do: Z.update(zipper, fn _ -> {String.to_atom("_#{id}"), [], nil} end)
+  defp same_line_and_no_usages?({declaration, usages}, line),
+    do: AST.starts_at?(declaration, line) and usages == []
 end
