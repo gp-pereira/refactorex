@@ -19,8 +19,6 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
       do: false
 
   def can_refactor?(%{node: node} = zipper, selection) do
-    IO.inspect({node, selection})
-
     cond do
       not AST.equal?(node, selection) ->
         false

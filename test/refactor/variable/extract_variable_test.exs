@@ -270,7 +270,6 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
     )
   end
 
-  @tag :only
   test "extracts single captured variable inside anonymous function" do
     assert_refactored(
       ExtractVariable,
