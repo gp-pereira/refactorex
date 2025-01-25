@@ -6,8 +6,14 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspect do
 
   alias Refactorex.Refactor.Variable
 
+  @io_inspect_call {{:., [], [{:__aliases__, [], [:IO]}, :inspect]}, [], []}
+
+  def can_refactor?(_, {:&, _, [body]})
+      when not is_number(body),
+      do: false
+
   def can_refactor?(_, {id, _, _})
-      when id in ~w(<- & alias __aliases__)a,
+      when id in ~w(<- alias __aliases__)a,
       do: :skip
 
   def can_refactor?(%{node: node} = zipper, selection) do
@@ -18,7 +24,7 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspect do
       Variable.inside_declaration?(zipper) ->
         false
 
-      match?(%{node: {:@, _, [^node]}}, Z.up(zipper)) ->
+      invalid_parent?(zipper) ->
         false
 
       true ->
@@ -26,14 +32,14 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspect do
     end
   end
 
-  def refactor(%{node: node} = zipper, _) do
-    Z.replace(
-      zipper,
-      {:|>, [],
-       [
-         node,
-         {{:., [], [{:__aliases__, [], [:IO]}, :inspect]}, [], []}
-       ]}
-    )
+  def refactor(%{node: node} = zipper, _),
+    do: Z.replace(zipper, {:|>, [], [node, @io_inspect_call]})
+
+  defp invalid_parent?(%{node: node} = zipper) do
+    case Z.up(zipper) do
+      %{node: {:|>, _, [_, ^node]}} -> true
+      %{node: {:@, _, [^node]}} -> true
+      _ -> false
+    end
   end
 end

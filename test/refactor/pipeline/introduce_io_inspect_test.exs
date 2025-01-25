@@ -84,4 +84,21 @@ defmodule Refactorex.Refactor.Pipeline.IntroduceIOInspectTest do
       """
     )
   end
+
+  test "ignores part of pipeline" do
+    assert_ignored(
+      IntroduceIOInspect,
+      """
+      defmodule Foo do
+        def foo() do
+          arg
+          #  v
+          |> qez()
+          #      ^
+          |> bar()
+        end
+      end
+      """
+    )
+  end
 end
