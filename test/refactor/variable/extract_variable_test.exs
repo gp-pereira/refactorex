@@ -270,6 +270,27 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
     )
   end
 
+  test "extracts single captured variable inside anonymous function" do
+    assert_refactored(
+      ExtractVariable,
+      """
+      def foo() do
+        #                v
+        Enum.map(1..2, &(&1))
+        #                 ^
+      end
+      """,
+      """
+      def foo() do
+        Enum.map(1..2, fn arg1 ->
+          extracted_variable = arg1
+          extracted_variable
+        end)
+      end
+      """
+    )
+  end
+
   test "ignores variable declarations" do
     assert_ignored(
       ExtractVariable,
@@ -298,7 +319,6 @@ defmodule Refactorex.Refactor.Variable.ExtractVariableTest do
       """
     )
   end
-
 
   test "ignores part of constant" do
     assert_ignored(

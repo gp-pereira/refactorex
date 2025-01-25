@@ -86,7 +86,9 @@ defmodule Refactorex.Refactor.Variable.ExtractVariable do
 
         parent
         |> Function.ExpandAnonymousFunction.refactor(parent.node)
-        |> AST.go_to_node(new_selection)
+        |> Z.down()
+        |> Z.down()
+        |> Z.right()
         |> refactor(new_selection)
 
       _ ->
