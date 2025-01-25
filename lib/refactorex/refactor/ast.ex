@@ -6,6 +6,7 @@ defmodule Refactorex.Refactor.AST do
     leading_comments
     trailing_comments
     closing
+    parens
   )a
 
   def starts_at?(macro, line), do: get_start_line(macro) == line
