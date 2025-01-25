@@ -4,7 +4,6 @@ defmodule Refactorex.DataflowTest do
   alias Refactorex.Refactor.AST
   alias Refactorex.Dataflow
 
-  @tag :only
   test "lists all variables inside simple function with constants" do
     assert_has_variables(
       """
