@@ -70,93 +70,74 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
     )
   end
 
-  # test "extracts consecutive statements that are not the whole block" do
-  #   assert_refactored(
-  #     ExtractFunction,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #         a = 10
-  #     #   v
-  #         b = 20
-  #         a + b
-  #     #       ^
-  #         c = 30
-  #       end
-  #     end
-  #     """,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #         a = 10
-  #         extracted_function(a)
-  #         c = 30
-  #       end
+  test "extracts head of a pipeline into function" do
+    assert_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+        # v
+          a
+        # ^
+          |> foo(b)
+          |> bar()
+          |> qez(b)
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          extracted_function(a)
+          |> foo(b)
+          |> bar()
+          |> qez(b)
+        end
 
-  #       defp extracted_function(a) do
-  #         b = 20
-  #         a + b
-  #       end
-  #     end
-  #     """
-  #   )
-  # end
+        defp extracted_function(a) do
+          a
+        end
+      end
+      """
+    )
+  end
 
-  # test "extracts function and recreates the last assignment " do
-  #   assert_refactored(
-  #     ExtractFunction,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #     #   v
-  #         a = a + 10
-  #         b = a + 20
-  #     #            ^
-  #         c = b + 30
-  #       end
-  #     end
-  #     """,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #         b = extracted_function(a)
-  #         c = b + 30
-  #       end
+  test "extracts beginning of a pipeline into function" do
+    assert_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+        # v
+          a
+          |> foo(b)
+        #         ^
+          |> bar()
+          |> qez(b)
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          extracted_function(
+            a,
+            b
+          )
+          |> bar()
+          |> qez(b)
+        end
 
-  #       defp extracted_function(a) do
-  #         a = a + 10
-  #         a + 20
-  #       end
-  #     end
-  #     """
-  #   )
+        defp extracted_function(a, b) do
+          a
+          |> foo(b)
+        end
+      end
+      """
+    )
+  end
 
-  #   assert_refactored(
-  #     ExtractFunction,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #     #   v
-  #         b = a + 20
-  #     #            ^
-  #       end
-  #     end
-  #     """,
-  #     """
-  #     defmodule Foo do
-  #       def foo(a) do
-  #         b = extracted_function(a)
-  #       end
-
-  #       defp extracted_function(a) do
-  #         a + 20
-  #       end
-  #     end
-  #     """
-  #   )
-  # end
-
-  test "extracts part of a pipeline into function" do
+  test "extracts middle of a pipeline into function" do
     assert_refactored(
       ExtractFunction,
       """
@@ -187,6 +168,72 @@ defmodule Refactorex.Refactor.Function.ExtractFunctionTest do
           |> bar(b)
           |> quack(b)
           |> qez()
+        end
+      end
+      """
+    )
+  end
+
+  test "extracts middle to end of a pipeline into function" do
+    assert_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          a
+          |> foo()
+          |> bar(b)
+          #  v
+          |> quack(b)
+          |> qez()
+          |> baz()
+          #      ^
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          a |> foo() |> bar(b) |> extracted_function(b)
+        end
+
+        defp extracted_function(arg1, b) do
+          arg1
+          |> quack(b)
+          |> qez()
+          |> baz()
+        end
+      end
+      """
+    )
+  end
+
+  test "extracts end of a pipeline into function" do
+    assert_refactored(
+      ExtractFunction,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          a
+          |> foo()
+          |> bar(b)
+          #  v
+          |> qez(b)
+          #       ^
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo(a, b) do
+          a
+          |> foo()
+          |> bar(b)
+          |> extracted_function(b)
+        end
+
+        defp extracted_function(arg1, b) do
+          arg1 |> qez(b)
         end
       end
       """

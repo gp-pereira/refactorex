@@ -39,22 +39,34 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
   def refactor(%{node: node} = zipper, selection) do
     name = Function.next_available_function_name(zipper, @function_name)
     args = find_function_args(zipper, selection)
+    new_arg = {:arg1, [], nil}
 
-    if Pipeline.starts_at?(selection, node) do
-      %{node: {:|>, _, [before, _]}} = Z.up(zipper)
+    cond do
+      Pipeline.starts_at?(selection, node) ->
+        %{node: {:|>, _, [before, _]}} = Z.up(zipper)
 
-      zipper
-      |> Pipeline.go_to_top(selection)
-      |> Z.replace({:|>, [], [before, {name, [], args}]})
-      |> Function.new_private_function(
-        name,
-        [{:arg1, [], nil} | args],
-        Pipeline.update_start(selection, &{:|>, [], [{:arg1, [], nil}, &1]})
-      )
-    else
-      zipper
-      |> Z.replace({name, [], args})
-      |> Function.new_private_function(name, args, selection)
+        zipper
+        |> Pipeline.go_to_top(selection)
+        |> Z.replace({:|>, [], [before, {name, [], args}]})
+        |> Function.new_private_function(
+          name,
+          [new_arg | args],
+          Pipeline.update_start(selection, &{:|>, [], [new_arg, &1]})
+        )
+
+      match?(%{node: {:|>, _, [_, ^node]}}, Z.up(zipper)) ->
+        zipper
+        |> Z.replace({name, [], args})
+        |> Function.new_private_function(
+          name,
+          [new_arg | args],
+          {:|>, [], [new_arg, selection]}
+        )
+
+      true ->
+        zipper
+        |> Z.replace({name, [], args})
+        |> Function.new_private_function(name, args, selection)
     end
   end
 
