@@ -6,11 +6,13 @@ defmodule Refactorex.Refactor.Function do
   import Sourceror.Identifier
 
   def definition?(node)
+  def definition?({_, _, nil}), do: false
   def definition?({:def, _, _}), do: true
   def definition?({:defp, _, _}), do: true
   def definition?(_node), do: false
 
   def anonymous?(node)
+  def anonymous?({_, _, nil}), do: false
   def anonymous?({:&, _, [i]}) when is_number(i), do: false
   def anonymous?({:&, _, _}), do: true
   def anonymous?({:fn, _, _}), do: true
