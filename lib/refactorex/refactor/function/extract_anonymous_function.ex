@@ -4,10 +4,11 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     kind: "refactor.extract",
     works_on: :selection
 
+  alias Refactorex.Dataflow
+
   alias Refactorex.Refactor.{
     Function,
-    Module,
-    Variable
+    Module
   }
 
   @function_name "extracted_function"
@@ -33,71 +34,34 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     end
   end
 
-  def refactor(%{node: {:&, _, [body]}} = zipper, _) do
-    closure_variables = Variable.list_unique_variables(body)
-
-    # find &{i} usages and replace them with arg{i}
-    {%{node: body}, args} =
-      body
-      |> Z.zip()
-      |> Z.traverse_while(MapSet.new(), fn
-        %{node: {:&, _, [i]}} = zipper, args when is_number(i) ->
-          arg = {String.to_atom("arg#{i}"), [], nil}
-          {:cont, Z.update(zipper, fn _ -> arg end), MapSet.put(args, arg)}
-
-        zipper, args ->
-          {:cont, zipper, args}
-      end)
-      |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
-
-    name = Function.next_available_function_name(zipper, @function_name)
-
+  def refactor(%{node: {:&, _, _}} = zipper, _) do
     zipper
-    |> anonymous_to_function_call(name, args, closure_variables)
-    |> Function.new_private_function(name, args ++ closure_variables, body)
+    |> Function.ExpandAnonymousFunction.refactor(nil)
+    |> refactor(nil)
   end
 
-  def refactor(%{node: {:fn, _, clauses}} = zipper, _) do
-    available_variables = Variable.find_available_variables(zipper)
+  def refactor(%{node: {:fn, _, clauses} = node} = zipper, _) do
+    [{:->, _, [args, _]} | _] = clauses
 
-    closure_variables =
-      clauses
-      |> Enum.map(fn {:->, _, [args, _] = clause} ->
-        unpinned_args = Variable.list_unpinned_variables(args)
-
-        Variable.list_variables(
-          clause,
-          &(Variable.member?(available_variables, &1.node) and
-              not Variable.member?(unpinned_args, &1.node))
-        )
-      end)
-      |> List.flatten()
-      |> Variable.remove_duplicates()
-
-    # all clauses have the same number of args,
-    # so we can just grab them from the first one
-    {:->, _, [args, _]} = List.first(clauses)
     name = Function.next_available_function_name(zipper, @function_name)
+    outer_variables = Dataflow.outer_variables(node)
+
+    args = for i <- 1..length(args), do: {:&, [], [i]}
+    args = args ++ outer_variables
 
     zipper
-    |> anonymous_to_function_call(name, args, closure_variables)
-    |> then(
-      &Enum.reduce(clauses, &1, fn {:->, _, [args, body]}, zipper ->
-        Function.new_private_function(zipper, name, args ++ closure_variables, body)
-      end)
+    |> Z.replace({:&, [], [{name, [], args}]})
+    |> add_private_functions(clauses, name, outer_variables)
+  end
+
+  defp add_private_functions(zipper, clauses, name, outer_variables) do
+    Enum.reduce(
+      clauses,
+      zipper,
+      fn {:->, _, [args, body]}, zipper ->
+        Function.new_private_function(zipper, name, args ++ outer_variables, body)
+      end
     )
-  end
-
-  defp anonymous_to_function_call(zipper, name, args, closure_variables) do
-    Z.update(zipper, fn _ ->
-      {:&, [],
-       [
-         {name, [],
-          1..length(args)
-          |> Enum.map(&{:&, [], [&1]})
-          |> Kernel.++(closure_variables)}
-       ]}
-    end)
   end
 
   defp already_extracted_function?({_, _, [{name, _, _} | _]})

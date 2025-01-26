@@ -5,6 +5,7 @@ defmodule Refactorex.Dataflow do
            when is_tuple(node) and
                   tuple_size(node) == 3 and
                   is_atom(elem(node, 0)) and
+                  elem(node, 0) != :binary and
                   is_nil(elem(node, 2))
 
   defstruct commands: [],
@@ -16,6 +17,15 @@ defmodule Refactorex.Dataflow do
     |> Map.get(:variables)
     |> Enum.map(&{&1.declaration, &1.usages})
     |> Map.new()
+  end
+
+  def outer_variables(node) do
+    %__MODULE__{}
+    |> recursive_analyze(node)
+    |> Map.get(:commands)
+    |> Stream.map(fn {:use, variable} -> variable end)
+    |> Enum.reverse()
+    |> Enum.uniq_by(fn {name, _, _} -> name end)
   end
 
   defp recursive_analyze(dataflow, zipper) do
