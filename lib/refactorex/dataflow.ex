@@ -36,6 +36,12 @@ defmodule Refactorex.Dataflow do
       {id, _, [{:when, _, [header, body]}]} when id in ~w(defguard defguardp)a ->
         analyze_sealed_scope(dataflow, header, body)
 
+      {:test, _, [_, {:%{}, _, setup}, scope]} ->
+        analyze_sealed_scope(dataflow, setup, scope)
+
+      {:test, _, [_ | _] = scope} ->
+        analyze_sealed_scope(dataflow, scope)
+
       {id, _, [condition, clauses]} when id in ~w(if unless)a ->
         %__MODULE__{}
         |> recursive_analyze(condition)
@@ -55,10 +61,10 @@ defmodule Refactorex.Dataflow do
         |> recursive_analyze(catches)
         |> close_scope(dataflow)
 
-      {:case, _, expression_and_clauses} ->
+      {:case, _, [_ | _] = expression_and_clauses} ->
         analyze_compound_scope(dataflow, expression_and_clauses, [])
 
-      {:with, _, children} ->
+      {:with, _, [_ | _] = children} ->
         {
           statements,
           [[body | catches]]
@@ -68,18 +74,12 @@ defmodule Refactorex.Dataflow do
         |> analyze_compound_scope(statements, body)
         |> recursive_analyze(catches)
 
-      {:for, _, children} ->
+      {:for, _, [_ | _] = children} ->
         {statements, body} = Enum.split_while(children, &match?({_, _, _}, &1))
         analyze_compound_scope(dataflow, statements, body)
 
       {{:__block__, _, [:do]}, block} ->
         analyze_scope(dataflow, block)
-
-      {:test, _, [_, {:%{}, _, setup}, scope]} ->
-        analyze_sealed_scope(dataflow, setup, scope)
-
-      {:test, _, scope} ->
-        analyze_sealed_scope(dataflow, scope)
 
       {:->, _, [[{:when, _, [left, guard]}], right]} ->
         analyze_scope(dataflow, left, [guard, right])
