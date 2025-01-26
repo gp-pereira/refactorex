@@ -26,6 +26,6 @@ defmodule Refactorex.Refactor.Function.ExpandAnonymousFunction do
 
   def refactor(%{node: {:&, _, [body]}} = zipper, _) do
     {%{node: body}, variables} = Variable.turn_captures_into_variables(body)
-    Z.replace(zipper, {:fn, [], [{:->, [], [Enum.into(variables, []), body]}]})
+    Z.replace(zipper, {:fn, [], [{:->, [], [variables, body]}]})
   end
 end

@@ -140,6 +140,7 @@ defmodule Refactorex.Refactor.Variable do
       zipper, variables ->
         {zipper, variables}
     end)
+    |> then(fn {zipper, args} -> {zipper, Enum.into(args, [])} end)
   end
 
   def replace_usages_by_value(node, name, value) do
