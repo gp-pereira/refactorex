@@ -17,6 +17,7 @@ defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
       {_declaration, _usages} ->
         false
     end)
+    |> then(&if &1, do: true, else: :skip)
   end
 
   def refactor(%{node: node} = zipper, line) do
