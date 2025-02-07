@@ -10,6 +10,8 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     Variable
   }
 
+  alias Refactorex.Dataflow
+
   def can_refactor?(zipper, {:&, _, [body]}), do: can_refactor?(zipper, body)
 
   def can_refactor?(%{node: node} = zipper, selection) do
@@ -95,22 +97,28 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
       [{_, _, [{:when, _, _}, _]} = guarded_definition] ->
         merge_definitions_as_case_statement([guarded_definition], call_values)
 
-      [{_, _, [{_, _, args}, _]} = definition] ->
+      [{_, _, [{_, _, args}, [{_, body}]]} = single_definition] ->
+        args = args || []
+
         statements =
-          case definition do
-            {_, _, [_, [{_, {:__block__, _, statements}}]]} -> statements
-            {_, _, [_, [{_, statement}]]} -> [statement]
+          case body do
+            {:__block__, _, statements} -> statements
+            statement -> [statement]
           end
 
-        if Enum.all?(args, &match?({_, _, nil}, &1)) do
+        if all_simple_variables?(args) do
+          dataflow = Dataflow.analyze(single_definition)
+
           args
+          |> Stream.map(&dataflow[&1])
           |> Stream.zip(call_values)
           |> Enum.reduce(
-            statements,
-            fn {{arg_name, _, _}, call_value}, statements ->
-              Variable.replace_usages_by_value(statements, arg_name, call_value)
+            Z.zip(statements),
+            fn {usages, call_value}, statements_zipper ->
+              AST.replace_nodes(statements_zipper, usages, call_value)
             end
           )
+          |> Z.node()
         else
           [{:=, [], [{:{}, [], args}, {:{}, [], call_values}]} | statements]
         end
@@ -157,4 +165,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
         else: zipper
     )
   end
+
+  defp all_simple_variables?(args),
+    do: Enum.all?(args, &match?({_, _, nil}, &1))
 end

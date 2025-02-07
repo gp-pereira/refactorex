@@ -172,7 +172,7 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
     )
   end
 
-  test "inlines the function call inside list" do
+  test "inlines the function call inside map" do
     assert_refactored(
       InlineFunction,
       """
@@ -200,6 +200,36 @@ defmodule Refactorex.Refactor.Function.InlineFunctionTest do
           c = b + a
           b = c * a
           a + b + c
+        end
+      end
+      """
+    )
+  end
+
+  test "inlines the function call with zero args" do
+    assert_refactored(
+      InlineFunction,
+      """
+      defmodule Foo do
+        def foo do
+          #    v
+          call(bar())
+          #        ^
+        end
+
+        defp bar do
+          [1, 2]
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo do
+          call([1, 2])
+        end
+
+        defp bar do
+          [1, 2]
         end
       end
       """
