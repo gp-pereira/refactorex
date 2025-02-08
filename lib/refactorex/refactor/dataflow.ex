@@ -5,7 +5,7 @@ defmodule Refactorex.Refactor.Dataflow do
   defstruct commands: [],
             variables: []
 
-  def analyze(node) do
+  def group_variables_semantically(node) do
     %__MODULE__{}
     |> recursive_analyze(node)
     |> Map.get(:variables)

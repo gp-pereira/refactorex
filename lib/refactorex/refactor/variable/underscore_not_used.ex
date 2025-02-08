@@ -8,7 +8,7 @@ defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
 
   def can_refactor?(%{node: node}, line) do
     node
-    |> Dataflow.analyze()
+    |> Dataflow.group_variables_semantically()
     |> Enum.any?(fn
       {{name, _, _} = declaration, []} ->
         AST.starts_at?(declaration, line) and
@@ -22,7 +22,7 @@ defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
 
   def refactor(%{node: node} = zipper, line) do
     node
-    |> Dataflow.analyze()
+    |> Dataflow.group_variables_semantically()
     |> Stream.filter(&same_line_and_no_usages?(&1, line))
     |> Enum.reduce(zipper, fn
       {declaration, []}, zipper ->

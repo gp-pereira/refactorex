@@ -49,7 +49,7 @@ defmodule Refactorex.Refactor.Variable do
   def find_all_references(zipper, {name, _, _} = variable) do
     zipper
     |> Z.topmost_root()
-    |> Dataflow.analyze()
+    |> Dataflow.group_variables_semantically()
     |> Stream.map(fn {d, u} -> [d | u] end)
     |> Enum.find([], fn
       [{^name, _, _} | _] = references ->
@@ -61,10 +61,10 @@ defmodule Refactorex.Refactor.Variable do
   end
 
   def replace_variables_by_values(selection, variables, values, scope) do
-    dataflow = Dataflow.analyze(scope)
+    variable_groups = Dataflow.group_variables_semantically(scope)
 
     variables
-    |> Stream.map(&dataflow[&1])
+    |> Stream.map(&variable_groups[&1])
     |> Stream.zip(values)
     |> Enum.reduce(
       Z.zip(selection),

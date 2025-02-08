@@ -474,7 +474,7 @@ defmodule Refactorex.Refactor.DataflowTest do
     found_variables =
       original
       |> Sourceror.parse_string!()
-      |> Dataflow.analyze()
+      |> Dataflow.group_variables_semantically()
       |> Enum.map(&AST.simpler_meta/1)
       |> Enum.into(%{})
 

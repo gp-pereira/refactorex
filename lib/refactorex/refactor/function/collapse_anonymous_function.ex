@@ -23,7 +23,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
       not Variable.plain_variables?(args) ->
         false
 
-      some_arg_not_used?(args, Dataflow.analyze(node)) ->
+      some_arg_not_used?(args, Dataflow.group_variables_semantically(node)) ->
         false
 
       true ->
@@ -42,6 +42,6 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
     )
   end
 
-  defp some_arg_not_used?(args, dataflow),
-    do: not Enum.all?(args, &match?([_ | _], dataflow[&1]))
+  defp some_arg_not_used?(args, variable_groups),
+    do: not Enum.all?(args, &(variable_groups[&1] != []))
 end
