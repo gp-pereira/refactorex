@@ -18,9 +18,6 @@ defmodule Refactorex.Refactor.Variable do
 
   def at_one?(_zipper), do: false
 
-  def was_declared?(zipper, variable),
-    do: not Enum.empty?(find_all_references(zipper, variable))
-
   def find_all_references(zipper, {name, _, _} = variable) do
     zipper
     |> Z.topmost_root()
@@ -33,6 +30,19 @@ defmodule Refactorex.Refactor.Variable do
       _ ->
         false
     end)
+  end
+
+  def replace_variables_by_values(selection, variables, values, scope) do
+    dataflow = Dataflow.analyze(scope)
+
+    variables
+    |> Stream.map(&dataflow[&1])
+    |> Stream.zip(values)
+    |> Enum.reduce(
+      Z.zip(selection),
+      fn {usages, value}, zipper -> AST.replace_nodes(zipper, usages, value) end
+    )
+    |> Z.node()
   end
 
   # remove later ?

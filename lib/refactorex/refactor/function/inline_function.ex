@@ -10,8 +10,6 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
     Variable
   }
 
-  alias Refactorex.Dataflow
-
   def can_refactor?(zipper, {:&, _, [body]}), do: can_refactor?(zipper, body)
 
   def can_refactor?(%{node: node} = zipper, selection) do
@@ -107,18 +105,12 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
           end
 
         if all_simple_variables?(args) do
-          dataflow = Dataflow.analyze(single_definition)
-
-          args
-          |> Stream.map(&dataflow[&1])
-          |> Stream.zip(call_values)
-          |> Enum.reduce(
-            Z.zip(statements),
-            fn {usages, call_value}, statements_zipper ->
-              AST.replace_nodes(statements_zipper, usages, call_value)
-            end
+          Variable.replace_variables_by_values(
+            statements,
+            args,
+            call_values,
+            single_definition
           )
-          |> Z.node()
         else
           [{:=, [], [{:{}, [], args}, {:{}, [], call_values}]} | statements]
         end

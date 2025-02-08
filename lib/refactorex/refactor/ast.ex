@@ -86,14 +86,16 @@ defmodule Refactorex.Refactor.AST do
 
   def inside?(zipper, matcher_fn), do: !!up_until(zipper, matcher_fn)
 
-  def replace_nodes(zipper, nodes_to_replace, new_value) do
-    Z.traverse(
-      zipper,
-      fn %{node: node} = zipper ->
-        if Enum.member?(nodes_to_replace, node),
-          do: Z.replace(zipper, new_value),
-          else: zipper
-      end
-    )
+  def replace_nodes(zipper, list_of_nodes, new_value),
+    do: update_nodes(zipper, list_of_nodes, fn _ -> new_value end)
+
+  def update_nodes(zipper, nodes_to_replace, updater_fn) do
+    zipper
+    |> Z.top()
+    |> Z.traverse(fn %{node: node} = zipper ->
+      if Enum.member?(nodes_to_replace, node),
+        do: Z.update(zipper, updater_fn),
+        else: zipper
+    end)
   end
 end

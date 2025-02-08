@@ -14,7 +14,7 @@ defmodule Refactorex.Refactor.Variable.RenameVariable do
       not Variable.at_one?(zipper) ->
         false
 
-      not Variable.was_declared?(zipper, selection) ->
+      Enum.empty?(Variable.find_all_references(zipper, selection)) ->
         false
 
       true ->
@@ -23,18 +23,10 @@ defmodule Refactorex.Refactor.Variable.RenameVariable do
   end
 
   def refactor(%{node: variable} = zipper, _) do
-    all_references = Variable.find_all_references(zipper, variable)
-
-    zipper
-    |> Z.top()
-    |> Z.traverse(fn %{node: node} = zipper ->
-      if Enum.member?(all_references, node) do
-        Z.update(zipper, fn {_, meta, nil} ->
-          {placeholder(), meta, nil}
-        end)
-      else
-        zipper
-      end
-    end)
+    AST.update_nodes(
+      zipper,
+      Variable.find_all_references(zipper, variable),
+      fn {_, meta, nil} -> {placeholder(), meta, nil} end
+    )
   end
 end

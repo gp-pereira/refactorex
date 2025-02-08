@@ -9,7 +9,6 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
     Variable
   }
 
-  alias Refactorex.Dataflow
   def can_refactor?(%{node: {:fn, _, [{:->, _, [[], _]}]}}, _), do: false
 
   def can_refactor?(%{node: {:fn, _, [{:->, _, [args, body]}]} = node}, selection) do
@@ -32,23 +31,11 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
   def can_refactor?(_, _), do: false
 
   def refactor(%{node: {_, _, [{:->, _, [args, body]}]} = node} = zipper, _) do
-    dataflow = Dataflow.analyze(node)
+    new_args = for i <- 1..length(args), do: {:&, [], [i]}
 
     Z.replace(
       zipper,
-      {:&, [],
-       [
-         args
-         |> Stream.map(&dataflow[&1])
-         |> Stream.with_index(1)
-         |> Enum.reduce(
-           Z.zip(body),
-           fn {usages, i}, zipper ->
-             AST.replace_nodes(zipper, usages, {:&, [], [i]})
-           end
-         )
-         |> Z.node()
-       ]}
+      {:&, [], [Variable.replace_variables_by_values(body, args, new_args, node)]}
     )
   end
 end
