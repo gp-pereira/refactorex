@@ -187,6 +187,40 @@ defmodule Refactorex.Refactor.Alias.InlineAliasTest do
     )
   end
 
+  test "inlines nested namespace alias" do
+    assert_refactored(
+      InlineAlias,
+      """
+      defmodule Shop do
+        alias Shop.{
+          Cart,
+          Inventory.{Item},
+          Inventory
+        }
+
+        def restock(item_id, quantity) do
+        # v
+          Inventory.update_stock(item_id, quantity)
+        #         ^
+        end
+      end
+      """,
+      """
+      defmodule Shop do
+        alias Shop.{
+          Cart,
+          Inventory.{Item},
+          Inventory
+        }
+
+        def restock(item_id, quantity) do
+          Shop.Inventory.update_stock(item_id, quantity)
+        end
+      end
+      """
+    )
+  end
+
   test "ignores alias declaration" do
     assert_ignored(
       InlineAlias,

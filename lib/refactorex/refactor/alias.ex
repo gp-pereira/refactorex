@@ -74,15 +74,23 @@ defmodule Refactorex.Refactor.Alias do
   defp go_to_declaration(node, used_alias) do
     node
     |> Z.zip()
-    |> Z.find(fn
-      {:alias, _, [_, opts]} ->
-        Enum.any?(opts, &match?({{_, _, [:as]}, {_, _, [^used_alias]}}, &1))
+    |> Z.traverse_while(nil, fn
+      %{node: {:alias, _, [_, opts]}} = zipper, nil ->
+        if Enum.any?(opts, &match?({{_, _, [:as]}, {_, _, [^used_alias]}}, &1)),
+          do: {:halt, zipper, zipper},
+          else: {:cont, zipper, nil}
 
-      {:__aliases__, _, aliases} ->
-        List.last(aliases) == used_alias
+      %{node: {:__aliases__, _, aliases}} = zipper, nil ->
+        if List.last(aliases) == used_alias,
+          do: {:halt, zipper, zipper},
+          else: {:cont, zipper, nil}
 
-      _ ->
-        false
+      %{node: {:., _, [_, :{}]}} = zipper, nil ->
+        {:skip, zipper, nil}
+
+      zipper, nil ->
+        {:cont, zipper, nil}
     end)
+    |> elem(1)
   end
 end
