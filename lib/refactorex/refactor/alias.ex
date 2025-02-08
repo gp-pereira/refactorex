@@ -60,6 +60,9 @@ defmodule Refactorex.Refactor.Alias do
       %{node: {{:., _, [{:__aliases__, _, aliases}, _]}, _, _}} ->
         expand_declaration(Z.up(zipper), aliases ++ path)
 
+      %{node: {{:., _, [{:__MODULE__, _, _}, :{}]}, _, _}} ->
+        [:__MODULE__ | path]
+
       %{node: {:alias, _, [{:__aliases__, _, aliases} | _]}} ->
         aliases ++ (path -- aliases)
 

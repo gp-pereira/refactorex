@@ -135,6 +135,29 @@ defmodule Refactorex.Refactor.Alias.ExpandAliasesTest do
     )
   end
 
+  test "expands __MODULE__ aliases" do
+    assert_refactored(
+      ExpandAliases,
+      """
+      defmodule Foo do
+      # v
+        alias __MODULE__.{
+          Alpha,
+          Delta.{Bar, Test}
+        }
+      # ^
+      end
+      """,
+      """
+      defmodule Foo do
+        alias __MODULE__.Alpha
+        alias __MODULE__.Delta.Bar
+        alias __MODULE__.Delta.Test
+      end
+      """
+    )
+  end
+
   test "ignores outside module" do
     assert_ignored(
       ExpandAliases,
