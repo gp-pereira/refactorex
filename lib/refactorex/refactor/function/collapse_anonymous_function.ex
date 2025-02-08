@@ -6,6 +6,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
 
   alias Refactorex.Refactor.{
     Block,
+    Dataflow,
     Variable
   }
 
@@ -19,12 +20,14 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
       Block.has_multiple_statements?(body) ->
         false
 
-      args != Variable.list_unpinned_variables(args) ->
+      not Variable.plain_variables?(args) ->
+        false
+
+      some_arg_not_used?(args, Dataflow.analyze(node)) ->
         false
 
       true ->
-        used_variables = Variable.list_unique_variables(body)
-        Enum.all?(args, &Variable.member?(used_variables, &1))
+        true
     end
   end
 
@@ -38,4 +41,7 @@ defmodule Refactorex.Refactor.Function.CollapseAnonymousFunction do
       {:&, [], [Variable.replace_variables_by_values(body, args, new_args, node)]}
     )
   end
+
+  defp some_arg_not_used?(args, dataflow),
+    do: not Enum.all?(args, &match?([_ | _], dataflow[&1]))
 end

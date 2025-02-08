@@ -27,7 +27,7 @@ defmodule Refactorex.Refactor.Constant.InlineConstant do
 
   defp find_definition(%{node: {:@, _, [{id, _, _}]}} = zipper) do
     zipper
-    |> AST.find(&match?({:@, _, [{^id, _, u}]} when not is_nil(u), &1))
+    |> AST.find(&match?({:@, _, [{^id, _, u}]} when not is_nil(u), &1.node))
     |> List.first()
   end
 end

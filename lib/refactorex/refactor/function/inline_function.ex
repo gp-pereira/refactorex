@@ -104,7 +104,7 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
             statement -> [statement]
           end
 
-        if all_simple_variables?(args) do
+        if Variable.plain_variables?(args) do
           Variable.replace_variables_by_values(
             statements,
             args,
@@ -157,7 +157,4 @@ defmodule Refactorex.Refactor.Function.InlineFunction do
         else: zipper
     )
   end
-
-  defp all_simple_variables?(args),
-    do: Enum.all?(args, &match?({_, _, nil}, &1))
 end

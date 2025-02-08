@@ -1,12 +1,6 @@
 defmodule Refactorex.Refactor.Dataflow do
   alias Sourceror.Zipper, as: Z
-
-  defguard is_variable(node)
-           when is_tuple(node) and
-                  tuple_size(node) == 3 and
-                  is_atom(elem(node, 0)) and
-                  elem(node, 0) != :binary and
-                  is_nil(elem(node, 2))
+  import Refactorex.Refactor.Variable, only: [is_variable: 1]
 
   defstruct commands: [],
             variables: []

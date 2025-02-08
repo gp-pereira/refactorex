@@ -50,7 +50,7 @@ defmodule Refactorex.Refactor.AST do
     zipper
     |> Z.top()
     |> Z.traverse([], fn %{node: node} = zipper, nodes ->
-      if finder.(node),
+      if finder.(zipper),
         do: {zipper, [node | nodes]},
         else: {zipper, nodes}
     end)

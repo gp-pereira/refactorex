@@ -7,9 +7,9 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
   alias Refactorex.NameCache
 
   alias Refactorex.Refactor.{
+    Dataflow,
     Guard,
-    Module,
-    Variable
+    Module
   }
 
   @guard_name "extracted_guard"
@@ -32,7 +32,7 @@ defmodule Refactorex.Refactor.Guard.ExtractGuard do
 
   def refactor(%{node: node} = zipper, _) do
     name = next_available_guard_name(zipper)
-    args = Variable.list_unique_variables(node)
+    args = Dataflow.outer_variables(node)
 
     zipper
     |> Z.replace({name, [], args})

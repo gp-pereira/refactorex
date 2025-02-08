@@ -25,7 +25,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
       not Module.inside_one?(zipper) ->
         false
 
-      Enum.any?(Variable.list_variables(node)) ->
+      Enum.any?(AST.find(selection, &Variable.at_one?/1)) ->
         :skip
 
       match?(%{node: {:|>, _, [_, ^node]}}, Z.up(zipper)) ->
@@ -68,8 +68,10 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
       {{:@, _, [{:behaviour, _, _}]}, i} ->
         i + 1
 
-      {{:@, _, [constant]}, i} ->
-        if Variable.member?(constants_used, constant), do: i + 1, else: 0
+      {{:@, _, [{name, _, _}]}, i} ->
+        if Enum.any?(constants_used, &match?({^name, _, _}, &1)),
+          do: i + 1,
+          else: 0
 
       _ ->
         0
@@ -79,7 +81,7 @@ defmodule Refactorex.Refactor.Constant.ExtractConstant do
 
   defp find_constants_used(to_be_constant) do
     to_be_constant
-    |> AST.find(&match?({:@, _, [{_, _, nil}]}, &1))
+    |> AST.find(&match?({:@, _, [{_, _, nil}]}, &1.node))
     |> Enum.map(fn {:@, _, [constant]} -> constant end)
   end
 end
