@@ -1,7 +1,10 @@
 defmodule Refactorex.Refactor.Variable do
-  alias Refactorex.Dataflow
-  alias Refactorex.Refactor.AST
   alias Sourceror.Zipper, as: Z
+
+  alias Refactorex.Refactor.{
+    AST,
+    Dataflow
+  }
 
   def at_one?(%{node: {name, _, nil}} = zipper) do
     cond do

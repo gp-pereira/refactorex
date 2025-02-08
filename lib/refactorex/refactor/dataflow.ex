@@ -1,4 +1,4 @@
-defmodule Refactorex.Dataflow do
+defmodule Refactorex.Refactor.Dataflow do
   alias Sourceror.Zipper, as: Z
 
   defguard is_variable(node)

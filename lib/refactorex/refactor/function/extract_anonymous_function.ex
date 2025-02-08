@@ -4,9 +4,8 @@ defmodule Refactorex.Refactor.Function.ExtractAnonymousFunction do
     kind: "refactor.extract",
     works_on: :selection
 
-  alias Refactorex.Dataflow
-
   alias Refactorex.Refactor.{
+    Dataflow,
     Function,
     Module
   }

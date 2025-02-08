@@ -1,8 +1,10 @@
-defmodule Refactorex.DataflowTest do
+defmodule Refactorex.Refactor.DataflowTest do
   use ExUnit.Case
 
-  alias Refactorex.Refactor.AST
-  alias Refactorex.Dataflow
+  alias Refactorex.Refactor.{
+    AST,
+    Dataflow
+  }
 
   test "lists all variables inside simple function with constants" do
     assert_has_variables(

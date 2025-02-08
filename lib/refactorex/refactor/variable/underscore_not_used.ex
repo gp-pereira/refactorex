@@ -4,7 +4,7 @@ defmodule Refactorex.Refactor.Variable.UnderscoreNotUsed do
     kind: "quickfix",
     works_on: :line
 
-  alias Refactorex.Dataflow
+  alias Refactorex.Refactor.Dataflow
 
   def can_refactor?(%{node: node}, line) do
     node
