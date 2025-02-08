@@ -23,10 +23,18 @@ defmodule Refactorex.Refactor.Variable.RenameVariable do
   end
 
   def refactor(%{node: variable} = zipper, _) do
-    Variable.update_all_references(
-      zipper,
-      variable,
-      fn {_, meta, nil} -> {placeholder(), meta, nil} end
-    )
+    all_references = Variable.find_all_references(zipper, variable)
+
+    zipper
+    |> Z.top()
+    |> Z.traverse(fn %{node: node} = zipper ->
+      if Enum.member?(all_references, node) do
+        Z.update(zipper, fn {_, meta, nil} ->
+          {placeholder(), meta, nil}
+        end)
+      else
+        zipper
+      end
+    end)
   end
 end

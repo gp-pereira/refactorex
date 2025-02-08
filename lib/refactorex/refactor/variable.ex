@@ -21,22 +21,6 @@ defmodule Refactorex.Refactor.Variable do
   def was_declared?(zipper, variable),
     do: not Enum.empty?(find_all_references(zipper, variable))
 
-  def update_all_references(zipper, variable, updater_fn) do
-    references = find_all_references(zipper, variable)
-
-    zipper
-    |> Z.top()
-    |> Z.traverse(fn
-      %{node: {_, _, nil} = node} = zipper ->
-        if Enum.member?(references, node),
-          do: Z.replace(zipper, updater_fn.(node)),
-          else: zipper
-
-      zipper ->
-        zipper
-    end)
-  end
-
   def find_all_references(zipper, {name, _, _} = variable) do
     zipper
     |> Z.topmost_root()
