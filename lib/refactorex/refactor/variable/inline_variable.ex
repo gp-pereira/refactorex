@@ -27,25 +27,14 @@ defmodule Refactorex.Refactor.Variable.InlineVariable do
   end
 
   def refactor(zipper, _) do
-    %{node: {:=, _, [declaration, value]} = assignment} = Z.up(zipper)
+    %{node: {:=, _, [declaration, value]}} = parent = Z.up(zipper)
     [_ | usages] = Variable.find_all_references(zipper, declaration)
 
-    zipper
-    |> Z.top()
-    |> Z.traverse(fn
-      %{node: ^assignment} = zipper ->
-        if replace_assignment_by_value?(zipper),
-          do: Z.replace(zipper, value),
-          else: Z.remove(zipper)
-
-      %{node: {_, _, nil} = node} = zipper ->
-        if Enum.member?(usages, node),
-          do: Z.replace(zipper, value),
-          else: zipper
-
-      zipper ->
-        zipper
-    end)
+    if(replace_assignment_by_value?(parent),
+      do: Z.replace(parent, value),
+      else: Z.remove(parent)
+    )
+    |> AST.replace_nodes(usages, value)
     |> AST.go_to_node(value)
   end
 
