@@ -48,25 +48,10 @@ defmodule Refactorex.Refactor.Variable do
     |> Z.node()
   end
 
-  # remove later ?
-  def find_available_variables(%{node: node} = zipper) do
-    line = AST.get_start_line(node)
-
-    zipper
-    # go to outer scope
-    |> Z.find(:prev, fn
-      {id, _, _} when id in ~w(defmodule def defp)a -> true
-      _ -> false
-    end)
-    |> Z.node()
-    |> list_unique_variables()
-    |> Enum.reject(&(AST.get_start_line(&1) >= line))
-  end
-
   def list_unique_variables(node, filter_fn \\ fn _zipper -> true end) do
     node
     |> list_variables(filter_fn)
-    |> remove_duplicates()
+    |> Enum.uniq_by(fn {name, _, _} -> name end)
   end
 
   def list_unpinned_variables(node),
@@ -90,9 +75,6 @@ defmodule Refactorex.Refactor.Variable do
     end)
     |> elem(1)
   end
-
-  def remove_duplicates(variables),
-    do: Enum.uniq_by(variables, fn {name, _, _} -> name end)
 
   def member?(variables, {name, _, _} = _variable),
     do: Enum.any?(variables, &match?({^name, _, _}, &1))

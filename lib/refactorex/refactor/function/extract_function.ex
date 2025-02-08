@@ -5,6 +5,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
     works_on: :selection
 
   alias Refactorex.Refactor.{
+    Dataflow,
     Function,
     Module,
     Pipeline,
@@ -38,7 +39,7 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
 
   def refactor(%{node: node} = zipper, selection) do
     name = Function.next_available_function_name(zipper, @function_name)
-    args = find_function_args(zipper, selection)
+    args = Dataflow.outer_variables(selection)
     new_arg = {:arg1, [], nil}
 
     cond do
@@ -68,13 +69,5 @@ defmodule Refactorex.Refactor.Function.ExtractFunction do
         |> Z.replace({name, [], args})
         |> Function.new_private_function(name, args, selection)
     end
-  end
-
-  defp find_function_args(zipper, selection) do
-    available_variables = Variable.find_available_variables(zipper)
-
-    selection
-    |> Variable.list_unique_variables()
-    |> Enum.reject(&(not Variable.member?(available_variables, &1)))
   end
 end
