@@ -103,6 +103,36 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
     )
   end
 
+  test "renames function call followed by pipe" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Foo do
+        def foo() do
+        # v
+          extracted_function(zipper, aliases)
+        #                  ^
+          |> IO.inspect()
+        end
+
+        def extracted_function(a, b) do
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def foo() do
+          #{placeholder()}(zipper, aliases)
+          |> IO.inspect()
+        end
+
+        def #{placeholder()}(a, b) do
+        end
+      end
+      """
+    )
+  end
+
   test "renames the selected public function with multiple definitions" do
     assert_refactored(
       RenameFunction,

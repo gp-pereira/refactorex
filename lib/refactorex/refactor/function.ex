@@ -26,13 +26,13 @@ defmodule Refactorex.Refactor.Function do
   def find_definitions(%{node: {:/, _, _}} = zipper),
     do: find_definitions(Z.down(zipper))
 
-  def find_definitions(%{node: {name, _, args}} = zipper) do
+  def find_definitions(%{node: {name, _, args} = node} = zipper) do
     num_args =
       case Z.up(zipper) do
         %{node: {:/, _, [_, {:__block__, _, [num_args]}]}} ->
           num_args
 
-        %{node: {:|>, _, _}} ->
+        %{node: {:|>, _, [_, ^node]}} ->
           length(args) + 1
 
         _ ->
