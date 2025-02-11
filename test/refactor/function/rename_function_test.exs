@@ -133,6 +133,60 @@ defmodule Refactorex.Refactor.Function.RenameFunctionTest do
     )
   end
 
+  test "renames collapsed anonymous function" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Foo do
+        #   v
+        def foo() do
+        #     ^
+          &foo/0
+          &foo/1
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def #{placeholder()}() do
+          &#{placeholder()}/0
+          &foo/1
+        end
+      end
+      """
+    )
+  end
+
+  test "renames function called from __MODULE__" do
+    assert_refactored(
+      RenameFunction,
+      """
+      defmodule Foo do
+        def foo() do
+        #            v
+          __MODULE__.foo()
+        #              ^
+          __MODULE__.foo(10)
+          &__MODULE__.foo/0
+          &__MODULE__.foo/1
+          &__MODULE__.foo()
+        end
+      end
+      """,
+      """
+      defmodule Foo do
+        def #{placeholder()}() do
+          __MODULE__.#{placeholder()}()
+          __MODULE__.foo(10)
+          &__MODULE__.#{placeholder()}/0
+          &__MODULE__.foo/1
+          &__MODULE__.#{placeholder()}()
+        end
+      end
+      """
+    )
+  end
+
   test "renames the selected public function with multiple definitions" do
     assert_refactored(
       RenameFunction,
