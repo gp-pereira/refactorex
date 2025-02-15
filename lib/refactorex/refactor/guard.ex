@@ -6,6 +6,7 @@ defmodule Refactorex.Refactor.Guard do
     Module
   }
 
+  def definition?(%Z{node: node}), do: definition?(node)
   def definition?({:defguard, _, _}), do: true
   def definition?({:defguardp, _, _}), do: true
   def definition?(_), do: false

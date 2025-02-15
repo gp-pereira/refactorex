@@ -87,6 +87,23 @@ defmodule Refactorex.Refactor.Guard.InlineGuardTest do
     )
   end
 
+  test "ignores guard definition" do
+    assert_ignored(
+      InlineGuard,
+      """
+      defmodule Foo do
+        #        v
+        defguard extracted_guard(arg) when arg.valid? == true
+        #                           ^
+
+        def foo(arg) when extracted_guard(arg) do
+          arg
+        end
+      end
+      """
+    )
+  end
+
   test "ignores guard call outside module" do
     assert_ignored(
       InlineGuard,

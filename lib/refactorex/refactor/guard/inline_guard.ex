@@ -21,6 +21,9 @@ defmodule Refactorex.Refactor.Guard.InlineGuard do
       not Guard.guard_statement?(zipper) ->
         false
 
+      Guard.definition?(AST.up(zipper, 2)) ->
+        false
+
       is_nil(Guard.find_definition(zipper)) ->
         false
 
@@ -29,27 +32,11 @@ defmodule Refactorex.Refactor.Guard.InlineGuard do
     end
   end
 
-  def refactor(zipper, _), do: Z.replace(zipper, replace_guard_args_by_call_values(zipper))
+  def refactor(%{node: {_, _, call_values}} = zipper, _) do
+    {_, _, [{_, _, [{_, _, args}, body]}]} = definition = Guard.find_definition(zipper)
 
-  defp replace_guard_args_by_call_values(%{node: {_, _, call_values}} = zipper) do
-    {_, _, [{_, _, [{_, _, guard_args}, guard_block]}]} = Guard.find_definition(zipper)
-
-    args_to_values =
-      [guard_args, call_values]
-      |> Enum.zip()
-      |> Map.new(fn {{id, _, _}, value} -> {id, value} end)
-
-    guard_block
-    |> Z.zip()
-    |> Z.traverse_while(fn
-      %{node: {id, _, _}} = zipper ->
-        if Variable.at_one?(zipper),
-          do: {:skip, Z.replace(zipper, args_to_values[id])},
-          else: {:cont, zipper}
-
-      zipper ->
-        {:cont, zipper}
-    end)
-    |> Z.node()
+    body
+    |> Variable.replace_variables_by_values(args, call_values, definition)
+    |> then(&Z.replace(zipper, &1))
   end
 end
