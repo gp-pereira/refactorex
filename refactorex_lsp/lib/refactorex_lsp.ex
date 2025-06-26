@@ -1,4 +1,4 @@
-defmodule Refactorex do
+defmodule RefactorexLSP do
   use GenLSP
 
   alias GenLSP.Requests.{
@@ -17,12 +17,15 @@ defmodule Refactorex do
     TextDocumentDidClose
   }
 
+  alias Refactorex.{
+    NameCache,
+    Parser,
+    Refactor
+  }
+
   alias __MODULE__.{
     Diff,
     Logger,
-    NameCache,
-    Parser,
-    Refactor,
     Response
   }
 
@@ -33,7 +36,7 @@ defmodule Refactorex do
 
   @impl true
   def init(lsp, _args) do
-    Logger.info("Server started")
+    # Logger.info("Server started")
     {:ok, assign(lsp, documents: %{})}
   end
 

@@ -1,7 +1,7 @@
-defmodule Refactorex.DiffTest do
+defmodule RefactorexLSP.DiffTest do
   use ExUnit.Case
 
-  alias Refactorex.Diff
+  alias RefactorexLSP.Diff
 
   test "grabs ranges of modified text" do
     assert Diff.find_diffs(

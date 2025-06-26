@@ -1,4 +1,4 @@
-defmodule Refactorex.Logger do
+defmodule RefactorexLSP.Logger do
   use Agent
 
   require Logger

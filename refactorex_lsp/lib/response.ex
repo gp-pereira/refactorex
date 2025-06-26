@@ -1,4 +1,4 @@
-defmodule Refactorex.Response do
+defmodule RefactorexLSP.Response do
   alias GenLSP.{
     Enumerations,
     ErrorResponse,

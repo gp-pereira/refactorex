@@ -1,4 +1,4 @@
-defmodule Refactorex.Application do
+defmodule RefactorexLSP.Application do
   use Application
 
   @default_port 6890
@@ -6,17 +6,12 @@ defmodule Refactorex.Application do
   def start(_, _) do
     Supervisor.start_link(
       [
-        {
-          GenLSP.Buffer,
-          [communication: communication_config()]
-        },
-        {Refactorex.Logger, []},
-        {Refactorex.NameCache, []},
-        {Refactorex, []},
-        {Task.Supervisor, [name: Refactorex.Refactor]}
+        {GenLSP.Buffer, [communication: communication_config()]},
+        {RefactorexLSP.Logger, []},
+        {RefactorexLSP, []}
       ],
       strategy: :one_for_one,
-      name: Refactorex.Supervisor
+      name: RefactorexLSP.Supervisor
     )
   end
 

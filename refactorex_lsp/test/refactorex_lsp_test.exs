@@ -1,4 +1,4 @@
-defmodule RefactorexTest do
+defmodule RefactorexLSPTest do
   use ExUnit.Case, async: true
 
   import GenLSP.Test
@@ -13,11 +13,10 @@ defmodule RefactorexTest do
 
     # Linking the lsp process to the test process
     # so a server crash will also crash the test
-    lsp = start_supervised!({Refactorex, []})
+    lsp = start_supervised!({RefactorexLSP, []})
     Process.link(lsp)
 
     server = %{lsp: lsp, port: port, buffer: @buffer}
-
     client = client(server)
 
     root_uri = "file://#{Path.absname(tmp_dir)}"
@@ -29,6 +28,7 @@ defmodule RefactorexTest do
         "id" => 1,
         "jsonrpc" => "2.0",
         "params" => %{
+          "processId" => nil,
           "capabilities" => %{},
           "rootUri" => file_uri
         }

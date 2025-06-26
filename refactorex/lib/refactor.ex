@@ -118,8 +118,7 @@ defmodule Refactorex.Refactor do
       {:ok, refactoring}, refactorings ->
         [refactoring | refactorings]
 
-      {:exit, reason}, refactorings ->
-        Refactorex.Logger.error(reason)
+      {:exit, _reason}, refactorings ->
         refactorings
     end)
   end
