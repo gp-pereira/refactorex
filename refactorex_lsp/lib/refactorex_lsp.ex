@@ -36,7 +36,7 @@ defmodule RefactorexLSP do
 
   @impl true
   def init(lsp, _args) do
-    # Logger.info("Server started")
+    Logger.info("Server started")
     {:ok, assign(lsp, documents: %{})}
   end
 
