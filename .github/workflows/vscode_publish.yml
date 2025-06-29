@@ -32,7 +32,7 @@ jobs:
           path: extensions/vscode/package.json
 
       - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           packagePath: extensions/vscode
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
