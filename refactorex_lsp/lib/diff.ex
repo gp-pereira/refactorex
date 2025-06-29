@@ -1,4 +1,4 @@
-defmodule Refactorex.Diff do
+defmodule RefactorexLSP.Diff do
   def from_original(%{refactored: refactored} = refactoring, original),
     do: %{refactoring | diffs: find_diffs(original, refactored)}
 

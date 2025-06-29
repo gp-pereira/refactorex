@@ -2,6 +2,6 @@
 
 # used for local development
 
-cd "$(dirname "$0")"/.. || exit 1
+cd "$(dirname "$0")"/../refactorex_lsp || exit 1
 
-elixir --sname undefined -S mix run --no-halt -e "Application.ensure_all_started(:refactorex)" -- "$@"
+elixir --sname undefined -S mix run --no-halt -e "Application.ensure_all_started(:refactorex_lsp)" -- "$@"

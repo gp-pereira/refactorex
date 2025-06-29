@@ -1,32 +1,26 @@
-defmodule Refactorex.MixProject do
+defmodule RefactorexWorkspace.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :refactorex,
+      app: :refactorex_workspace,
       version: "0.1.0",
       elixir: "~> 1.13",
-      start_permanent: Mix.env() == :prod,
-      elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
-  def application do
-    [
-      extra_applications: [:logger],
-      mod: {Refactorex.Application, []}
-    ]
-  end
+  def application, do: [extra_applications: []]
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp deps, do: [{:credo, "~> 1.7", only: [:dev, :test], runtime: false}]
 
-  defp deps do
+  defp aliases do
     [
-      {:gen_lsp, "~> 0.3.0"},
-      {:sourceror, "~> 1.7"},
-      {:credo, "~> 1.7.0", only: [:test, :dev], runtime: false}
+      "test.all": ["cmd --cd refactorex mix test", "cmd --cd refactorex_lsp mix test"],
+      "deps.all": ["cmd --cd refactorex mix deps.get", "cmd --cd refactorex_lsp mix deps.get"],
+      "credo.all": ["credo --config-file .credo.exs"],
+      "check.all": ["format.all --check-formatted", "credo.all --strict", "test.all"]
     ]
   end
 end

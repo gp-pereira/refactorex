@@ -13,19 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # - name: Setup elixir
-      #   uses: erlef/setup-elixir@v1
-      #   with:
-      #     elixir-version: 1.13.4
-      #     otp-version: 24.3.4
-
-      # - name: Install elixir deps
-      #   run: mix deps.get
-
       - name: Move necessary files
         run: |
           mkdir extensions/vscode/refactorex
-          cp -r lib mix.exs mix.lock extensions/vscode/refactorex
+          cp -r refactorex/lib refactorex/mix.exs refactorex/mix.lock extensions/vscode/refactorex
+          mkdir extensions/vscode/refactorex_lsp
+          cp -r refactorex_lsp/lib refactorex_lsp/mix.exs refactorex_lsp/mix.lock extensions/vscode/refactorex_lsp
           cp README.md LICENSE.md extensions/vscode
 
       - name: Install node deps

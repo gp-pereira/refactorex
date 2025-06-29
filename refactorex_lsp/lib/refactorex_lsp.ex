@@ -1,4 +1,4 @@
-defmodule Refactorex do
+defmodule RefactorexLSP do
   use GenLSP
 
   alias GenLSP.Requests.{
@@ -17,12 +17,15 @@ defmodule Refactorex do
     TextDocumentDidClose
   }
 
+  alias Refactorex.{
+    NameCache,
+    Parser,
+    Refactor
+  }
+
   alias __MODULE__.{
     Diff,
     Logger,
-    NameCache,
-    Parser,
-    Refactor,
     Response
   }
 

@@ -13,7 +13,7 @@ let client: LanguageClient;
 let server: ChildProcess;
 
 export async function activate(context: ExtensionContext) {
-	const serverPath = context.asAbsolutePath("refactorex");
+	const serverPath = context.asAbsolutePath("refactorex_lsp");
 
 	client = new LanguageClient(
 		"refactorex",
@@ -93,7 +93,7 @@ function startServer(serverPath: string, port: number): ChildProcess {
 			`cd ${serverPath} &&`,
 			`elixir --sname undefined -S`,
 			`mix run --no-halt -e`,
-			`"Application.ensure_all_started(:refactorex)"`,
+			`"Application.ensure_all_started(:refactorex_lsp)"`,
 			`-- --port ${port}`,
 		].join(" "),
 		(error, stdout, stderr) => {
