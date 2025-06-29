@@ -15,8 +15,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         elixir_otp:
-          - { elixir: 1.13, otp: 22 }
-          - { elixir: 1.14, otp: 23 }
+          - { elixir: 1.13, otp: 24 }
+          - { elixir: 1.14, otp: 24 }
           - { elixir: 1.15, otp: 24 }
           - { elixir: 1.16, otp: 25 }
           - { elixir: 1.17, otp: 26 }
