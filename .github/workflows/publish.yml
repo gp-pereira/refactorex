@@ -56,10 +56,9 @@ jobs:
       - name: Install Hex
         run: mix local.hex --force
 
-      - name: Update version in mix.exs
-        run: |
-          sed -i 's/version: "[^"]*"/version: "${{ github.ref_name }}"/' refactorex/mix.exs
-          cat refactorex/mix.exs
+      # - name: Update version in mix.exs
+      #   run: |
+      #     sed -i 's/version: "[^"]*"/version: "${{ github.ref_name }}"/' refactorex/mix.exs
           
       - name: Publish to Hex
         env:
