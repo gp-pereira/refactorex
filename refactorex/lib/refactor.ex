@@ -36,7 +36,7 @@ defmodule Refactorex.Refactor do
       def execute(zipper, selection_or_line) do
         zipper
         |> Z.traverse_while(false, &visit(&1, &2, selection_or_line, true))
-        |> then(fn {%{node: node}, true} -> Sourceror.to_string(node) end)
+        |> then(fn {%{node: node}, can_refactor?} -> if can_refactor?, do: node end)
       end
 
       defp visit(zipper, false, selection_or_line, refactor?) do
@@ -106,12 +106,20 @@ defmodule Refactorex.Refactor do
     __MODULE__.Variable.RenameVariable
   ]
 
-  def available_refactorings(zipper, selection_or_line, modules \\ @refactors) do
+  def available_refactorings(zipper, selection_or_line, execute? \\ false, modules \\ @refactors) do
     __MODULE__
     |> Task.Supervisor.async_stream_nolink(modules, fn module ->
-      if module.available?(zipper, selection_or_line),
-        do: module.refactoring(),
-        else: nil
+      cond do
+        execute? ->
+          if refactored = module.execute(zipper, selection_or_line),
+            do: module.refactoring(refactored)
+
+        module.available?(zipper, selection_or_line) ->
+          module.refactoring()
+
+        true ->
+          nil
+      end
     end)
     |> Enum.reduce([], fn
       {:ok, nil}, refactorings ->
@@ -130,17 +138,19 @@ defmodule Refactorex.Refactor do
 
     zipper
     |> module.execute(selection_or_line)
+    |> Sourceror.to_string()
     |> module.refactoring()
   end
 
   def rename_available?(zipper, selection),
-    do: length(available_refactorings(zipper, selection, @renamers)) == 1
+    do: length(available_refactorings(zipper, selection, false, @renamers)) == 1
 
   def rename(zipper, selection, new_name) do
-    [%{module: module}] = available_refactorings(zipper, selection, @renamers)
+    [%{module: module}] = available_refactorings(zipper, selection, false, @renamers)
 
     zipper
     |> module.execute(selection)
+    |> Sourceror.to_string()
     |> String.replace("#{placeholder()}", new_name)
     |> module.refactoring()
   end

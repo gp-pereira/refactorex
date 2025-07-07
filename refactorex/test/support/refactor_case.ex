@@ -30,7 +30,7 @@ defmodule Refactorex.RefactorCase do
 
       assert true == module.available?(zipper, selection_or_line)
 
-      refactored = module.execute(zipper, selection_or_line)
+      refactored = module.execute(zipper, selection_or_line) |> Sourceror.to_string()
 
       if unquote(raw?) do
         assert Sourceror.parse_string!(expected) == Sourceror.parse_string!(refactored)
