@@ -1,4 +1,4 @@
-name: Publish VS Code extension
+name: Publish Refactorex
 
 on: 
   push:
@@ -6,8 +6,8 @@ on:
       - '**'
 
 jobs:
-  publish:
-    name: Publish 
+  vscode:
+    name: Publish VS Code extension
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,3 +39,32 @@ jobs:
           registryUrl: https://marketplace.visualstudio.com
           baseContentUrl: https://github.com/gp-pereira/refactorex/blob/main/
           baseImagesUrl: https://github.com/gp-pereira/refactorex/blob/main/
+  
+  hex: 
+    name: Publish Hex package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: 1.13
+          otp-version: 24
+
+      - name: Install Hex
+        run: mix local.hex --force
+
+      - name: Update version in mix.exs
+        run: |
+          sed -i 's/version: "[^"]*"/version: "${{ github.ref_name }}"/' refactorex/mix.exs
+          
+      - name: Publish to Hex
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: |
+          cd refactorex
+          mix do deps.get, compile
+          mix hex.publish package --yes
+     

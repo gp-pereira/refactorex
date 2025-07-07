@@ -8,9 +8,13 @@ defmodule Refactorex.MixProject do
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
+      description: description(),
+      package: package(),
       deps: deps()
     ]
   end
+
+  defp description(), do: "Elixir source code refactoring"
 
   def application do
     [
@@ -23,4 +27,12 @@ defmodule Refactorex.MixProject do
   defp elixirc_paths(_), do: ["lib"]
 
   defp deps, do: [{:sourceror, "~> 1.7"}]
+
+  defp package() do
+    [
+      files: ~w(lib),
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/gp-pereira/refactorex"}
+    ]
+  end
 end
