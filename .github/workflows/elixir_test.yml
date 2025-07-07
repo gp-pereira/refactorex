@@ -33,9 +33,9 @@ jobs:
           otp-version: ${{ matrix.elixir_otp.otp }}
 
       - name: Install dependencies
-        run: mix deps.get
+        run: mix deps.all
 
       - name: Run tests
-        run: mix test
+        run: mix test.all
 
 
