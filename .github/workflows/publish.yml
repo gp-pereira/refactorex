@@ -1,44 +1,44 @@
 name: Publish Refactorex
 
 on: 
-  - push
-    # tags:
-    #   - '**'
+  push:
+    tags:
+      - '**'
 
 jobs:
-  # vscode:
-  #   name: Publish 
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
+  vscode:
+    name: Publish VS Code extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-  #     - name: Move necessary files
-  #       run: |
-  #         mkdir extensions/vscode/refactorex
-  #         cp -r refactorex/lib refactorex/mix.exs refactorex/mix.lock extensions/vscode/refactorex
-  #         mkdir extensions/vscode/refactorex_lsp
-  #         cp -r refactorex_lsp/lib refactorex_lsp/mix.exs refactorex_lsp/mix.lock extensions/vscode/refactorex_lsp
-  #         cp README.md LICENSE.md extensions/vscode
+      - name: Move necessary files
+        run: |
+          mkdir extensions/vscode/refactorex
+          cp -r refactorex/lib refactorex/mix.exs refactorex/mix.lock extensions/vscode/refactorex
+          mkdir extensions/vscode/refactorex_lsp
+          cp -r refactorex_lsp/lib refactorex_lsp/mix.exs refactorex_lsp/mix.lock extensions/vscode/refactorex_lsp
+          cp README.md LICENSE.md extensions/vscode
 
-  #     - name: Install node deps
-  #       run: npm install --prefix extensions/vscode
+      - name: Install node deps
+        run: npm install --prefix extensions/vscode
 
-  #     - name: Update package.json version
-  #       uses: maxgfr/github-change-json@main
-  #       with:
-  #         key: 'version'
-  #         value: '${{ github.ref_name }}'
-  #         path: extensions/vscode/package.json
+      - name: Update package.json version
+        uses: maxgfr/github-change-json@main
+        with:
+          key: 'version'
+          value: '${{ github.ref_name }}'
+          path: extensions/vscode/package.json
 
-  #     - name: Publish to Visual Studio Marketplace
-  #       uses: HaaLeo/publish-vscode-extension@v2
-  #       with:
-  #         packagePath: extensions/vscode
-  #         pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-  #         registryUrl: https://marketplace.visualstudio.com
-  #         baseContentUrl: https://github.com/gp-pereira/refactorex/blob/main/
-  #         baseImagesUrl: https://github.com/gp-pereira/refactorex/blob/main/
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          packagePath: extensions/vscode
+          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+          baseContentUrl: https://github.com/gp-pereira/refactorex/blob/main/
+          baseImagesUrl: https://github.com/gp-pereira/refactorex/blob/main/
   
   hex: 
     name: Publish Hex package
@@ -56,9 +56,9 @@ jobs:
       - name: Install Hex
         run: mix local.hex --force
 
-      # - name: Update version in mix.exs
-      #   run: |
-      #     sed -i 's/version: "[^"]*"/version: "${{ github.ref_name }}"/' refactorex/mix.exs
+      - name: Update version in mix.exs
+        run: |
+          sed -i 's/version: "[^"]*"/version: "${{ github.ref_name }}"/' refactorex/mix.exs
           
       - name: Publish to Hex
         env:
