@@ -61,5 +61,6 @@ jobs:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: |
           cd refactorex
+          mix do deps.get, compile
           mix hex.publish package --yes
      
