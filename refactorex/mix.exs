@@ -30,7 +30,7 @@ defmodule Refactorex.MixProject do
 
   defp package() do
     [
-      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
+      files: ~w(lib),
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/gp-pereira/refactorex"}
     ]
