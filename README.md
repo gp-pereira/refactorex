@@ -18,6 +18,9 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | `alias` | [Merge aliases](#alias-merge-aliases) | selection | refactor (`ctrl`+`.`) |
 | `alias` | [Sort nested aliases](#alias-sort-nested-aliases) | line | refactor (`ctrl`+`.`) |
 | | | |
+| `case` | [Convert from with](#case-convert-from-with) | line | refactor (`ctrl`+`.`) |
+| `case` | [Convert to with](#case-convert-to-with) | line | refactor (`ctrl`+`.`) |
+| | | |
 | `constant` | [Extract constant](#constant-extract-constant) | selection | refactor (`ctrl`+`.`) |
 | `constant` | [Inline constant](#constant-inline-constant) | selection | refactor (`ctrl`+`.`) |
 | `constant` | [Rename constant](#constant-rename-constant) | at symbol | rename (`F2`) |
@@ -112,6 +115,34 @@ You can check all supported editors in our [installation guide](INSTALLATION.md)
 | Description | Sort all nested `aliases` alphabetically |
 | Target | Line of `alias` with unsorted nested `aliases` |
 | Example | ![Example](assets/examples/alias/sort_nested_aliases.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Case: convert from with
+
+| | |
+|-|-|
+| Description | Convert `with` statement to `case` statement |
+| Target | Line of `with` statement |
+| Inverse of | [Convert to with](#case-convert-to-with) |
+| Notes | `with` statement cannot have multiple clauses |
+| Example | ![Example](assets/examples/case/convert_from_with.gif?raw=true) |
+
+[▲ top](#available-refactorings)
+
+<br>
+
+### Case: convert to with
+
+| | |
+|-|-|
+| Description | Convert `case` statement to `with` statement |
+| Target | Line of `case` statement |
+| Inverse of | [Convert from with](#case-convert-from-with) |
+| Notes | `case` statement cannot have an assignment in the expression |
+| Example | ![Example](assets/examples/case/convert_to_with.gif?raw=true) |
 
 [▲ top](#available-refactorings)
 
